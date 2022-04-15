@@ -1,17 +1,16 @@
 interface WordUse {
-  dateAttested?: number
   event?: 'dated' | 'obsolete'
-  example?: string
+  examples?: string[]
   meaning?: string
   useId: number
 }
 
 interface Word {
-  dateAttested?: number
+  date?: number
   id: number
   inflectionType?: string
-  laterDevelopments: object[]
-  partOfSpeech: 'noun' | 'verb' | 'adjective' | 'postposition' | 'adverb'
+  laterDevelopments: Partial<Word>[]
+  partOfSpeech: 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
   use: WordUse[]
   word: string
 }
@@ -20,28 +19,28 @@ const CHARS: Word[] = [
   {
     id: 1,
     word: 'kapcsos',
-    partOfSpeech: 'adjective',
+    partOfSpeech: 'melléknév',
     inflectionType: '-osADJ',
     use: [
       {
         useId: 1,
         meaning: 'Olyan <tárgy, eszköz>, amelyen kapocs van.',
-        example: 'kapcsos ruha',
+        examples: ['kapcsos ruha', 'kapcsos pénztárca'],
       },
       {
         useId: 2,
         meaning: 'Kapocs alakú.',
-        example: 'kapcsos zárójel',
+        examples: ['kapcsos zárójel'],
       },
     ],
     laterDevelopments: [
       {
+        date: 2053,
         use: [
           {
             useId: 3,
             meaning: '<Vmivel> kapcsolatos.',
-            example: 'az örökléssel kapcsos ügyek',
-            dateAttested: 2053,
+            examples: ['az örökléssel kapcsos ügyek'],
           },
         ],
       },

@@ -5,3 +5,18 @@
   justify-content: center;
   align-items: center;
 }
+
+.word-overview-container {
+  height: 5400px;
+}
+
+.word-overview-card {
+  width: 100%;
+  max-width: 640px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.year {
+  margin: 100px 0;
+}

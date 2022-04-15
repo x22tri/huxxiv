@@ -1,5 +1,4 @@
 .App {
-  /* text-align: center; */
   background-color: #f5e5dd;
   min-height: 100vh;
   color: #380d07;
@@ -7,19 +6,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
-}
-
-.Form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.Form.Label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .search-icon {
