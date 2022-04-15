@@ -2,27 +2,31 @@ import { useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
+import { Search } from 'react-bootstrap-icons'
 
-import CHARS from './CHARS'
+import { Word, CHARS } from './CHARS'
+import SearchResults from './SearchResults'
 import './App.css'
 
-import { Search } from 'react-bootstrap-icons'
+type ErrorMessage = string
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchResult, setSearchResult] = useState<
+    Word | ErrorMessage | undefined
+  >()
 
   const findWord = (word: string): void => {
     let foundWord = CHARS.find((element) => element.word === word)
-    if (foundWord) {
-      console.log(foundWord)
-    } else {
-      console.log('A szó nem található.')
-    }
+    foundWord
+      ? setSearchResult(foundWord)
+      : setSearchResult('A szó nem található az adatbázisban.')
   }
 
   return (
     <div className='App'>
       <Form
+        className='search-form'
         onSubmit={(event) => {
           event.preventDefault()
           findWord(searchTerm)
@@ -45,8 +49,10 @@ const App = () => {
           A szót szótári alakban add meg. (Igéknél ez az E/3 alak.)
         </Form.Text>
       </Form>
+      {searchResult && <SearchResults {...{ searchResult }} />}
     </div>
   )
 }
 
+export type { ErrorMessage }
 export default App

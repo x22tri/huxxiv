@@ -1,9 +1,27 @@
-const CHARS = [
+interface WordUse {
+  dateAttested?: number
+  event?: 'dated' | 'obsolete'
+  example?: string
+  meaning?: string
+  useId: number
+}
+
+interface Word {
+  dateAttested?: number
+  id: number
+  inflectionType?: string
+  laterDevelopments: object[]
+  partOfSpeech: 'noun' | 'verb' | 'adjective' | 'postposition' | 'adverb'
+  use: WordUse[]
+  word: string
+}
+
+const CHARS: Word[] = [
   {
     id: 1,
     word: 'kapcsos',
     partOfSpeech: 'adjective',
-    declensionType: '-osADJ',
+    inflectionType: '-osADJ',
     use: [
       {
         useId: 1,
@@ -18,12 +36,12 @@ const CHARS = [
     ],
     laterDevelopments: [
       {
-        dateAttested: 2053,
         use: [
           {
             useId: 3,
             meaning: '<Vmivel> kapcsolatos.',
             example: 'az örökléssel kapcsos ügyek',
+            dateAttested: 2053,
           },
         ],
       },
@@ -31,4 +49,5 @@ const CHARS = [
   },
 ]
 
-export default CHARS
+export type { Word }
+export { CHARS }
