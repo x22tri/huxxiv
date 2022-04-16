@@ -7,11 +7,7 @@ import './AppNavbar.css'
 
 const AppNavbar = ({ wordSearcher }: { wordSearcher: JSX.Element }) => {
   return (
-    <Navbar
-      fixed='top'
-      className='d-flex flex-nowrap border-bottom'
-      id='app-navbar'
-    >
+    <Navbar fixed='top' className='d-flex flex-nowrap' id='app-navbar'>
       <Container fluid>
         <Col>
           <Navbar.Brand href='/'>

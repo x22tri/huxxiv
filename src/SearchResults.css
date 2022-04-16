@@ -7,9 +7,9 @@
 
 .word-overview-container {
   height: 5400px;
+  width: 100%;
   background-color: #fefefe;
-  /* margin: -10px;
-  padding: 10px; */
+  padding-top: 70px;
 }
 
 .word-overview-card {
@@ -17,8 +17,20 @@
   max-width: 640px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 1;
 }
 
 .year {
-  margin: 100px 0;
+  margin-bottom: 475px;
+}
+
+hr {
+  margin: 0 !important;
+  z-index: 0;
+}
+
+.scroll-down-prompter {
+  width: 100%;
+  justify-content: center;
+  display: flex;
 }
