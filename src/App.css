@@ -8,16 +8,12 @@
   align-items: center;
 }
 
-.search-icon {
-  display: flex;
-}
-
 #search-button {
-  background-color: #873a92;
-  border-color: #6f2978;
+  background-color: #30703b;
+  border-color: #266330;
 }
 
 #search-button:hover {
-  background-color: #a65daf;
-  border-color: #934c9c;
+  background-color: #3d8e4a;
+  border-color: #30703b;
 }
