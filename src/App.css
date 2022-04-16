@@ -1,11 +1,13 @@
 .App {
-  background-color: #f5e5dd;
-  min-height: 100vh;
-  color: #380d07;
-  padding: 10px;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+#main-page-container {
+  background-color: #1f2041;
+  min-height: 100vh;
+  color: #f6f6f6;
 }
 
 #search-button {

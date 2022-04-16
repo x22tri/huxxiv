@@ -87,6 +87,7 @@ const SearchResults = ({
 }: {
   searchResult: Word | ErrorMessage
 }) => {
+  console.log(searchResult)
   return isErrorMessage(searchResult) ? (
     <ErrorField error={searchResult} />
   ) : (

@@ -1,13 +1,15 @@
 .error-field {
+  min-height: 100vh;
   display: flex;
-  width: 100%;
-  margin: auto;
   justify-content: center;
   align-items: center;
 }
 
 .word-overview-container {
   height: 5400px;
+  background-color: #fefefe;
+  /* margin: -10px;
+  padding: 10px; */
 }
 
 .word-overview-card {

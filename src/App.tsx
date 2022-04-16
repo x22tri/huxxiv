@@ -1,12 +1,8 @@
 import { useState, Dispatch, SetStateAction } from 'react'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
-import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
-import Row from 'react-bootstrap/Row'
 import { Search } from 'react-bootstrap-icons'
 
 import { Word, CHARS } from './CHARS'
@@ -37,13 +33,14 @@ const WordSearcher = ({
 
   return (
     <Form
+      className='search-form'
       onSubmit={(event) => {
         event.preventDefault()
         findWord(searchTerm)
       }}
     >
       {!navbarView && (
-        <Form.Label>
+        <Form.Label className='mt-5'>
           Keress rá egy magyar szóra, hogy megtudd, hogyan fog változni a
           következő 500 évben!
         </Form.Label>
@@ -58,7 +55,7 @@ const WordSearcher = ({
         </Button>
       </InputGroup>
       {!navbarView && (
-        <Form.Text className='text-muted'>
+        <Form.Text className='text-white-50'>
           A szót szótári alakban add meg. (Igéknél ez az E/3 alak.)
         </Form.Text>
       )}
@@ -75,7 +72,14 @@ const App = () => {
   return (
     <div className='App'>
       {!searchResult ? (
-        <WordSearcher {...{ searchTerm, setSearchTerm, setSearchResult }} />
+        <Container
+          fluid
+          className='d-flex flex-column align-items-center p-2'
+          id='main-page-container'
+        >
+          <img src={logo} alt='Logó' height='120' />
+          <WordSearcher {...{ searchTerm, setSearchTerm, setSearchResult }} />
+        </Container>
       ) : (
         <>
           <AppNavbar
