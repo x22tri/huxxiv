@@ -1,12 +1,12 @@
 interface WordUse {
-  event?: 'dated' | 'obsolete'
+  event?: 'dated' | 'obsolete' // A dated word shows a 'dated' indicator. An obsolete one is removed from the card altogether.
   examples?: string[]
   meaning?: string
   useId: number
 }
 
 interface LaterDevelopments extends Partial<Word> {
-  laterDevelopments?: never
+  laterDevelopments?: never // Recursion is not allowed.
 }
 
 interface Word {
@@ -46,11 +46,17 @@ const CHARS: Word[] = [
             meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
             examples: ['az örökléssel kapcsos ügyek'],
           },
+          {
+            useId: 1,
+            // meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
+            // examples: ['az örökléssel kapcsos ügyek'],
+            event: 'obsolete',
+          },
         ],
       },
     ],
   },
 ]
 
-export type { LaterDevelopments, Word }
+export type { LaterDevelopments, Word, WordUse }
 export { CHARS }

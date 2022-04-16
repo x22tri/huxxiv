@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Stack from 'react-bootstrap/Stack'
 
-import { LaterDevelopments, Word } from './CHARS'
+import { LaterDevelopments, Word, WordUse } from './CHARS'
 import { ErrorMessage } from './App'
 import './SearchResults.css'
 
@@ -47,9 +47,10 @@ const WordOverview = ({
       if (scrollDirection === 'down') {
         let newDevelopments: LaterDevelopments[] =
           word.laterDevelopments.filter(
-            (development) => development.date && development.date <= currentYear
-            // &&
-            // development.date !== wordState.latestUpdate
+            (development) =>
+              development.date &&
+              development.date <= currentYear &&
+              development.date !== wordState.latestUpdate
           )
         if (!!newDevelopments.length) {
           newDevelopments.forEach((development) => {
@@ -60,13 +61,36 @@ const WordOverview = ({
                 let attribute =
                   development[property as keyof typeof development]
                 // Arrays are merged with the word state's current arrays.
-                if (Array.isArray(attribute)) {
+                if (property === 'use' && Array.isArray(attribute)) {
                   attribute.forEach((element) => {
-                    let nestedAttribute =
-                      wordState[property as keyof typeof wordState]
-                    setWordState({ ...wordState, [property]: [element] })
-                    // console.log(property)
-                    console.log(wordState[property as keyof typeof wordState])
+                    let nestedAttribute = wordState[
+                      property as keyof typeof wordState
+                    ] as WordUse[]
+
+                    console.log(element)
+
+                    // Find updates to uses already present on the card.
+                    let foundItemToUpdate = nestedAttribute.find(
+                      (use) => use.useId === element.useId
+                    )
+                    if (foundItemToUpdate) {
+                      // Obsolete words are removed from the card.
+                      if (element.event === 'obsolete') {
+                        setWordState((prevState) => ({
+                          ...prevState,
+                          [property]: [
+                            ...nestedAttribute.filter(
+                              (item) => item.useId !== foundItemToUpdate!.useId
+                            ),
+                          ],
+                        }))
+                      }
+                    } else {
+                      setWordState((prevState) => ({
+                        ...prevState,
+                        [property]: [...(nestedAttribute || []), element],
+                      }))
+                    }
                   })
                 } else {
                   console.log('misc')
