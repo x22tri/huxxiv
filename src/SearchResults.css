@@ -20,6 +20,11 @@
   z-index: 1;
 }
 
+.list-item-tiny-text {
+  /* font-size: 1rem; */
+  margin-right: 4px;
+}
+
 .year {
   margin-bottom: 475px;
 }

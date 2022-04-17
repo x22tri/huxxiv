@@ -53,10 +53,10 @@ const CHARS: Word[] = [
             useId: 1,
             meaning: 'teszt',
           },
-          { useId: 4, event: 'dated' },
+          // { useId: 4, event: 'dated' },
           {
             useId: 2,
-            event: 'obsolete',
+            event: 'dated',
           },
         ],
         word: 'kapcsʚs',

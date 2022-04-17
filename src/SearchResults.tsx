@@ -36,6 +36,10 @@ const WordOverview = ({
   // On upscrolls where new development dates (-1) are passed, these developments are removed.
   const checkForDevelopmentsPassed = useCallback(
     (scrollDirection: 'up' | 'down') => {
+      // To-Do: implement upscrolls.
+      // All "previous states" (the state of the preceding "era") should probably be saved in state as an array
+      // and should be restored (as length - 1th element of array) when the corresponding dates are passed.
+
       // let developmentsPassed: Partial<Word>[] = word.laterDevelopments.filter(
       //   (development) =>
       //     development.date ===
@@ -62,11 +66,13 @@ const WordOverview = ({
             const merged = merger(
               JSON.parse(JSON.stringify(wordState)),
               development
-            ) as any as WordState
+            ) as WordState
 
             setWordState(merged)
           })
         }
+      } else {
+        //To-Do: scrolldirection up code
       }
     },
     [currentYear, word.laterDevelopments, wordState]
@@ -98,29 +104,41 @@ const WordOverview = ({
         position: 'fixed',
       }}
     >
-      <Card.Body>
-        <Card.Title as='h3'>{wordState.word}</Card.Title>
-        <Card.Subtitle className='mb-2 text-muted'>
+      <Card.Body className='p-0'>
+        <Card.Title as='h3' className='px-3 pt-3'>
+          {wordState.word}
+        </Card.Title>
+        <Card.Subtitle className='px-3 pb-3 text-muted'>
           {wordState.partOfSpeech}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
-          {wordState.use.map(element => {
-            // console.log(element)
-
-            return (
-              <ListGroup.Item as='li' className='fs-5' key={element.useId}>
-                <>
-                  {element.meaning}
-                  {element.examples &&
-                    element.examples.map((example, index) => (
-                      <div className='text-muted fs-6' key={index}>
-                        {example}
-                      </div>
-                    ))}
-                </>
+          {wordState.use.map(element =>
+            element.event === 'obsolete' ? null : (
+              <ListGroup.Item
+                as='li'
+                variant={element.event === 'dated' ? 'secondary' : undefined}
+                className='fs-5 p-3 d-flex align-items-start'
+                key={element.useId}
+              >
+                <div className='d-flex flex-column w-100 justify-content-between ms-2'>
+                  <div className='d-flex justify-content-between'>
+                    {element.meaning}
+                    {element.event === 'dated' && (
+                      <span className='list-item-tiny-text fs-6'>régies</span>
+                    )}
+                  </div>
+                  <div>
+                    {element.examples &&
+                      element.examples.map((example, index) => (
+                        <div className='text-muted fs-6' key={index}>
+                          {example}
+                        </div>
+                      ))}
+                  </div>
+                </div>
               </ListGroup.Item>
             )
-          })}
+          )}
         </ListGroup>
       </Card.Body>
     </Card>
