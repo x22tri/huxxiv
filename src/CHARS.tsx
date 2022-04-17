@@ -11,9 +11,9 @@ interface LaterDevelopments extends Partial<Word> {
 
 interface Word {
   date?: number
-  id: number
+  id?: number
   inflectionType?: string
-  laterDevelopments: LaterDevelopments[]
+  laterDevelopments?: LaterDevelopments[]
   partOfSpeech: 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
   use: WordUse[]
   word: string
@@ -46,6 +46,11 @@ const CHARS: Word[] = [
             meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
             examples: ['az örökléssel kapcsos ügyek'],
           },
+        ],
+      },
+      {
+        date: 2083,
+        use: [
           {
             useId: 1,
             // meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
