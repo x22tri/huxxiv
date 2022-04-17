@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { deepmerge, deepmergeCustom } from 'deepmerge-ts'
-import merge from 'ts-deepmerge'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Stack from 'react-bootstrap/Stack'
 
-import { LaterDevelopments, Word, WordUse } from './CHARS'
+import { Word } from './CHARS'
 import { ErrorMessage } from './App'
 import './SearchResults.css'
 
@@ -34,8 +32,6 @@ const WordOverview = ({
     ...word,
   })
 
-  // console.log(wordState.latestUpdate)
-
   // On downscrolls where new development dates are passed, these developments are added.
   // On upscrolls where new development dates (-1) are passed, these developments are removed.
   const checkForDevelopmentsPassed = useCallback(
@@ -57,135 +53,18 @@ const WordOverview = ({
               development.date > wordState.date
           )
         if (!!newDevelopments?.length) {
-          console.log(newDevelopments)
           newDevelopments.forEach(development => {
             setWordState(prevState => ({
               ...prevState,
               date: development.date!,
             }))
 
-            // let newDevelopmentMergable: WordState = development as WordState
-
-            // const stateCopy = JSON.parse(JSON.stringify(wordState))
-
             const merged = merger(
               JSON.parse(JSON.stringify(wordState)),
               development
             ) as any as WordState
 
-            // const coerced = merged
-
-            console.log(merged)
-
             setWordState(merged)
-
-            // const mergeIntoLatter = <
-            //   T extends keyof WordState,
-            //   NestedKey extends keyof T
-            // >(
-            //   firstObj: Partial<WordState> | keyof Partial<WordState>,
-            //   secondObj: WordState | keyof WordState
-            // ): void => {
-            //   Object.entries(firstObj).forEach(([key, value]) => {
-            //     if (secondObj[key as NestedKey] === undefined) {
-            //       secondObj[key] = value
-            //     } else if (typeof value === 'object') {
-            //       mergeIntoLatter(
-            //         firstObj[key as keyof typeof firstObj],
-            //         secondObj[key as keyof typeof secondObj]
-            //       )
-            //     }
-            //   })
-            // }
-            // mergeIntoLatter(development, stateCopy)
-
-            // const customDeepmerge = deepmergeCustom<WordState, LaterDevelopments>({})
-
-            // let newDevTest: Partial<WordState> = development
-
-            // const customDeepmerge = (
-            //   state: WordState,
-            //   newDev: WordState
-            // ): WordState => {
-            //   return deepmerge(state, newDev)
-            // }
-            // wordState.latestUpdate = development.date
-
-            // // const mergedDev = customDeepmerge(wordState, newDevFull)
-            // const customDeepmerge = deepmergeCustom({})
-
-            // const mergedDev = merge(stateCopy, development)
-            // console.log(mergedDev)
-
-            // const mergedDev = deepmerge(wordState, newDevFull)
-            // console.log(mergedDev)
-            // setWordState(mergedDev)
-            // console.log(mergedDev)
-            // console.log(typeof mergedDev.id)
-            // console.log(typeof wordState.id)
-
-            //   for (const property in development) {
-            //     if (property === 'date') continue
-            //     else {
-            //       let attribute =
-            //         development[property as keyof typeof development]
-            // To-Do: override word, inflectionType, etc. (strings and numbers)
-            // Arrays are merged with the word state's current arrays.
-            // if (property === 'use' && Array.isArray(attribute)) {
-            //   attribute.forEach((element) => {
-            //     let nestedAttribute = wordState[
-            //       property as keyof typeof wordState
-            //     ] as WordUse[]
-            //     console.log(element)
-            //   let findItemToUpdate = () => {
-            //     return nestedAttribute.find(
-            //         (use) => use.useId === element.useId
-            //       )
-            //   }
-            //   if (element.event === 'obsolete') {
-            //     if (findItemToUpdate() !== undefined) {
-            //       throw new Error('Hiba a bejegyzésben: nem frissíthető egy olyan értelem, amely eddig nem lett bevezetve.')
-            //     } else {
-            //     setWordState((prevState) => ({
-            //             ...prevState,
-            //             [property]: [
-            //               ...nestedAttribute.filter(
-            //                 (item) => item.useId !== findItemToUpdate()!.useId
-            //               ),
-            //             ],
-            //           }))
-            //   }
-            // }
-            // Find updates to uses already present on the card.
-            // let foundItemToUpdate = nestedAttribute.find(
-            //   (use) => use.useId === element.useId
-            // )
-            // if (foundItemToUpdate) {
-            // Obsolete words are removed from the card.
-            // if (element.event === 'obsolete') {
-            //   setWordState((prevState) => ({
-            //     ...prevState,
-            //     [property]: [...(nestedAttribute || []), element],
-            //   }))
-            // }
-            // for (const useProperty in element) {
-            // let useAttribute = element[
-            //   useProperty as keyof typeof element
-            // ]
-            // foundItemToUpdate[useProperty as keyof typeof element] = element[useProperty as keyof typeof element]
-            // }
-            // } else {
-            //   setWordState((prevState) => ({
-            //     ...prevState,
-            //     [property]: [...(nestedAttribute || []), element],
-            //   }))
-            // }
-            //     })
-            //   } else {
-            //     console.log('misc')
-            //   }
-            // }
-            // }
           })
         }
       }
@@ -204,30 +83,12 @@ const WordOverview = ({
     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop
   }, [checkForDevelopmentsPassed])
 
-  // console.log(currentYear)
-
-  // console.log(wordState)
-
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll])
-
-  // console.log(scrollDirection)
-
-  // useEffect(() => {
-  //   // const scrollDirection
-
-  //   let newDevelopments: Partial<Word>[] = word.laterDevelopments.filter(
-  //     (development) => development.date === currentYear
-  //   )
-
-  //   if (newDevelopments) {
-  //     console.log(newDevelopments)
-  //   }
-  // }, [currentYear, word.laterDevelopments])
 
   return (
     <Card

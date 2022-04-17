@@ -1,8 +1,4 @@
-import { LaterDevelopments, Word, WordUse } from './CHARS'
-
-interface WordState extends Word {
-  latestUpdate: number
-}
+// This code was adapted from https://gist.github.com/mir4ef/c172583bdb968951d9e57fb50d44c3f7
 
 interface IIsObject {
   (item: any): boolean
@@ -36,33 +32,36 @@ export const merger: IDeepMerge = (
   target: IObject,
   source: IObject
 ): IObject => {
-  const result: IObject = target
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (isObject(source[key])) {
+          if (!target[key] || !isObject(target[key])) {
+            target[key] = {}
+          }
+          merger(target[key], source[key])
+        } else {
+          if (Array.isArray(target[key]) && Array.isArray(source[key])) {
+            // Concatenate the two arrays.
+            // In arrays of objects with 'arrayNameId' properties, these id's are used to update or remove elements.
+            const attributeId = `${key}Id`
 
-  if (isObject(result)) {
-    //   const len: number = sources.length;
+            // If the new development pertains to an element already present in the word entry, merge the two objects.
+            // If it's a development with a brand new attributeId, add it to the array.
+            source[key].forEach((development: any) => {
+              const alreadyPresent = target[key].find(
+                (elem: any) => elem[attributeId] === development[attributeId]
+              )
 
-    //   for (let i = 0; i < len; i += 1) {
-    // const source: any = sources[i];
-
-    if (isObject(source)) {
-      for (const key in source) {
-        if (source.hasOwnProperty(key)) {
-          if (isObject(source[key])) {
-            if (!result[key] || !isObject(result[key])) {
-              result[key] = {}
-            }
-            merger(result[key], source[key])
+              alreadyPresent
+                ? merger(alreadyPresent, development)
+                : target[key].push(development)
+            })
           } else {
-            if (Array.isArray(result[key]) && Array.isArray(source[key])) {
-              // concatenate the two arrays and remove any duplicate primitive values
-              result[key] = Array.from(new Set(result[key].concat(source[key])))
-            } else {
-              result[key] = source[key]
-            }
+            target[key] = source[key]
           }
         }
       }
-      // }
     }
   }
 

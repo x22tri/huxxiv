@@ -19,6 +19,9 @@ interface Word {
   word: string
 }
 
+const idDictionary = new Map()
+idDictionary.set('use', 'useId')
+
 const CHARS: Word[] = [
   {
     id: 1,
@@ -46,15 +49,23 @@ const CHARS: Word[] = [
             meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
             examples: ['az örökléssel kapcsos ügyek'],
           },
+          {
+            useId: 1,
+            meaning: 'teszt',
+          },
+          { useId: 4, event: 'dated' },
+          {
+            useId: 2,
+            event: 'obsolete',
+          },
         ],
+        word: 'kapcsʚs',
       },
       {
         date: 2083,
         use: [
           {
             useId: 1,
-            // meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
-            // examples: ['az örökléssel kapcsos ügyek'],
             event: 'obsolete',
           },
         ],
