@@ -20,10 +20,6 @@
   z-index: 1;
 }
 
-.list-item-tiny-text {
-  margin-right: 4px;
-}
-
 .year {
   margin-bottom: 475px;
 }
@@ -46,12 +42,4 @@ hr {
   to {
     background: #fff;
   }
-}
-.flash {
-  animation: yellow-fade 0.5s ease-in-out 0s;
-}
-
-.keyword:only-child {
-  color: red;
-  border-bottom: 2px;
 }

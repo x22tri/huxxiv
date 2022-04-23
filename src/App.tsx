@@ -5,13 +5,11 @@ import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
-import { Word, CHARS } from './CHARSV2'
-import SearchResults from './SearchResults'
-import AppNavbar from './AppNavbar'
+import { Word, CHARS } from './database/CHARSV2'
+import SearchResults from './search-results/SearchResults'
+import AppNavbar from './navbar/AppNavbar'
 import logo from './assets/hun2500logo.png'
 import './App.css'
-
-// import { CHARS } from './CHARSV2'
 
 type ErrorMessage = string
 
@@ -27,16 +25,15 @@ const WordSearcher = ({
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
-    // let foundWord = CHARS.find(element => element.word === word)
-    let foundWord = CHARS[0]
-    foundWord
-      ? setSearchResult(foundWord)
-      : setSearchResult('A szó nem található az adatbázisban.')
+    setSearchResult(
+      CHARS.find(el => el.data.find(d => 'word' in d && d.word === word)) ??
+        'A szó nem található az adatbázisban.'
+    )
   }
 
   return (
     <Form
-      className='search-form'
+      className={`search-form ${!navbarView && 'mt-5'}`}
       onSubmit={event => {
         event.preventDefault()
         findWord(searchTerm)
@@ -80,7 +77,13 @@ const App = () => {
           className='d-flex flex-column align-items-center p-2'
           id='main-page-container'
         >
-          <img src={logo} alt='Logó' height='120' />
+          <img src={logo} alt='Logó' height='120' className='mt-3' />
+          <div className='mt-4 mb-0 fs-1 noselect' id='huxxiv-name'>
+            HUXXIV
+          </div>
+          <div className='text-white-50 noselect' id='huxxiv-pinyin'>
+            [ˈhuksiv]
+          </div>
           <WordSearcher {...{ searchTerm, setSearchTerm, setSearchResult }} />
         </Container>
       ) : (

@@ -4,10 +4,19 @@
   justify-content: center;
 }
 
+.noselect {
+  user-select: none;
+}
+
 #main-page-container {
   background-color: #1f2041;
   min-height: 100vh;
   color: #f6f6f6;
+}
+
+#huxxiv-name {
+  font-family: 'Orbitron', sans-serif;
+  line-height: 100%;
 }
 
 #search-button {
