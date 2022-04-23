@@ -4,11 +4,13 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Stack from 'react-bootstrap/Stack'
 
-import { Word } from './CHARS'
+import { Word } from './CHARSV2'
 import { ErrorMessage } from './App'
 import './SearchResults.css'
 
-import merger from './merger'
+// import merger from './merger'
+
+import convertCharToState from './convertCharToState'
 
 const ErrorField = ({ error }: { error: ErrorMessage }) => {
   return <div className='error-field d-flex my-auto'>{error}</div>
@@ -23,14 +25,16 @@ const WordOverview = ({
 }) => {
   const [currentYear, setCurrentYear] = useState(2000)
 
-  interface WordState extends Word {
-    date: number
-  }
+  // interface WordState extends Word {
+  //   date: number
+  // }
 
-  const [wordState, setWordState] = useState<WordState>({
-    date: word.date || 2000,
-    ...word,
-  })
+  // const [wordState, setWordState] = useState<WordState>({
+  //   date: word.date || 2000,
+  //   ...word,
+  // })
+
+  const [wordState, setWordState] = useState<Word>(convertCharToState(word))
 
   // On downscrolls where new development dates are passed, these developments are added.
   // On upscrolls where new development dates (-1) are passed, these developments are removed.
@@ -49,33 +53,31 @@ const WordOverview = ({
       //   console.log(developmentsPassed)
       // }
       if (scrollDirection === 'down') {
-        let newDevelopments: Partial<WordState>[] | undefined =
-          word.laterDevelopments?.filter(
-            development =>
-              development.date &&
-              development.date <= currentYear &&
-              development.date > wordState.date
-          )
-        if (!!newDevelopments?.length) {
-          newDevelopments.forEach(development => {
-            setWordState(prevState => ({
-              ...prevState,
-              date: development.date!,
-            }))
-
-            const merged = merger(
-              JSON.parse(JSON.stringify(wordState)),
-              development
-            ) as WordState
-
-            setWordState(merged)
-          })
-        }
+        // let newDevelopments: Partial<WordState>[] | undefined =
+        //   word.laterDevelopments?.filter(
+        //     development =>
+        //       development.date &&
+        //       development.date <= currentYear &&
+        //       development.date > wordState.date
+        //   )
+        // if (!!newDevelopments?.length) {
+        //   newDevelopments.forEach(development => {
+        //     setWordState(prevState => ({
+        //       ...prevState,
+        //       date: development.date!,
+        //     }))
+        //     const merged = merger(
+        //       JSON.parse(JSON.stringify(wordState)),
+        //       development
+        //     ) as WordState
+        //     setWordState(merged)
+        //   })
+        // }
       } else {
         //To-Do: scrolldirection up code
       }
     },
-    [currentYear, word.laterDevelopments, wordState]
+    []
   )
 
   const handleScroll = useCallback(() => {
@@ -100,12 +102,10 @@ const WordOverview = ({
     <Card
       ref={measuredRef}
       className='word-overview-card'
-      style={{
-        position: 'fixed',
-      }}
+      style={{ position: 'fixed' }}
     >
       <Card.Body className='p-0'>
-        <Card.Title as='h3' className='px-3 pt-3'>
+        {/* <Card.Title as='h3' className='px-3 pt-3'>
           {wordState.word}
         </Card.Title>
         <Card.Subtitle className='px-3 pb-3 text-muted'>
@@ -139,7 +139,8 @@ const WordOverview = ({
               </ListGroup.Item>
             )
           )}
-        </ListGroup>
+        </ListGroup> */}
+        <div>{JSON.stringify(word)}</div>
       </Card.Body>
     </Card>
   )
@@ -158,9 +159,7 @@ const SearchResults = ({
 }) => {
   const [cardHeight, setCardHeight] = useState<number>(0)
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) {
-      setCardHeight(node.getBoundingClientRect().height)
-    }
+    if (node !== null) setCardHeight(node.getBoundingClientRect().height)
   }, [])
 
   return isErrorMessage(searchResult) ? (

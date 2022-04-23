@@ -19,8 +19,8 @@ interface Word {
   word: string
 }
 
-const idDictionary = new Map()
-idDictionary.set('use', 'useId')
+// const idDictionary = new Map()
+// idDictionary.set('use', 'useId')
 
 const CHARS: Word[] = [
   {
