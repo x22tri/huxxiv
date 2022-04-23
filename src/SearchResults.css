@@ -21,7 +21,6 @@
 }
 
 .list-item-tiny-text {
-  /* font-size: 1rem; */
   margin-right: 4px;
 }
 
@@ -38,4 +37,16 @@ hr {
   width: 100%;
   justify-content: center;
   display: flex;
+}
+
+@keyframes yellow-fade {
+  from {
+    background: #f8edb0;
+  }
+  to {
+    background: #fff;
+  }
+}
+.flash {
+  animation: yellow-fade 1s ease-in-out 0s;
 }

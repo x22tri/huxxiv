@@ -24,17 +24,7 @@ const WordOverview = ({
   word: Word
 }) => {
   const [currentYear, setCurrentYear] = useState(2000)
-
-  // interface WordState extends Word {
-  //   date: number
-  // }
-
-  // const [wordState, setWordState] = useState<WordState>({
-  //   date: word.date || 2000,
-  //   ...word,
-  // })
-
-  const [wordState, setWordState] = useState<Word>(convertCharToState(word))
+  const [wordState, setWordState] = useState(convertCharToState(word))
 
   // On downscrolls where new development dates are passed, these developments are added.
   // On upscrolls where new development dates (-1) are passed, these developments are removed.
@@ -80,14 +70,41 @@ const WordOverview = ({
     []
   )
 
+  const handleAppear = (dataObject: { appears?: [number, number] }) => {
+    if (!('appears' in dataObject)) return dataObject
+    else {
+      if (dataObject.appears && dataObject.appears[0] <= currentYear) {
+        return dataObject
+      } else return null
+    }
+  }
+
+  const handleDisappear = (dataObject: { disappears?: [number, number] }) => {
+    if (!('disappears' in dataObject)) return dataObject
+    else {
+      if (dataObject.disappears && dataObject.disappears[1] > currentYear) {
+        return null
+      } else return dataObject
+    }
+  }
+
+  const handleAppearDisappear = (dataObject: {
+    appears?: [number, number]
+    disappears?: [number, number]
+  }) =>
+    !('disappears' in dataObject) && !('appears' in dataObject)
+      ? dataObject // If the object has neither property, it should always be shown.
+      : dataObject.appears && dataObject.appears[0] > currentYear
+      ? null // If the object has an "appears" property, but we haven't reached it yet, show nothing.
+      : dataObject.disappears && dataObject.disappears[1] < currentYear
+      ? null // If the object has a "disappears" property and we've gone past it, show nothing.
+      : dataObject
+
   const handleScroll = useCallback(() => {
     let lastScrollTop = 0
-    setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-
     let scrollTop = window.scrollY || document.documentElement.scrollTop
-    scrollTop > lastScrollTop
-      ? checkForDevelopmentsPassed('down')
-      : checkForDevelopmentsPassed('up')
+    setCurrentYear(2000 + Math.floor(window.scrollY / 10))
+    checkForDevelopmentsPassed(scrollTop > lastScrollTop ? 'down' : 'up')
     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop
   }, [checkForDevelopmentsPassed])
 
@@ -105,10 +122,20 @@ const WordOverview = ({
       style={{ position: 'fixed' }}
     >
       <Card.Body className='p-0'>
-        {/* <Card.Title as='h3' className='px-3 pt-3'>
-          {wordState.word}
+        <Card.Title as='h3' className='px-3 pt-3'>
+          {wordState.map(wordObject =>
+            'word' in wordObject && handleAppearDisappear(wordObject) ? (
+              <span
+                key={wordObject.word}
+                className='flash'
+                style={{ opacity: 0.5 }}
+              >
+                {wordObject.word}
+              </span>
+            ) : null
+          )}
         </Card.Title>
-        <Card.Subtitle className='px-3 pb-3 text-muted'>
+        {/* <Card.Subtitle className='px-3 pb-3 text-muted'>
           {wordState.partOfSpeech}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
@@ -140,7 +167,7 @@ const WordOverview = ({
             )
           )}
         </ListGroup> */}
-        <div>{JSON.stringify(word)}</div>
+        <div>{JSON.stringify(wordState)}</div>
       </Card.Body>
     </Card>
   )
