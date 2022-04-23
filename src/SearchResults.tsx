@@ -23,71 +23,22 @@ const WordOverview = ({
   measuredRef: (node: HTMLDivElement | null) => void
   word: Word
 }) => {
+  // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState, setWordState] = useState(convertCharToState(word))
 
-  // On downscrolls where new development dates are passed, these developments are added.
-  // On upscrolls where new development dates (-1) are passed, these developments are removed.
-  const checkForDevelopmentsPassed = useCallback(
-    (scrollDirection: 'up' | 'down') => {
-      // To-Do: implement upscrolls.
-      // All "previous states" (the state of the preceding "era") should probably be saved in state as an array
-      // and should be restored (as length - 1th element of array) when the corresponding dates are passed.
+  // Setting up the scroll / year connection.
+  useEffect(() => {
+    const handleScroll = () =>
+      setCurrentYear(2000 + Math.floor(window.scrollY / 10))
 
-      // let developmentsPassed: Partial<Word>[] = word.laterDevelopments.filter(
-      //   (development) =>
-      //     development.date ===
-      //     (scrollDirection === 'down' ? currentYear : currentYear + 1)
-      // )
-      // if (!!developmentsPassed.length) {
-      //   console.log(developmentsPassed)
-      // }
-      if (scrollDirection === 'down') {
-        // let newDevelopments: Partial<WordState>[] | undefined =
-        //   word.laterDevelopments?.filter(
-        //     development =>
-        //       development.date &&
-        //       development.date <= currentYear &&
-        //       development.date > wordState.date
-        //   )
-        // if (!!newDevelopments?.length) {
-        //   newDevelopments.forEach(development => {
-        //     setWordState(prevState => ({
-        //       ...prevState,
-        //       date: development.date!,
-        //     }))
-        //     const merged = merger(
-        //       JSON.parse(JSON.stringify(wordState)),
-        //       development
-        //     ) as WordState
-        //     setWordState(merged)
-        //   })
-        // }
-      } else {
-        //To-Do: scrolldirection up code
-      }
-    },
-    []
-  )
-
-  const handleAppear = (dataObject: { appears?: [number, number] }) => {
-    if (!('appears' in dataObject)) return dataObject
-    else {
-      if (dataObject.appears && dataObject.appears[0] <= currentYear) {
-        return dataObject
-      } else return null
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
     }
-  }
+  }, [])
 
-  const handleDisappear = (dataObject: { disappears?: [number, number] }) => {
-    if (!('disappears' in dataObject)) return dataObject
-    else {
-      if (dataObject.disappears && dataObject.disappears[1] > currentYear) {
-        return null
-      } else return dataObject
-    }
-  }
-
+  // The function that makes obsolete elements disappear and new elements appear.
   const handleAppearDisappear = (dataObject: {
     appears?: [number, number]
     disappears?: [number, number]
@@ -100,21 +51,40 @@ const WordOverview = ({
       ? null // If the object has a "disappears" property and we've gone past it, show nothing.
       : dataObject
 
-  const handleScroll = useCallback(() => {
-    let lastScrollTop = 0
-    let scrollTop = window.scrollY || document.documentElement.scrollTop
-    setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-    checkForDevelopmentsPassed(scrollTop > lastScrollTop ? 'down' : 'up')
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop
-  }, [checkForDevelopmentsPassed])
+  // The function that calculates an element's opacity based on when it appears / disappears from the language.
+  const calculateOpacity = (dataObject: {
+    appears?: [number, number]
+    disappears?: [number, number]
+  }): number | undefined => {
+    if (!dataObject.appears && !dataObject.disappears) return 1
+    else {
+      const calculatorFunc = (start: number, end: number): number | undefined =>
+        (currentYear - start) / (end - start)
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
+      let calcResult, opacity
+
+      if (dataObject.appears) {
+        calcResult = calculatorFunc(
+          dataObject.appears[0],
+          dataObject.appears[1]
+        )
+        opacity = calcResult !== undefined && calcResult < 1 ? calcResult : 1
+      }
+
+      if (dataObject.disappears) {
+        calcResult = calculatorFunc(
+          dataObject.disappears[0],
+          dataObject.disappears[1]
+        )
+        opacity =
+          calcResult !== undefined && calcResult >= 0 ? 1 - calcResult : 1
+      }
+
+      return opacity
     }
-  }, [handleScroll])
+  }
 
+  // The main return on the WordOverview component.
   return (
     <Card
       ref={measuredRef}
@@ -128,17 +98,25 @@ const WordOverview = ({
               <span
                 key={wordObject.word}
                 className='flash'
-                style={{ opacity: 0.5 }}
+                style={{
+                  color: `rgba(0, 0, 0, ${calculateOpacity(wordObject)}`,
+                }}
               >
                 {wordObject.word}
               </span>
             ) : null
           )}
         </Card.Title>
-        {/* <Card.Subtitle className='px-3 pb-3 text-muted'>
-          {wordState.partOfSpeech}
+        <Card.Subtitle className='px-3 pb-3 text-muted'>
+          {wordState.map(wordObject =>
+            'partOfSpeech' in wordObject ? (
+              <span key={wordObject.partOfSpeech}>
+                {wordObject.partOfSpeech}
+              </span>
+            ) : null
+          )}
         </Card.Subtitle>
-        <ListGroup as='ol' variant='flush' numbered>
+        {/* <ListGroup as='ol' variant='flush' numbered>
           {wordState.use.map(element =>
             element.event === 'obsolete' ? null : (
               <ListGroup.Item
