@@ -51,6 +51,7 @@ hr {
   animation: yellow-fade 0.5s ease-in-out 0s;
 }
 
-.prevent-flash {
-  animation: none;
+.keyword:only-child {
+  color: red;
+  border-bottom: 2px;
 }

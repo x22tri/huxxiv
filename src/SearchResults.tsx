@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Stack from 'react-bootstrap/Stack'
 
-import { Word } from './CHARSV2'
+import { Word, Keyword } from './CHARSV2'
 import { ErrorMessage } from './App'
 import './SearchResults.css'
 
@@ -84,6 +84,11 @@ const WordOverview = ({
     }
   }
 
+  // TypeScript doesn't seem to allow a "Keyword[]" return value with the regular "filter" function.
+  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
+    'word' in wordObject && handleAppearDisappear(wordObject) ? wordObject : []
+  )
+
   // The main return on the WordOverview component.
   return (
     <Card
@@ -93,19 +98,18 @@ const WordOverview = ({
     >
       <Card.Body className='p-0'>
         <Card.Title as='h3' className='px-3 pt-3'>
-          {wordState.map(wordObject =>
-            'word' in wordObject && handleAppearDisappear(wordObject) ? (
-              <span
-                key={wordObject.word}
-                className='flash'
-                style={{
-                  color: `rgba(0, 0, 0, ${calculateOpacity(wordObject)}`,
-                }}
-              >
-                {wordObject.word}
-              </span>
-            ) : null
-          )}
+          {keywordList.map((wordObject, index) => (
+            <span
+              key={wordObject.word}
+              className='flash keyword'
+              style={{
+                color: `rgba(0, 0, 0, ${calculateOpacity(wordObject)}`,
+              }}
+            >
+              {index > 0 && ' / '}
+              {wordObject.word}
+            </span>
+          ))}
         </Card.Title>
         <Card.Subtitle className='px-3 pb-3 text-muted'>
           {wordState.map(wordObject =>
@@ -184,7 +188,6 @@ const SearchResults = ({
               <div key={element} className='year'>
                 {element}
                 <hr />
-                {/* {currentYear} */}
               </div>
             )
           )}
