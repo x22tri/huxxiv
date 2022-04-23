@@ -7,6 +7,7 @@ interface Changeable {
 
 interface Keyword extends Changeable {
   word: string
+  pronunciation?: string
 }
 
 interface PartOfSpeech {
@@ -31,14 +32,12 @@ const CHARS: Word[] = [
   {
     id: 1,
     data: [
-      { word: 'kapcsos', disappears: [2030, 2080] },
-      { word: 'kapcsʚs', appears: [2020, 2040] },
+      { word: 'kapcsos' },
       { partOfSpeech: 'melléknév' },
       { inflectionType: '-osADJ' },
       {
         meaning: 'Olyan <tárgy, eszköz>, amelyen kapocs van.',
         examples: ['kapcsos ruha', 'kapcsos pénztárca'],
-        disappears: [2030, 2080],
       },
       {
         meaning: 'Kapocs alakú.',
@@ -47,7 +46,7 @@ const CHARS: Word[] = [
       {
         meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
         examples: ['az örökléssel kapcsos ügyek'],
-        appears: [2060, 2100],
+        appears: [2050, 2100],
       },
     ],
   },

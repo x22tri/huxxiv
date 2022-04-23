@@ -14,6 +14,11 @@ const WordOverview = ({
   measuredRef: (node: HTMLDivElement | null) => void
   word: Word
 }) => {
+  // Setting up the extended interface.
+  // interface WordState extends Word {
+  //     pronunciation: string
+  // }
+
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState] = useState(convertCharToState(word))
@@ -121,6 +126,15 @@ const WordOverview = ({
             </React.Fragment>
           ))}
         </Card.Title>
+        <Card.Subtitle className='px-3 pb-2 text-muted'>
+          {keywordList.map((wordObject, index) => (
+            <React.Fragment key={wordObject.pronunciation}>
+              <span>
+                {index > 0 && ' / '}/{wordObject.pronunciation}/
+              </span>
+            </React.Fragment>
+          ))}
+        </Card.Subtitle>
         <Card.Subtitle className='px-3 pb-3 text-muted'>
           {wordState.map(wordObject =>
             'partOfSpeech' in wordObject ? (
