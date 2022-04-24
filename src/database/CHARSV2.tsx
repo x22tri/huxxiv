@@ -23,10 +23,20 @@ interface WordUse extends Changeable {
 }
 
 interface Phonemic {
-  phonemic: string
+  phonemic: string[]
 }
 
-type DataOptions = Keyword | PartOfSpeech | InflectionType | WordUse | Phonemic
+interface Pronunciation extends Changeable {
+  pronunciation: string
+}
+
+type DataOptions =
+  | Keyword
+  | PartOfSpeech
+  | InflectionType
+  | WordUse
+  | Phonemic
+  | Pronunciation
 
 interface Word {
   id: number
@@ -66,5 +76,6 @@ export type {
   Changeable,
   DataOptions,
   Phonemic,
+  Pronunciation,
 }
 export { CHARS }

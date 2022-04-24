@@ -82,7 +82,7 @@ const App = () => {
             HUXXIV
           </div>
           <div className='text-white-50 noselect' id='huxxiv-pinyin'>
-            [ˈhuksiv]
+            [ˈhukːsiv]
           </div>
           <WordSearcher {...{ searchTerm, setSearchTerm, setSearchResult }} />
         </Container>

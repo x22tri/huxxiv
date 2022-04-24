@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -16,7 +16,8 @@ const WordOverview = ({
 }) => {
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
-  const [wordState] = useState(convertCharToState(word))
+  const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
+  const [pronunciation, setPronunciation] = useState()
 
   // Setting up the scroll / year connection.
   useEffect(() => {
@@ -75,9 +76,7 @@ const WordOverview = ({
     }
   }
 
-  // console.log(wordState)
-
-  // TypeScript doesn't seem to allow a "Keyword[]" return value with the regular "filter" function.
+  // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
   const keywordList: Keyword[] = wordState.flatMap(wordObject =>
     'word' in wordObject && handleAppear(wordObject) ? wordObject : []
   )
@@ -102,6 +101,34 @@ const WordOverview = ({
           }`}
     </style>
   )
+
+  interface Rule {
+    target: string
+    change?: string
+    appears?: [number, number]
+    disappears?: [number, number]
+  }
+
+  const ruleDictionary: Rule[] = [
+    { target: 'ɒ', change: 'ɑ', appears: [2010, 2050] },
+    { target: 'ɒ', disappears: [2040, 2080] },
+  ]
+
+  const getPronunciation = (phonemic: Phonemic) => {
+    let initialPronunciation = phonemic.phonemic.join('')
+
+    for (let i = 0; i < phonemic.phonemic.length; i++) {
+      let phoneme = phonemic.phonemic[i]
+      for (let j = 0; j < ruleDictionary.length; j++) {
+        let rule = ruleDictionary[j]
+        if (rule.target === phoneme) {
+          console.log(handleAppear(rule))
+        }
+      }
+    }
+
+    // return
+  }
 
   // The main return on the WordOverview component.
   return (
@@ -138,11 +165,15 @@ const WordOverview = ({
           </span>
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {phonemicList.map((wordObject, index) => (
-            <span key={wordObject.phonemic}>
-              {index > 0 && ' / '}/{wordObject.phonemic}/
-            </span>
-          ))}
+          {phonemicList.map((wordObject, index) => {
+            getPronunciation(wordObject)
+            return (
+              // <span key={wordObject.phonemic.join('')}>
+              //   {index > 0 && ' / '}/{wordObject.phonemic.join('')}/
+              // </span>
+              <div>test</div>
+            )
+          })}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
