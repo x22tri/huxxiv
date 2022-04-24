@@ -1,4 +1,4 @@
-import { Word, Keyword } from '../database/CHARSV2'
+import { Word, Phonemic } from '../database/CHARSV2'
 
 // const graphPhonemeDictionary = [
 //   { a: 'ɒ' },
@@ -131,7 +131,7 @@ const graphPhonemeDictionary = [
 // graphPhonemeDictionary.set('z', 'z')
 // graphPhonemeDictionary.set('zs', 'ʒ')
 
-const convertKeywordToPhonemes = (keyword: string): string => {
+const convertKeywordToPhonemes = (keyword: string): Phonemic => {
   const lettersSortedByLength = graphPhonemeDictionary
     .map(i => i[0])
     .sort()
@@ -148,24 +148,19 @@ const convertKeywordToPhonemes = (keyword: string): string => {
     if (phoneme) phonemeArray.push(phoneme[1])
   })
 
-  return phonemeArray.join('')
+  return { phonemic: phonemeArray.join('') }
 }
 
-// interface WordState extends Word {
-//   pronunciation: string
-// }
-
 const convertCharToState = (word: Word) => {
-  word.data = word.data.map(element => {
-    if (!('word' in element)) return element
-    else
-      return {
-        ...element,
-        pronunciation: convertKeywordToPhonemes(element.word),
-      }
-  })
+  let dataWithPhonemic = word.data
+    .map(element => {
+      return !('word' in element)
+        ? element
+        : [element, convertKeywordToPhonemes(element.word)]
+    })
+    .flat()
 
-  return word.data
+  return dataWithPhonemic
 }
 
 export default convertCharToState

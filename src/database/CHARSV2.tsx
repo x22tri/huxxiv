@@ -7,7 +7,6 @@ interface Changeable {
 
 interface Keyword extends Changeable {
   word: string
-  pronunciation?: string
 }
 
 interface PartOfSpeech {
@@ -23,9 +22,15 @@ interface WordUse extends Changeable {
   examples?: string[]
 }
 
+interface Phonemic {
+  phonemic: string
+}
+
+type DataOptions = Keyword | PartOfSpeech | InflectionType | WordUse | Phonemic
+
 interface Word {
   id: number
-  data: (Keyword | PartOfSpeech | InflectionType | WordUse)[]
+  data: DataOptions[]
 }
 
 const CHARS: Word[] = [
@@ -52,5 +57,14 @@ const CHARS: Word[] = [
   },
 ]
 
-export type { Keyword, PartOfSpeech, InflectionType, WordUse, Word, Changeable }
+export type {
+  Keyword,
+  PartOfSpeech,
+  InflectionType,
+  WordUse,
+  Word,
+  Changeable,
+  DataOptions,
+  Phonemic,
+}
 export { CHARS }

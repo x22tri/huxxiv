@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
-import { Keyword, WordUse, Word } from '../database/CHARSV2'
+import { Keyword, WordUse, Word, Phonemic } from '../database/CHARSV2'
 
 import convertCharToState from '../utils/convertCharToState'
 
@@ -14,11 +14,6 @@ const WordOverview = ({
   measuredRef: (node: HTMLDivElement | null) => void
   word: Word
 }) => {
-  // Setting up the extended interface.
-  // interface WordState extends Word {
-  //     pronunciation: string
-  // }
-
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState] = useState(convertCharToState(word))
@@ -80,9 +75,15 @@ const WordOverview = ({
     }
   }
 
+  // console.log(wordState)
+
   // TypeScript doesn't seem to allow a "Keyword[]" return value with the regular "filter" function.
   const keywordList: Keyword[] = wordState.flatMap(wordObject =>
     'word' in wordObject && handleAppear(wordObject) ? wordObject : []
+  )
+
+  const phonemicList: Phonemic[] = wordState.flatMap(wordObject =>
+    'phonemic' in wordObject ? wordObject : []
   )
 
   const useList: WordUse[] = wordState.flatMap(wordObject =>
@@ -125,24 +126,23 @@ const WordOverview = ({
               </span>
             </React.Fragment>
           ))}
+          &nbsp;
+          <span className='fs-6 text-muted'>
+            {wordState.map(wordObject =>
+              'partOfSpeech' in wordObject ? (
+                <span key={wordObject.partOfSpeech}>
+                  {wordObject.partOfSpeech}
+                </span>
+              ) : null
+            )}
+          </span>
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {keywordList.map((wordObject, index) => (
-            <React.Fragment key={wordObject.pronunciation}>
-              <span>
-                {index > 0 && ' / '}/{wordObject.pronunciation}/
-              </span>
-            </React.Fragment>
+          {phonemicList.map((wordObject, index) => (
+            <span key={wordObject.phonemic}>
+              {index > 0 && ' / '}/{wordObject.phonemic}/
+            </span>
           ))}
-        </Card.Subtitle>
-        <Card.Subtitle className='px-3 pb-3 text-muted'>
-          {wordState.map(wordObject =>
-            'partOfSpeech' in wordObject ? (
-              <span key={wordObject.partOfSpeech}>
-                {wordObject.partOfSpeech}
-              </span>
-            ) : null
-          )}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
