@@ -50,29 +50,25 @@ const WordOverview = ({
   }): number | undefined => {
     if (!dataObject.appears && !dataObject.disappears) return 1
     else {
-      const calculatorFunc = (start: number, end: number): number | undefined =>
+      const minimumOpacity = 0.2
+      const type = dataObject.appears ?? dataObject.disappears
+
+      const calculatorFunc = (start: number, end: number): number =>
         (currentYear - start) / (end - start)
 
-      let calcResult, opacity
-
-      if (dataObject.appears) {
-        calcResult = calculatorFunc(
-          dataObject.appears[0],
-          dataObject.appears[1]
-        )
-        opacity = calcResult !== undefined && calcResult < 1 ? calcResult : 1
+      const clamp = (num: number, min: number, max: number, rev: boolean) => {
+        let result = !rev ? num : 1 - num
+        return result <= min ? min : result >= max ? max : result
       }
 
-      if (dataObject.disappears) {
-        calcResult = calculatorFunc(
-          dataObject.disappears[0],
-          dataObject.disappears[1]
+      if (!type) throw new Error('Hiba: a beérkező adat rossz szerkezetű.')
+      else
+        return clamp(
+          calculatorFunc(type[0], type[1]),
+          minimumOpacity,
+          1,
+          type === dataObject.disappears
         )
-        opacity =
-          calcResult !== undefined && calcResult >= 0 ? 1 - calcResult : 1
-      }
-
-      return opacity
     }
   }
 
@@ -110,9 +106,21 @@ const WordOverview = ({
   }
 
   const ruleDictionary: Rule[] = [
-    { target: 'ɒ', change: 'ɑ', appears: [2010, 2050] },
-    { target: 'ɒ', disappears: [2040, 2080] },
+    // { target: 'ɒ', change: 'ɑ', appears: [2010, 2050] },
+    {
+      target: 'ɒ',
+      change: 'ɑ',
+      appears: [2010, 2050],
+      disappears: [2040, 2080],
+    },
+    // { target: 'ɒ', disappears: [2040, 2080] },
+    // { target: 'ɑ', change: 'ä', appears: [2060, 2090]}
   ]
+
+  // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
+  // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)
+  // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
+  // 2081: main: kɑpcsos + 1 -> ɑ ~ ä (käpcsos)
 
   const getPronunciation = (phonemic: Phonemic) => {
     let initialPronunciation = phonemic.phonemic.join('')
@@ -122,12 +130,21 @@ const WordOverview = ({
       for (let j = 0; j < ruleDictionary.length; j++) {
         let rule = ruleDictionary[j]
         if (rule.target === phoneme) {
-          console.log(handleAppear(rule))
+          // console.log(handleAppear(rule))
         }
       }
     }
 
-    // return
+    // code v2:
+    // check all rules for all phonemes in Phonemic
+    // (phonemes in targets, as well as phonemes in "change" attributes with currentYear < disappears[1])
+    // for every phoneme, if it has neither an "appears" or a "disappears", display it normally
+    // if it has "disappears" but no "appears", throw error (a phoneme cannot disappear without something else taking its place?)
+    // if it has "appears", add +1 if currentYear >= appears[0] (&& currentYear < disappears[1])
+    // (i.e. if handleAppear = true)
+    // clicking on +1 displays in a separate component like "target ~ change" (e.g. "ɒ ~ ɑ") and "note" if present.
+    // if currentYear < appears[1], display new main pronunciation (replace target with change in Phonemic?)
+    // and make it the basis of new changes
   }
 
   // The main return on the WordOverview component.
@@ -171,7 +188,7 @@ const WordOverview = ({
               // <span key={wordObject.phonemic.join('')}>
               //   {index > 0 && ' / '}/{wordObject.phonemic.join('')}/
               // </span>
-              <div>test</div>
+              <div key={index}>test</div>
             )
           })}
         </Card.Subtitle>

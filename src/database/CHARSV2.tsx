@@ -53,6 +53,7 @@ const CHARS: Word[] = [
       {
         meaning: 'Olyan <tárgy, eszköz>, amelyen kapocs van.',
         examples: ['kapcsos ruha', 'kapcsos pénztárca'],
+        disappears: [2120, 2230],
       },
       {
         meaning: 'Kapocs alakú.',
