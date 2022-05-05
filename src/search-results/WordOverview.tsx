@@ -27,9 +27,15 @@ const WordOverview = ({
     'phonemic' in wordObject ? wordObject : []
   )
 
-  const [pronunciation, setPronunciation] = useState<string[]>(
-    phonemicList.map(wordObject => wordObject.phonemic.join(''))
+  // console.log(phonemicList.map(wordObject => wordObject.phonemic))
+
+  const [phonemic, setPhonemic] = useState<string[][]>(
+    phonemicList.map(wordObject => wordObject.phonemic)
   )
+
+  // const [pronunciation, setPronunciation] = useState<string[]>(
+  //   phonemicList.map(wordObject => wordObject.phonemic.join(''))
+  // )
 
   // Setting up the scroll / year connection.
   useEffect(() => {
@@ -109,7 +115,7 @@ const WordOverview = ({
 
   // console.log(phonemicList)
 
-  console.log(pronunciation)
+  // console.log(phonemic)
 
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.
@@ -139,38 +145,26 @@ const WordOverview = ({
   // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
   // 2081: main: kɑpcsos + 1 -> ɑ ~ ä (käpcsos)
 
-  const getPronunciation = (phonemic: Phonemic) => {
-    let initialPronunciation = phonemic.phonemic.join('')
-
-    // console.log(pronunciation)
+  const getPronunciation = (phonemic: string[]) => {
+    // let initialPronunciation = phonemic.join('')
+    let initialPronunciation = [...phonemic]
 
     ruleDictionary.forEach(rule => {
-      phonemic.phonemic.forEach(phoneme => {
+      initialPronunciation.map((phoneme, index, array) => {
         if (rule.target === phoneme && rule.change) {
           if (handleAppear(rule) === activeChange) {
-            let chg = initialPronunciation.replaceAll(rule.target, rule.change)
-            // console.log(pronunciation)
-            // setPronunciation(prev => [...prev, chg])
-          } else if (handleAppear(rule) === gonePast) {
-            // console.log(
-            //   initialPronunciation.replaceAll(rule.target, rule.change)
-            // )
+            initialPronunciation[index] = rule.change
+            // setPronunciation(prev => [...prev, { phonemic: chg }])
+          } else if (handleAppear(rule) === notReachedYet) {
+            initialPronunciation[index] = rule.target
           }
         }
       })
     })
 
-    ruleDictionary.forEach(rule => {
-      phonemic.phonemic.forEach(phoneme => {
-        if (rule.target === phoneme && rule.change) {
-          if (handleAppear(rule) === activeChange) {
-            let chg = initialPronunciation.replaceAll(rule.target, rule.change)
-            // console.log(pronunciation)
-            setPronunciation(prev => [...prev, chg])
-          }
-        }
-      })
-    })
+    console.log(phonemic)
+
+    return initialPronunciation.join('')
 
     // code v2:
     // check all rules for all phonemes in Phonemic
@@ -183,6 +177,12 @@ const WordOverview = ({
     // if currentYear < appears[1], display new main pronunciation (replace target with change in Phonemic?)
     // and make it the basis of new changes
   }
+
+  // useEffect(() => {
+  //   pronunciation.forEach(pron => getPronunciation(pron))
+  // }, [])
+
+  // pronunciation.forEach(pron => getPronunciation(pron))
 
   // The main return on the WordOverview component.
   return (
@@ -220,15 +220,14 @@ const WordOverview = ({
           </span>
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {/* {phonemicList.map((wordObject, index) => {
-            getPronunciation(wordObject)
+          {phonemic.map((wordObject, index) => {
             return (
               // <span key={wordObject.phonemic.join('')}>
               //   {index > 0 && ' / '}/{wordObject.phonemic.join('')}/
               // </span>
-              <div key={index}>test</div>
+              <div key={index}>{getPronunciation(wordObject)}</div>
             )
-          })} */}
+          })}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
