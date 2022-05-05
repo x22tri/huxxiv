@@ -3,9 +3,14 @@ import React, { useState, useEffect } from 'react'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
-import { Keyword, WordUse, Word, Phonemic } from '../database/CHARSV2'
+import { Keyword, WordUse, Word, Phonemic, Rule, Changeable } from '../types'
 
 import convertCharToState from '../utils/convertCharToState'
+
+const alwaysShown = 'Mindig látható'
+const notReachedYet = 'Még nincs elérve'
+const gonePast = 'Meghaladva'
+const activeChange = 'Folyamatban lévő változás'
 
 const WordOverview = ({
   measuredRef,
@@ -17,7 +22,14 @@ const WordOverview = ({
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
-  const [pronunciation, setPronunciation] = useState()
+
+  const phonemicList: Phonemic[] = wordState.flatMap(wordObject =>
+    'phonemic' in wordObject ? wordObject : []
+  )
+
+  const [pronunciation, setPronunciation] = useState<string[]>(
+    phonemicList.map(wordObject => wordObject.phonemic.join(''))
+  )
 
   // Setting up the scroll / year connection.
   useEffect(() => {
@@ -30,24 +42,25 @@ const WordOverview = ({
     }
   }, [])
 
-  // The function that makes obsolete elements disappear and new elements appear.
-  const handleAppear = (dataObject: {
-    appears?: [number, number]
-    disappears?: [number, number]
-  }) =>
-    !('disappears' in dataObject) && !('appears' in dataObject)
-      ? dataObject // If the object has neither property, it should always be shown.
+  // The function that shows the status of an element based on the current year.
+  // It is used to make obsolete elements disappear and new elements appear.
+  const handleAppear = (dataObject: Changeable) =>
+    !dataObject.appears && !dataObject.disappears
+      ? alwaysShown
       : dataObject.appears && dataObject.appears[0] > currentYear
-      ? null // If the object has an "appears" property, but we haven't reached it yet, show nothing.
+      ? notReachedYet
       : dataObject.disappears && dataObject.disappears[1] < currentYear
-      ? null // If the object has a "disappears" property and we've gone past it, show nothing.
-      : dataObject
+      ? gonePast
+      : activeChange
+
+  // An auxiliary function that calls handleAppear and returns true if the element is always shown or currently active,
+  // and false otherwise.
+  const notOutOfBounds = (dataObject: Changeable): boolean =>
+    handleAppear(dataObject) !== notReachedYet &&
+    handleAppear(dataObject) !== gonePast
 
   // The function that calculates an element's opacity based on when it appears / disappears from the language.
-  const calculateOpacity = (dataObject: {
-    appears?: [number, number]
-    disappears?: [number, number]
-  }): number | undefined => {
+  const calculateOpacity = (dataObject: Changeable): number | undefined => {
     if (!dataObject.appears && !dataObject.disappears) return 1
     else {
       const minimumOpacity = 0.2
@@ -74,19 +87,32 @@ const WordOverview = ({
 
   // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
   const keywordList: Keyword[] = wordState.flatMap(wordObject =>
-    'word' in wordObject && handleAppear(wordObject) ? wordObject : []
-  )
-
-  const phonemicList: Phonemic[] = wordState.flatMap(wordObject =>
-    'phonemic' in wordObject ? wordObject : []
+    'word' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
   )
 
   const useList: WordUse[] = wordState.flatMap(wordObject =>
-    'meaning' in wordObject && handleAppear(wordObject) ? wordObject : []
+    'meaning' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
   )
 
+  // useEffect(() => {
+  //   if (phonemicList) {
+  //     console.log(phonemicList)
+  //     phonemicList.forEach(wordObject => {
+  //       let initialPronunciation = wordObject.phonemic.join('')
+  //       console.log(wordObject)
+  //       if (!pronunciation.includes(initialPronunciation)) {
+  //         setPronunciation(prev => [...prev, initialPronunciation])
+  //       }
+  //     })
+  //   }
+  // }, [])
+
+  // console.log(phonemicList)
+
+  console.log(pronunciation)
+
   // A dynamic style attribute that shows a yellow flash when an element appears.
-  // Has to be placed next to the element, at the same level.
+  // Has to be placed next to the element (which should have the className "flash"), at the same level.
   const Flash = () => (
     <style type='text/css'>
       {`.flash {
@@ -98,22 +124,13 @@ const WordOverview = ({
     </style>
   )
 
-  interface Rule {
-    target: string
-    change?: string
-    appears?: [number, number]
-    disappears?: [number, number]
-  }
-
   const ruleDictionary: Rule[] = [
-    // { target: 'ɒ', change: 'ɑ', appears: [2010, 2050] },
     {
       target: 'ɒ',
       change: 'ɑ',
       appears: [2010, 2050],
       disappears: [2040, 2080],
     },
-    // { target: 'ɒ', disappears: [2040, 2080] },
     // { target: 'ɑ', change: 'ä', appears: [2060, 2090]}
   ]
 
@@ -125,15 +142,35 @@ const WordOverview = ({
   const getPronunciation = (phonemic: Phonemic) => {
     let initialPronunciation = phonemic.phonemic.join('')
 
-    for (let i = 0; i < phonemic.phonemic.length; i++) {
-      let phoneme = phonemic.phonemic[i]
-      for (let j = 0; j < ruleDictionary.length; j++) {
-        let rule = ruleDictionary[j]
-        if (rule.target === phoneme) {
-          // console.log(handleAppear(rule))
+    // console.log(pronunciation)
+
+    ruleDictionary.forEach(rule => {
+      phonemic.phonemic.forEach(phoneme => {
+        if (rule.target === phoneme && rule.change) {
+          if (handleAppear(rule) === activeChange) {
+            let chg = initialPronunciation.replaceAll(rule.target, rule.change)
+            // console.log(pronunciation)
+            // setPronunciation(prev => [...prev, chg])
+          } else if (handleAppear(rule) === gonePast) {
+            // console.log(
+            //   initialPronunciation.replaceAll(rule.target, rule.change)
+            // )
+          }
         }
-      }
-    }
+      })
+    })
+
+    ruleDictionary.forEach(rule => {
+      phonemic.phonemic.forEach(phoneme => {
+        if (rule.target === phoneme && rule.change) {
+          if (handleAppear(rule) === activeChange) {
+            let chg = initialPronunciation.replaceAll(rule.target, rule.change)
+            // console.log(pronunciation)
+            setPronunciation(prev => [...prev, chg])
+          }
+        }
+      })
+    })
 
     // code v2:
     // check all rules for all phonemes in Phonemic
@@ -172,6 +209,7 @@ const WordOverview = ({
           ))}
           &nbsp;
           <span className='fs-6 text-muted'>
+            {/* Maybe this could be replaced with a find function since there's only one POS? */}
             {wordState.map(wordObject =>
               'partOfSpeech' in wordObject ? (
                 <span key={wordObject.partOfSpeech}>
@@ -182,7 +220,7 @@ const WordOverview = ({
           </span>
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {phonemicList.map((wordObject, index) => {
+          {/* {phonemicList.map((wordObject, index) => {
             getPronunciation(wordObject)
             return (
               // <span key={wordObject.phonemic.join('')}>
@@ -190,7 +228,7 @@ const WordOverview = ({
               // </span>
               <div key={index}>test</div>
             )
-          })}
+          })} */}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (

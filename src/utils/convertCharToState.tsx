@@ -1,4 +1,4 @@
-import { Word, Phonemic, Pronunciation } from '../database/CHARSV2'
+import { Word, Phonemic, Pronunciation } from '../types'
 
 const graphPhonemeDictionary = [
   { letter: 'a', phoneme: 'ɒ', soundType: 'vowel' },
@@ -77,9 +77,9 @@ const convertKeywordToPhonemes = (keyword: string): Phonemic => {
   return { phonemic: phonemicResult }
 }
 
-interface PhonologicalRule {
-  rule: string
-}
+// interface PhonologicalRule {
+//   rule: string
+// }
 
 // [kɒpt͡ʃoʃ], disappear: [2010-2060]
 // [kɑpt͡ʃoʃ], appear: [2010-2040]

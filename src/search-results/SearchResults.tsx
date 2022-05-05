@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 
 import Stack from 'react-bootstrap/Stack'
 
-import { Word } from '../database/CHARSV2'
+import { Word } from '../types'
 import { ErrorMessage } from '../App'
 import WordOverview from './WordOverview'
 import './SearchResults.css'
@@ -22,7 +22,7 @@ const SearchResults = ({
 }: {
   searchResult: Word | ErrorMessage
 }) => {
-  const [cardHeight, setCardHeight] = useState<number>(0)
+  const [cardHeight, setCardHeight] = useState(0)
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node !== null) setCardHeight(node.getBoundingClientRect().height)
   }, [])
