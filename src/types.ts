@@ -49,15 +49,22 @@ interface Rule extends Changeable {
   change?: string
 }
 
+interface PhoneticVariant extends Changeable {
+  main: string
+  new?: string
+  old?: string
+}
+
 export type {
-  Keyword,
-  PartOfSpeech,
-  InflectionType,
-  WordUse,
-  Word,
   Changeable,
   DataOptions,
+  InflectionType,
+  Keyword,
+  PartOfSpeech,
   Phonemic,
+  PhoneticVariant,
   Pronunciation,
   Rule,
+  Word,
+  WordUse,
 }

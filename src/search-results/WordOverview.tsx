@@ -3,7 +3,15 @@ import React, { useState, useEffect } from 'react'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
-import { Keyword, WordUse, Word, Phonemic, Rule, Changeable } from '../types'
+import {
+  Keyword,
+  WordUse,
+  Word,
+  Phonemic,
+  PhoneticVariant,
+  Rule,
+  Changeable,
+} from '../types'
 
 import convertCharToState from '../utils/convertCharToState'
 
@@ -11,6 +19,9 @@ const alwaysShown = 'Mindig látható'
 const notReachedYet = 'Még nincs elérve'
 const gonePast = 'Meghaladva'
 const activeChange = 'Folyamatban lévő változás'
+const appearanceInProgress = 'Újonnan megjelenő elem'
+const disappearanceInProgress = 'Eltűnő elem'
+const concurrentVariants = 'Egyenértékű változatok'
 
 const WordOverview = ({
   measuredRef,
@@ -26,8 +37,6 @@ const WordOverview = ({
   const phonemicList: Phonemic[] = wordState.flatMap(wordObject =>
     'phonemic' in wordObject ? wordObject : []
   )
-
-  // console.log(phonemicList.map(wordObject => wordObject.phonemic))
 
   const [phonemic, setPhonemic] = useState<string[][]>(
     phonemicList.map(wordObject => wordObject.phonemic)
@@ -55,9 +64,13 @@ const WordOverview = ({
       ? alwaysShown
       : dataObject.appears && dataObject.appears[0] > currentYear
       ? notReachedYet
+      : dataObject.appears && dataObject.appears[1] > currentYear
+      ? appearanceInProgress
       : dataObject.disappears && dataObject.disappears[1] < currentYear
       ? gonePast
-      : activeChange
+      : dataObject.disappears && dataObject.disappears[0] < currentYear
+      ? disappearanceInProgress
+      : concurrentVariants
 
   // An auxiliary function that calls handleAppear and returns true if the element is always shown or currently active,
   // and false otherwise.
@@ -76,7 +89,7 @@ const WordOverview = ({
         (currentYear - start) / (end - start)
 
       const clamp = (num: number, min: number, max: number, rev: boolean) => {
-        let result = !rev ? num : 1 - num
+        const result = !rev ? num : 1 - num
         return result <= min ? min : result >= max ? max : result
       }
 
@@ -147,24 +160,49 @@ const WordOverview = ({
 
   const getPronunciation = (phonemic: string[]) => {
     // let initialPronunciation = phonemic.join('')
-    let initialPronunciation = [...phonemic]
+    let initialPronunciation = [...phonemic] as (string | PhoneticVariant)[]
 
     ruleDictionary.forEach(rule => {
       initialPronunciation.map((phoneme, index, array) => {
         if (rule.target === phoneme && rule.change) {
-          if (handleAppear(rule) === activeChange) {
-            initialPronunciation[index] = rule.change
-            // setPronunciation(prev => [...prev, { phonemic: chg }])
-          } else if (handleAppear(rule) === notReachedYet) {
-            initialPronunciation[index] = rule.target
+          // console.log(handleAppear(rule))
+          switch (handleAppear(rule)) {
+            case appearanceInProgress:
+              initialPronunciation[index] = {
+                main: rule.target,
+                new: rule.change,
+                appears: rule.appears,
+              }
+              break
+            case notReachedYet:
+              initialPronunciation[index] = rule.target
+              break
+            case gonePast:
+              initialPronunciation[index] = rule.change
+              break
+            case disappearanceInProgress:
+              initialPronunciation[index] = {
+                main: rule.change,
+                old: rule.target,
+                disappears: rule.disappears,
+              }
+              break
           }
         }
       })
     })
 
-    console.log(phonemic)
+    console.log(initialPronunciation)
 
-    return initialPronunciation.join('')
+    let numberOfVariants = initialPronunciation.filter(
+      phoneme => typeof phoneme === 'object'
+    ).length
+
+    return (
+      initialPronunciation
+        .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
+        .join('') + (!!numberOfVariants ? ` +${numberOfVariants}` : '')
+    ) // To-Do: make into clickable component that opens pronunciation view
 
     // code v2:
     // check all rules for all phonemes in Phonemic
