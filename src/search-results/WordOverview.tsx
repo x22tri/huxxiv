@@ -9,20 +9,13 @@ import {
   Word,
   Phonemic,
   PhoneticVariant,
-  Rule,
   Changeable,
 } from '../types'
 
+import { RULES } from '../database/RULES'
+
 import convertCharToState from '../utils/convertCharToState'
 import './WordOverview.css'
-
-const alwaysShown = 'Mindig látható'
-const notReachedYet = 'Még nincs elérve'
-const gonePast = 'Meghaladva'
-// const activeChange = 'Folyamatban lévő változás'
-const appearanceInProgress = 'Újonnan megjelenő elem'
-const disappearanceInProgress = 'Eltűnő elem'
-const concurrentVariants = 'Egyenértékű változatok'
 
 const WordOverview = ({
   measuredRef,
@@ -31,6 +24,15 @@ const WordOverview = ({
   measuredRef: (node: HTMLDivElement | null) => void
   word: Word
 }) => {
+  // Setting up localized strings.
+  const alwaysShown = 'Mindig látható'
+  const notReachedYet = 'Még nincs elérve'
+  const gonePast = 'Meghaladva'
+  // const activeChange = 'Folyamatban lévő változás'
+  const appearanceInProgress = 'Újonnan megjelenő elem'
+  const disappearanceInProgress = 'Eltűnő elem'
+  const concurrentVariants = 'Egyenértékű változatok'
+
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
@@ -42,6 +44,8 @@ const WordOverview = ({
   const [phonemic, setPhonemic] = useState<string[][]>(
     phonemicList.map(wordObject => wordObject.phonemic)
   )
+
+  const [activeRules, setActiveRules] = useState<object[]>([])
 
   // const [pronunciation, setPronunciation] = useState<string[]>(
   //   phonemicList.map(wordObject => wordObject.phonemic.join(''))
@@ -79,6 +83,15 @@ const WordOverview = ({
     handleAppear(dataObject) !== notReachedYet &&
     handleAppear(dataObject) !== gonePast
 
+  // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
+  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
+    'word' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
+  )
+
+  const useList: WordUse[] = wordState.flatMap(wordObject =>
+    'meaning' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
+  )
+
   // The function that calculates an element's opacity based on when it appears / disappears from the language.
   const calculateOpacity = (dataObject: Changeable): number | undefined => {
     if (!dataObject.appears && !dataObject.disappears) return 1
@@ -105,28 +118,6 @@ const WordOverview = ({
     }
   }
 
-  // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
-  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
-    'word' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
-  )
-
-  const useList: WordUse[] = wordState.flatMap(wordObject =>
-    'meaning' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
-  )
-
-  // useEffect(() => {
-  //   if (phonemicList) {
-  //     console.log(phonemicList)
-  //     phonemicList.forEach(wordObject => {
-  //       let initialPronunciation = wordObject.phonemic.join('')
-  //       console.log(wordObject)
-  //       if (!pronunciation.includes(initialPronunciation)) {
-  //         setPronunciation(prev => [...prev, initialPronunciation])
-  //       }
-  //     })
-  //   }
-  // }, [])
-
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.
   const Flash = () => (
@@ -140,29 +131,20 @@ const WordOverview = ({
     </style>
   )
 
-  const ruleDictionary: Rule[] = [
-    {
-      target: 'ɒ',
-      change: 'ɑ',
-      appears: [2010, 2050],
-      disappears: [2040, 2080],
-    },
-    // { target: 'ɑ', change: 'ä', appears: [2060, 2090]}
-  ]
-
   // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
   // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)
   // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
   // 2081: main: kɑpcsos + 1 -> ɑ ~ ä (käpcsos)
 
-  const getPronunciation = (phonemic: string[]) => {
-    // let initialPronunciation = phonemic.join('')
-    let initialPronunciation = [...phonemic] as (string | PhoneticVariant)[]
+  const getPronunciation = (
+    phonemic: string[]
+  ): [string[], number, object[]] => {
+    const initialPronunciation: (string | PhoneticVariant)[] = [...phonemic]
+    const actRules: object[] = []
 
-    ruleDictionary.forEach(rule => {
+    RULES.forEach(rule => {
       initialPronunciation.forEach((phoneme, index) => {
         if (rule.target === phoneme && rule.change) {
-          // console.log(handleAppear(rule))
           switch (handleAppear(rule)) {
             case appearanceInProgress:
               initialPronunciation[index] = {
@@ -170,12 +152,15 @@ const WordOverview = ({
                 new: rule.change,
                 appears: rule.appears,
               }
+              !actRules.includes(rule) && actRules.push(rule)
               break
             case notReachedYet:
               initialPronunciation[index] = rule.target
+              actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
               break
             case gonePast:
               initialPronunciation[index] = rule.change
+              actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
               break
             case disappearanceInProgress:
               initialPronunciation[index] = {
@@ -183,30 +168,20 @@ const WordOverview = ({
                 old: rule.target,
                 disappears: rule.disappears,
               }
+              !actRules.includes(rule) && actRules.push(rule)
               break
           }
         }
       })
     })
 
-    console.log(initialPronunciation)
-
-    let numberOfVariants = initialPronunciation.filter(
-      phoneme => typeof phoneme === 'object'
-    ).length
-
-    // return (
-    //   initialPronunciation
-    //     .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
-    //     .join('') + (!!numberOfVariants ? ` +${numberOfVariants}` : '')
-    // )
-    // To-Do: make into clickable component that opens pronunciation view
-
     return [
       initialPronunciation.map(phoneme =>
         typeof phoneme === 'string' ? phoneme : phoneme.main
       ),
-      numberOfVariants,
+      initialPronunciation.filter(phoneme => typeof phoneme === 'object')
+        .length, // the number of variants
+      actRules,
     ]
 
     // code v2:
@@ -220,12 +195,6 @@ const WordOverview = ({
     // if currentYear < appears[1], display new main pronunciation (replace target with change in Phonemic?)
     // and make it the basis of new changes
   }
-
-  // useEffect(() => {
-  //   pronunciation.forEach(pron => getPronunciation(pron))
-  // }, [])
-
-  // pronunciation.forEach(pron => getPronunciation(pron))
 
   // The main return on the WordOverview component.
   return (
@@ -252,7 +221,6 @@ const WordOverview = ({
           ))}
           &nbsp;
           <span className='fs-6 text-muted'>
-            {/* Maybe this could be replaced with a find function since there's only one POS? */}
             {wordState.map(wordObject =>
               'partOfSpeech' in wordObject ? (
                 <span key={wordObject.partOfSpeech}>
@@ -264,7 +232,7 @@ const WordOverview = ({
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
           {phonemic.map((wordObject, index) => {
-            let [mainPronunciation, numberOfVariants] =
+            let [mainPronunciation, numberOfVariants, actRules] =
               getPronunciation(wordObject)
             return (
               // <span key={wordObject.phonemic.join('')}>
@@ -275,7 +243,7 @@ const WordOverview = ({
                 {!!numberOfVariants && (
                   <span
                     className='number-of-variants'
-                    onClick={() => console.log('heh')}
+                    onClick={() => console.log(actRules)}
                   >{`(+${numberOfVariants})`}</span>
                 )}
               </div>

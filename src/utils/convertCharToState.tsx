@@ -69,38 +69,17 @@ const convertKeywordToPhonemes = (keyword: string): Phonemic => {
   let phonemicResult: string[] = []
   keywordBreakdownToLetters?.forEach(letter => {
     let phonemeObject = graphPhonemeDictionary.find(i => i.letter === letter)
-    if (phonemeObject) {
-      phonemicResult.push(phonemeObject.phoneme)
-    }
+    if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
   })
 
   return { phonemic: phonemicResult }
 }
-
-// interface PhonologicalRule {
-//   rule: string
-// }
-
-// [kɒpt͡ʃoʃ], disappear: [2010-2060]
-// [kɑpt͡ʃoʃ], appear: [2010-2040]
-// [kɑpt͡ʃɔʃ], appear: [2040-2040]
-// [kɑpt͡ʃɒʃ], appear: [2040-2040]
-// [käpt͡ʃɒʃ], appear: [2040-2040]
-//
 
 // 1. a - ɒ > ɑ
 // 2. o -  o > ɔ
 // 3. á - a: > æ(ː)
 // 4. o - ɔ > ɒ
 // 5. a - ɑ > ä
-
-//spec: "main" pronunciation, then +N (variants)
-//
-
-const ruleDictionary = [
-  { target: 'ɒ', change: 'ɑ', appears: [2010, 2050] },
-  { target: 'ɒ', disappears: [2040, 2080] },
-]
 
 // const convertPhonemicToPronunciation = (
 //   phonemic: Phonemic
