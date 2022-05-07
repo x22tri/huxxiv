@@ -14,11 +14,12 @@ import {
 } from '../types'
 
 import convertCharToState from '../utils/convertCharToState'
+import './WordOverview.css'
 
 const alwaysShown = 'Mindig látható'
 const notReachedYet = 'Még nincs elérve'
 const gonePast = 'Meghaladva'
-const activeChange = 'Folyamatban lévő változás'
+// const activeChange = 'Folyamatban lévő változás'
 const appearanceInProgress = 'Újonnan megjelenő elem'
 const disappearanceInProgress = 'Eltűnő elem'
 const concurrentVariants = 'Egyenértékű változatok'
@@ -126,10 +127,6 @@ const WordOverview = ({
   //   }
   // }, [])
 
-  // console.log(phonemicList)
-
-  // console.log(phonemic)
-
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.
   const Flash = () => (
@@ -163,7 +160,7 @@ const WordOverview = ({
     let initialPronunciation = [...phonemic] as (string | PhoneticVariant)[]
 
     ruleDictionary.forEach(rule => {
-      initialPronunciation.map((phoneme, index, array) => {
+      initialPronunciation.forEach((phoneme, index) => {
         if (rule.target === phoneme && rule.change) {
           // console.log(handleAppear(rule))
           switch (handleAppear(rule)) {
@@ -198,11 +195,19 @@ const WordOverview = ({
       phoneme => typeof phoneme === 'object'
     ).length
 
-    return (
-      initialPronunciation
-        .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
-        .join('') + (!!numberOfVariants ? ` +${numberOfVariants}` : '')
-    ) // To-Do: make into clickable component that opens pronunciation view
+    // return (
+    //   initialPronunciation
+    //     .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
+    //     .join('') + (!!numberOfVariants ? ` +${numberOfVariants}` : '')
+    // )
+    // To-Do: make into clickable component that opens pronunciation view
+
+    return [
+      initialPronunciation.map(phoneme =>
+        typeof phoneme === 'string' ? phoneme : phoneme.main
+      ),
+      numberOfVariants,
+    ]
 
     // code v2:
     // check all rules for all phonemes in Phonemic
@@ -259,11 +264,21 @@ const WordOverview = ({
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
           {phonemic.map((wordObject, index) => {
+            let [mainPronunciation, numberOfVariants] =
+              getPronunciation(wordObject)
             return (
               // <span key={wordObject.phonemic.join('')}>
               //   {index > 0 && ' / '}/{wordObject.phonemic.join('')}/
               // </span>
-              <div key={index}>{getPronunciation(wordObject)}</div>
+              <div key={index}>
+                <span>{mainPronunciation}</span>
+                {!!numberOfVariants && (
+                  <span
+                    className='number-of-variants'
+                    onClick={() => console.log('heh')}
+                  >{`(+${numberOfVariants})`}</span>
+                )}
+              </div>
             )
           })}
         </Card.Subtitle>

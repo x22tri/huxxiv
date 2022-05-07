@@ -1,0 +1,15 @@
+.number-of-variants {
+  font-size: 80%;
+  color: #43456d;
+  margin-left: 6px;
+  padding: 0 3px 3px;
+  background-color: #d8d9f2;
+  border-radius: 4px;
+}
+
+.number-of-variants:hover {
+  cursor: pointer;
+  background-color: #7578b3;
+  color: white;
+  transition: 0.3s;
+}
