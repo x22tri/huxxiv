@@ -15,6 +15,7 @@ import {
 import { RULES } from '../database/RULES'
 
 import convertCharToState from '../utils/convertCharToState'
+import getPronunciation from '../utils/getPronunciation'
 import './WordOverview.css'
 
 const WordOverview = ({
@@ -36,27 +37,22 @@ const WordOverview = ({
   const [currentYear, setCurrentYear] = useState(2000)
   const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
 
-  const phonemicList: Phonemic[] = wordState.flatMap(wordObject =>
-    'phonemic' in wordObject ? wordObject : []
-  )
-
-  // const [phonemic, setPhonemic] = useState<string[][]>(
-  //   phonemicList.map(wordObject => wordObject.phonemic)
-  // )
-
-  const phonemic = phonemicList.map(wordObject => wordObject.phonemic)
+  const phonemic = wordState
+    .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
+    .map(element => element.phonemic)
 
   const [activeRules, setActiveRules] = useState<object[]>([])
 
   const [pronunciation, setPronunciation] = useState<
-    (string | PhoneticVariant)[][]
-  >(
-    // phonemicList.map(wordObject => wordObject.phonemic.join(''))
-    [...phonemic]
-  )
+    {
+      pron: string[]
+      numberOfVariants: number
+    }[]
+  >(phonemic.map(elem => ({ pron: elem, numberOfVariants: 0 })))
 
   // The function that shows the status of an element based on the current year.
   // It is used to make obsolete elements disappear and new elements appear.
+  // To-Do: move to getPronunciation, make it into a hook?
   const handleAppear = useCallback(
     (dataObject: Changeable) =>
       !dataObject.appears && !dataObject.disappears
@@ -88,63 +84,12 @@ const WordOverview = ({
     'meaning' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
   )
 
-  // To-Do: convert getPron and similar functions to hooks and have the card take the state from it and just display it
-
+  //  To-Do: make this into the main hook that updates state for the card?
   // Setting up the scroll / year connection.
   useEffect(() => {
     const handleScroll = () => {
       setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-
-      const testGetPron = () => {
-        const initialPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
-          JSON.stringify(phonemic)
-        )
-
-        initialPronunciation.forEach(phonemicVariant => {
-          RULES.forEach(rule => {
-            phonemicVariant.forEach((phoneme, index) => {
-              // console.log(
-              //   'target: ' +
-              //     rule.target +
-              //     ', phoneme: ' +
-              //     phoneme +
-              //     ', change: ' +
-              //     rule.change
-              // )
-              if (rule.target === phoneme && rule.change) {
-                switch (handleAppear(rule)) {
-                  case appearanceInProgress:
-                    phonemicVariant[index] = {
-                      main: rule.target,
-                      new: rule.change,
-                      appears: rule.appears,
-                    }
-                    // !actRules.includes(rule) && actRules.push(rule)
-                    break
-                  case notReachedYet:
-                    phonemicVariant[index] = rule.target
-                    // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-                    break
-                  case gonePast:
-                    phonemicVariant[index] = rule.change
-                    // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-                    break
-                  case disappearanceInProgress:
-                    phonemicVariant[index] = {
-                      main: rule.change,
-                      old: rule.target,
-                      disappears: rule.disappears,
-                    }
-                    // !actRules.includes(rule) && actRules.push(rule)
-                    break
-                }
-              }
-            })
-          })
-        })
-        return initialPronunciation
-      }
-      setPronunciation(testGetPron)
+      setPronunciation(getPronunciation(phonemic, handleAppear))
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -153,7 +98,7 @@ const WordOverview = ({
     }
   }, [handleAppear, phonemic])
 
-  console.log(pronunciation)
+  // console.log(pronunciation)
 
   // The function that calculates an element's opacity based on when it appears / disappears from the language.
   const calculateOpacity = (dataObject: Changeable): number | undefined => {
@@ -199,66 +144,6 @@ const WordOverview = ({
   // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
   // 2081: main: kɑpcsos + 1 -> ɑ ~ ä (käpcsos)
 
-  const getPronunciation = (
-    phonemic: string[]
-  ): [string[], number, object[]] => {
-    const initialPronunciation: (string | PhoneticVariant)[] = [...phonemic]
-    const actRules: object[] = []
-
-    RULES.forEach(rule => {
-      initialPronunciation.forEach((phoneme, index) => {
-        if (rule.target === phoneme && rule.change) {
-          switch (handleAppear(rule)) {
-            case appearanceInProgress:
-              initialPronunciation[index] = {
-                main: rule.target,
-                new: rule.change,
-                appears: rule.appears,
-              }
-              !actRules.includes(rule) && actRules.push(rule)
-              break
-            case notReachedYet:
-              initialPronunciation[index] = rule.target
-              actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-              break
-            case gonePast:
-              initialPronunciation[index] = rule.change
-              actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-              break
-            case disappearanceInProgress:
-              initialPronunciation[index] = {
-                main: rule.change,
-                old: rule.target,
-                disappears: rule.disappears,
-              }
-              !actRules.includes(rule) && actRules.push(rule)
-              break
-          }
-        }
-      })
-    })
-
-    return [
-      initialPronunciation.map(phoneme =>
-        typeof phoneme === 'string' ? phoneme : phoneme.main
-      ),
-      initialPronunciation.filter(phoneme => typeof phoneme === 'object')
-        .length, // the number of variants
-      actRules,
-    ]
-
-    // code v2:
-    // check all rules for all phonemes in Phonemic
-    // (phonemes in targets, as well as phonemes in "change" attributes with currentYear < disappears[1])
-    // for every phoneme, if it has neither an "appears" or a "disappears", display it normally
-    // if it has "disappears" but no "appears", throw error (a phoneme cannot disappear without something else taking its place?)
-    // if it has "appears", add +1 if currentYear >= appears[0] (&& currentYear < disappears[1])
-    // (i.e. if handleAppear = true)
-    // clicking on +1 displays in a separate component like "target ~ change" (e.g. "ɒ ~ ɑ") and "note" if present.
-    // if currentYear < appears[1], display new main pronunciation (replace target with change in Phonemic?)
-    // and make it the basis of new changes
-  }
-
   // The main return on the WordOverview component.
   return (
     <Card
@@ -294,24 +179,20 @@ const WordOverview = ({
           </span>
         </Card.Title>
         <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {phonemic.map((wordObject, index) => {
-            let [mainPronunciation, numberOfVariants, actRules] =
-              getPronunciation(wordObject)
-            return (
-              // <span key={wordObject.phonemic.join('')}>
-              //   {index > 0 && ' / '}/{wordObject.phonemic.join('')}/
-              // </span>
-              <div key={index}>
-                <span>{mainPronunciation}</span>
-                {!!numberOfVariants && (
-                  <span
-                    className='number-of-variants'
-                    onClick={() => console.log(actRules)}
-                  >{`(+${numberOfVariants})`}</span>
-                )}
-              </div>
-            )
-          })}
+          {pronunciation.map((pronVersion, index) => (
+            <div key={index}>
+              <span>
+                {index > 0 && ' / '}
+                {`[${pronVersion.pron.join('')}]`}
+              </span>
+              {!!pronVersion.numberOfVariants && (
+                <span
+                  className='number-of-variants'
+                  // onClick={() => console.log(actRules)}
+                >{`(+${pronVersion.numberOfVariants})`}</span>
+              )}
+            </div>
+          ))}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (

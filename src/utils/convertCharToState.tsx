@@ -1,4 +1,4 @@
-import { Word, Phonemic, Pronunciation } from '../types'
+import { Word, Phonemic } from '../types'
 
 const graphPhonemeDictionary = [
   { letter: 'a', phoneme: 'ɒ', soundType: 'vowel' },
@@ -57,18 +57,9 @@ const convertKeywordToPhonemes = (keyword: string): Phonemic => {
     )
   )
 
-  // Add phonemes to an array one by one.
-  // let phonemicResult = ''
-  // keywordBreakdownToLetters?.forEach(letter => {
-  //   let phonemeObject = graphPhonemeDictionary.find(i => i.letter === letter)
-  //   if (phonemeObject) {
-  //     phonemicResult = phonemicResult + phonemeObject.phoneme
-  //   }
-  // })
-
   let phonemicResult: string[] = []
   keywordBreakdownToLetters?.forEach(letter => {
-    let phonemeObject = graphPhonemeDictionary.find(i => i.letter === letter)
+    const phonemeObject = graphPhonemeDictionary.find(i => i.letter === letter)
     if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
   })
 
@@ -80,30 +71,6 @@ const convertKeywordToPhonemes = (keyword: string): Phonemic => {
 // 3. á - a: > æ(ː)
 // 4. o - ɔ > ɒ
 // 5. a - ɑ > ä
-
-// const convertPhonemicToPronunciation = (
-//   phonemic: Phonemic
-// ): Pronunciation[] => {
-//   let source = phonemic.phonemic
-//   let pronunciationArray = []
-
-//   for (let i = 0; i < ruleDictionary.length; i++) {
-//     let rule = ruleDictionary[i]
-//     // first pronunciation?? check for target and disappears with no appears?
-
-//     if (rule.target && rule.change && rule.appears) {
-//       pronunciationArray.push({
-//         pronunciation: source.replace(rule.target, rule.change),
-//         appears: rule.appears,
-//       })
-//     }
-//   }
-
-//   // if (source)
-//   // source = source.replace('ɒ', 'ɑ')
-
-//   return [{ pronunciation: source }]
-// }
 
 const convertCharToState = (word: Word) => {
   let dataWithPhonemic = word.data
