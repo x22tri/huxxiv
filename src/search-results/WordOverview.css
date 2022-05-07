@@ -5,11 +5,12 @@
   padding: 0 3px 3px;
   background-color: #d8d9f2;
   border-radius: 4px;
+  transition: 0.2s;
 }
 
 .number-of-variants:hover {
   cursor: pointer;
   background-color: #7578b3;
   color: white;
-  transition: 0.3s;
+  transition: 0.2s;
 }

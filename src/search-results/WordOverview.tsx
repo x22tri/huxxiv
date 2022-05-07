@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -28,7 +28,6 @@ const WordOverview = ({
   const alwaysShown = 'Mindig látható'
   const notReachedYet = 'Még nincs elérve'
   const gonePast = 'Meghaladva'
-  // const activeChange = 'Folyamatban lévő változás'
   const appearanceInProgress = 'Újonnan megjelenő elem'
   const disappearanceInProgress = 'Eltűnő elem'
   const concurrentVariants = 'Egyenértékű változatok'
@@ -41,41 +40,38 @@ const WordOverview = ({
     'phonemic' in wordObject ? wordObject : []
   )
 
-  const [phonemic, setPhonemic] = useState<string[][]>(
-    phonemicList.map(wordObject => wordObject.phonemic)
-  )
+  // const [phonemic, setPhonemic] = useState<string[][]>(
+  //   phonemicList.map(wordObject => wordObject.phonemic)
+  // )
+
+  const phonemic = phonemicList.map(wordObject => wordObject.phonemic)
 
   const [activeRules, setActiveRules] = useState<object[]>([])
 
-  // const [pronunciation, setPronunciation] = useState<string[]>(
-  //   phonemicList.map(wordObject => wordObject.phonemic.join(''))
-  // )
-
-  // Setting up the scroll / year connection.
-  useEffect(() => {
-    const handleScroll = () =>
-      setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+  const [pronunciation, setPronunciation] = useState<
+    (string | PhoneticVariant)[][]
+  >(
+    // phonemicList.map(wordObject => wordObject.phonemic.join(''))
+    [...phonemic]
+  )
 
   // The function that shows the status of an element based on the current year.
   // It is used to make obsolete elements disappear and new elements appear.
-  const handleAppear = (dataObject: Changeable) =>
-    !dataObject.appears && !dataObject.disappears
-      ? alwaysShown
-      : dataObject.appears && dataObject.appears[0] > currentYear
-      ? notReachedYet
-      : dataObject.appears && dataObject.appears[1] > currentYear
-      ? appearanceInProgress
-      : dataObject.disappears && dataObject.disappears[1] < currentYear
-      ? gonePast
-      : dataObject.disappears && dataObject.disappears[0] < currentYear
-      ? disappearanceInProgress
-      : concurrentVariants
+  const handleAppear = useCallback(
+    (dataObject: Changeable) =>
+      !dataObject.appears && !dataObject.disappears
+        ? alwaysShown
+        : dataObject.appears && dataObject.appears[0] > currentYear
+        ? notReachedYet
+        : dataObject.appears && dataObject.appears[1] > currentYear
+        ? appearanceInProgress
+        : dataObject.disappears && dataObject.disappears[1] < currentYear
+        ? gonePast
+        : dataObject.disappears && dataObject.disappears[0] < currentYear
+        ? disappearanceInProgress
+        : concurrentVariants,
+    [currentYear]
+  )
 
   // An auxiliary function that calls handleAppear and returns true if the element is always shown or currently active,
   // and false otherwise.
@@ -91,6 +87,73 @@ const WordOverview = ({
   const useList: WordUse[] = wordState.flatMap(wordObject =>
     'meaning' in wordObject && notOutOfBounds(wordObject) ? wordObject : []
   )
+
+  // To-Do: convert getPron and similar functions to hooks and have the card take the state from it and just display it
+
+  // Setting up the scroll / year connection.
+  useEffect(() => {
+    const handleScroll = () => {
+      setCurrentYear(2000 + Math.floor(window.scrollY / 10))
+
+      const testGetPron = () => {
+        const initialPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
+          JSON.stringify(phonemic)
+        )
+
+        initialPronunciation.forEach(phonemicVariant => {
+          RULES.forEach(rule => {
+            phonemicVariant.forEach((phoneme, index) => {
+              // console.log(
+              //   'target: ' +
+              //     rule.target +
+              //     ', phoneme: ' +
+              //     phoneme +
+              //     ', change: ' +
+              //     rule.change
+              // )
+              if (rule.target === phoneme && rule.change) {
+                switch (handleAppear(rule)) {
+                  case appearanceInProgress:
+                    phonemicVariant[index] = {
+                      main: rule.target,
+                      new: rule.change,
+                      appears: rule.appears,
+                    }
+                    // !actRules.includes(rule) && actRules.push(rule)
+                    break
+                  case notReachedYet:
+                    phonemicVariant[index] = rule.target
+                    // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+                    break
+                  case gonePast:
+                    phonemicVariant[index] = rule.change
+                    // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+                    break
+                  case disappearanceInProgress:
+                    phonemicVariant[index] = {
+                      main: rule.change,
+                      old: rule.target,
+                      disappears: rule.disappears,
+                    }
+                    // !actRules.includes(rule) && actRules.push(rule)
+                    break
+                }
+              }
+            })
+          })
+        })
+        return initialPronunciation
+      }
+      setPronunciation(testGetPron)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [handleAppear, phonemic])
+
+  console.log(pronunciation)
 
   // The function that calculates an element's opacity based on when it appears / disappears from the language.
   const calculateOpacity = (dataObject: Changeable): number | undefined => {
