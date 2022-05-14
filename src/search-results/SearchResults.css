@@ -12,12 +12,9 @@
   padding-top: 70px;
 }
 
-.word-overview-card {
+.fixed-row {
+  position: fixed;
   width: 100%;
-  max-width: 640px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
 }
 
 .year {

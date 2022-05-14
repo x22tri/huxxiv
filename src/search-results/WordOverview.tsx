@@ -149,7 +149,7 @@ const WordOverview = ({
     <Card
       ref={measuredRef}
       className='word-overview-card'
-      style={{ position: 'fixed' }}
+      // style={{ position: 'fixed' }}
     >
       <Card.Body className='p-0'>
         <Card.Title as='h3' className='px-3 pt-3'>

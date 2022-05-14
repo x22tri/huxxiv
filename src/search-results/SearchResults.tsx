@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react'
 
+import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
 import Stack from 'react-bootstrap/Stack'
 
 import { Word } from '../types'
@@ -30,7 +34,7 @@ const SearchResults = ({
   return isErrorMessage(searchResult) ? (
     <ErrorField error={searchResult} />
   ) : (
-    <div className='word-overview-container'>
+    <Container fluid className='word-overview-container'>
       <p className='scroll-down-prompter'>
         ↓ Görgess lefelé a szó fejlődésének megtekintéséhez ↓
       </p>
@@ -49,8 +53,16 @@ const SearchResults = ({
           )}
         </Stack>
       )}
-      <WordOverview word={searchResult} {...{ measuredRef }} />
-    </div>
+      <Row className='fixed-row'>
+        <Col xs={0} md={2} lg={3} />
+        <Col xs={12} md={8} lg={6}>
+          <WordOverview word={searchResult} {...{ measuredRef }} />
+        </Col>
+        <Col xs={0} md={0} lg={3}>
+          <Card>test</Card>
+        </Col>
+      </Row>
+    </Container>
   )
 }
 
