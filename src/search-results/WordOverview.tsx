@@ -12,6 +12,7 @@ import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
 import {
   Keyword,
+  DataOptions,
   WordUse,
   Word,
   Phonemic,
@@ -27,16 +28,18 @@ import './WordOverview.css'
 
 const WordOverview = ({
   measuredRef,
-  word,
   sidePaneMode,
   setSidePaneMode,
+  wordState,
+  setWordState,
 }: {
   measuredRef: (node: HTMLDivElement | null) => void
-  word: Word
   sidePaneMode: null | 'pronunciation' | 'inflection'
   setSidePaneMode: Dispatch<
     SetStateAction<null | 'pronunciation' | 'inflection'>
   >
+  wordState: undefined | DataOptions[]
+  setWordState: Dispatch<SetStateAction<undefined | DataOptions[]>>
 }) => {
   // Setting up localized strings.
   const alwaysShown = 'Mindig látható'
@@ -52,7 +55,22 @@ const WordOverview = ({
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
 
-  const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
+  // const [wordState] = useState(convertCharToState(word))
+  // This will probably be a fetch call.
+  // console.log(wordState)
+
+  // const [tempWordState] = useState(convertCharToState(word))
+
+  // useEffect(() => {
+  //   setWordState(wordState)
+
+  //   if (convertCharToState(word)) console.log('yee')
+  // }, [word, setWordState])
+
+  // setWordState(tempWordState)
+
+  if (wordState === undefined)
+    throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
   const phonemic = wordState
     .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))

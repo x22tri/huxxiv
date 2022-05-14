@@ -74,11 +74,11 @@ const convertKeywordToPhonemes = (keyword: string): Phonemic => {
 
 const convertCharToState = (word: Word) => {
   let dataWithPhonemic = word.data
-    .map(element => {
-      return !('word' in element)
+    .map(element =>
+      !('word' in element)
         ? element
         : [element, convertKeywordToPhonemes(element.word)]
-    })
+    )
     .flat()
 
   return dataWithPhonemic
