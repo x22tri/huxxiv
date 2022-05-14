@@ -1,4 +1,5 @@
-import { PhoneticVariant } from '../types'
+import { Dispatch, SetStateAction } from 'react'
+import { DataOptions, PhoneticVariant } from '../types'
 
 import { RULES } from '../database/RULES'
 
@@ -10,12 +11,20 @@ const disappearanceInProgress = 'Eltűnő elem'
 const concurrentVariants = 'Egyenértékű változatok'
 
 const getPronunciation = (
-  phonemic: (string | PhoneticVariant)[][],
+  //phonemic: (string | PhoneticVariant)[][],
+  wordState: DataOptions[],
+  // setWordState: Dispatch<SetStateAction<DataOptions[]>>,
   handleAppear: (rule: object) => string
 ): { pron: string[]; numberOfVariants: number }[] => {
+  const phonemic = wordState
+    .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
+    .map(element => element.phonemic)
+
   const changedPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
     JSON.stringify(phonemic)
   )
+
+  // console.log(changedPronunciation)
 
   changedPronunciation.forEach(phonemicVariant => {
     RULES.forEach(rule => {

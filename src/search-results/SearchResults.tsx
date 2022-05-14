@@ -32,7 +32,7 @@ const SearchResults = ({
     null | 'pronunciation' | 'inflection'
   >(null)
 
-  const [wordState, setWordState] = useState<undefined | DataOptions[]>()
+  const [wordState, setWordState] = useState<DataOptions[]>([])
 
   // const WordContext = createContext({})
 
@@ -43,14 +43,14 @@ const SearchResults = ({
 
   useEffect(() => {
     if (!isErrorMessage(searchResult)) {
-      setWordState(convertCharToState(searchResult))
+      setWordState(convertCharToState(searchResult)) // This will probably be a fetch call.
     }
   }, [searchResult])
 
   if (isErrorMessage(searchResult)) return <ErrorField error={searchResult} />
   else if (!wordState) return <div>Betöltés...</div>
   else {
-    console.log(wordState)
+    // console.log(wordState)
     return (
       <Container fluid className='word-overview-container'>
         <p className='scroll-down-prompter'>

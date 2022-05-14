@@ -26,8 +26,24 @@ interface Phonemic {
   phonemic: string[]
 }
 
+// This is for sound change rules.
+interface Rule extends Changeable {
+  target: string
+  change?: string
+}
+
+interface PhoneticVariant extends Changeable {
+  main: string
+  new?: string
+  old?: string
+}
+
 interface Pronunciation extends Changeable {
-  pronunciation: string
+  pronunciation: {
+    pron: (string | PhoneticVariant)[]
+    numberOfVariants: number
+    // (string | PhoneticVariant)[][]
+  }[]
 }
 
 type DataOptions =
@@ -41,18 +57,6 @@ type DataOptions =
 interface Word {
   id: number
   data: DataOptions[]
-}
-
-// This is for sound change rules.
-interface Rule extends Changeable {
-  target: string
-  change?: string
-}
-
-interface PhoneticVariant extends Changeable {
-  main: string
-  new?: string
-  old?: string
 }
 
 export type {

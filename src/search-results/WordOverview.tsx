@@ -39,8 +39,10 @@ const WordOverview = ({
     SetStateAction<null | 'pronunciation' | 'inflection'>
   >
   wordState: undefined | DataOptions[]
-  setWordState: Dispatch<SetStateAction<undefined | DataOptions[]>>
+  setWordState: Dispatch<SetStateAction<DataOptions[]>>
 }) => {
+  if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
+
   // Setting up localized strings.
   const alwaysShown = 'Mindig látható'
   const notReachedYet = 'Még nincs elérve'
@@ -51,30 +53,8 @@ const WordOverview = ({
 
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
-
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
-
-  // const [wordState] = useState(convertCharToState(word))
-  // This will probably be a fetch call.
-  // console.log(wordState)
-
-  // const [tempWordState] = useState(convertCharToState(word))
-
-  // useEffect(() => {
-  //   setWordState(wordState)
-
-  //   if (convertCharToState(word)) console.log('yee')
-  // }, [word, setWordState])
-
-  // setWordState(tempWordState)
-
-  if (wordState === undefined)
-    throw new Error('Hiba történt. Kérjük, próbálkozz később.')
-
-  const phonemic = wordState
-    .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
-    .map(element => element.phonemic)
 
   const [activeRules, setActiveRules] = useState<object[]>([])
 
@@ -83,7 +63,11 @@ const WordOverview = ({
       pron: string[]
       numberOfVariants: number
     }[]
-  >(phonemic.map(elem => ({ pron: elem, numberOfVariants: 0 })))
+  >([{ pron: [], numberOfVariants: 0 }])
+
+  // console.log(pronunciation)
+
+  // console.log(wordState)
 
   // The function that shows the status of an element based on the current year.
   // It is used to make obsolete elements disappear and new elements appear.
@@ -122,16 +106,22 @@ const WordOverview = ({
   //  To-Do: make this into the main hook that updates state for the card?
   // Setting up the scroll / year connection.
   useEffect(() => {
+    setPronunciation(getPronunciation(wordState, handleAppear))
+
     const handleScroll = () => {
       setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-      setPronunciation(getPronunciation(phonemic, handleAppear))
+      setPronunciation(getPronunciation(wordState, handleAppear))
+      // setWordState(prev => [
+      //   ...prev,
+      //   { pronunciation: getPronunciation(wordState, handleAppear) },
+      // ]) ---- This currently adds a new {pronunciation: ...} object on every scroll.
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [handleAppear, phonemic])
+  }, [wordState, handleAppear])
 
   // console.log(pronunciation)
 
