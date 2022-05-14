@@ -27,6 +27,11 @@ const SearchResults = ({
   searchResult: Word | ErrorMessage
 }) => {
   const [cardHeight, setCardHeight] = useState(0)
+  const [sidePaneMode, setSidePaneMode] = useState<
+    null | 'pronunciation' | 'inflection'
+  >(null)
+
+  // This is used to make sure '2000' is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node !== null) setCardHeight(node.getBoundingClientRect().height)
   }, [])
@@ -56,11 +61,16 @@ const SearchResults = ({
       <Row className='fixed-row'>
         <Col xs={0} md={2} lg={3} />
         <Col xs={12} md={8} lg={6}>
-          <WordOverview word={searchResult} {...{ measuredRef }} />
+          <WordOverview
+            word={searchResult}
+            {...{ measuredRef, sidePaneMode, setSidePaneMode }}
+          />
         </Col>
-        <Col xs={0} md={0} lg={3}>
-          <Card>test</Card>
-        </Col>
+        {sidePaneMode && (
+          <Col xs={0} md={0} lg={3}>
+            <Card>test</Card>
+          </Col>
+        )}
       </Row>
     </Container>
   )

@@ -15,6 +15,11 @@
 .fixed-row {
   position: fixed;
   width: 100%;
+  padding: 0 5px;
+}
+
+.fixed-row > div {
+  padding: 0 5px;
 }
 
 .year {

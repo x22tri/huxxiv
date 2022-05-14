@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
+import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
 import {
   Keyword,
@@ -21,9 +28,15 @@ import './WordOverview.css'
 const WordOverview = ({
   measuredRef,
   word,
+  sidePaneMode,
+  setSidePaneMode,
 }: {
   measuredRef: (node: HTMLDivElement | null) => void
   word: Word
+  sidePaneMode: null | 'pronunciation' | 'inflection'
+  setSidePaneMode: Dispatch<
+    SetStateAction<null | 'pronunciation' | 'inflection'>
+  >
 }) => {
   // Setting up localized strings.
   const alwaysShown = 'Mindig látható'
@@ -35,6 +48,10 @@ const WordOverview = ({
 
   // Setting up state.
   const [currentYear, setCurrentYear] = useState(2000)
+
+  const [pronunciationHover, setPronunciationHover] = useState(false)
+  const [inflectionHover, setInflectionHover] = useState(false)
+
   const [wordState] = useState(convertCharToState(word)) // This will be a fetch call.
 
   const phonemic = wordState
@@ -146,11 +163,7 @@ const WordOverview = ({
 
   // The main return on the WordOverview component.
   return (
-    <Card
-      ref={measuredRef}
-      className='word-overview-card'
-      // style={{ position: 'fixed' }}
-    >
+    <Card ref={measuredRef} className='word-overview-card'>
       <Card.Body className='p-0'>
         <Card.Title as='h3' className='px-3 pt-3'>
           {keywordList.map((wordObject, index) => (
@@ -167,32 +180,67 @@ const WordOverview = ({
               </span>
             </React.Fragment>
           ))}
-          &nbsp;
-          <span className='fs-6 text-muted'>
-            {wordState.map(wordObject =>
-              'partOfSpeech' in wordObject ? (
-                <span key={wordObject.partOfSpeech}>
-                  {wordObject.partOfSpeech}
-                </span>
-              ) : null
-            )}
-          </span>
         </Card.Title>
-        <Card.Subtitle className='px-3 pb-2 text-muted'>
-          {pronunciation.map((pronVersion, index) => (
-            <div key={index}>
-              <span>
-                {index > 0 && ' / '}
-                {`[${pronVersion.pron.join('')}]`}
+        <div>
+          <Card.Subtitle
+            className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
+              pronunciationHover ? '#43456d' : 'text-muted'
+            }`}
+            onMouseEnter={() => setPronunciationHover(true)}
+            onMouseLeave={() => setPronunciationHover(false)}
+            onClick={() =>
+              sidePaneMode === 'pronunciation'
+                ? setSidePaneMode(null)
+                : setSidePaneMode('pronunciation')
+            }
+          >
+            {pronunciationHover ? (
+              <EarFill color='#43456d' />
+            ) : (
+              <Ear color='#43456d' />
+            )}
+            <span style={{ marginRight: '6px' }} />
+            {pronunciation.map((pronVersion, index) => (
+              <div key={index}>
+                <span>
+                  {index > 0 && ' / '}
+                  {`[${pronVersion.pron.join('')}]`}
+                </span>
+                {!!pronVersion.numberOfVariants && (
+                  <span
+                    className='number-of-variants'
+                    // onClick={() => console.log(actRules)}
+                  >{`(+${pronVersion.numberOfVariants})`}</span>
+                )}
+              </div>
+            ))}
+          </Card.Subtitle>
+        </div>
+        <Card.Subtitle
+          className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
+            inflectionHover ? '#43456d' : 'text-muted'
+          }`}
+          onMouseEnter={() => setInflectionHover(true)}
+          onMouseLeave={() => setInflectionHover(false)}
+          onClick={() =>
+            sidePaneMode === 'inflection'
+              ? setSidePaneMode(null)
+              : setSidePaneMode('inflection')
+          }
+        >
+          {inflectionHover ? (
+            <PencilFill color='#43456d' />
+          ) : (
+            <Pencil color='#43456d' />
+          )}
+          <span style={{ marginRight: '6px' }} />
+          {wordState.map(wordObject =>
+            'partOfSpeech' in wordObject ? (
+              <span key={wordObject.partOfSpeech}>
+                {wordObject.partOfSpeech}
               </span>
-              {!!pronVersion.numberOfVariants && (
-                <span
-                  className='number-of-variants'
-                  // onClick={() => console.log(actRules)}
-                >{`(+${pronVersion.numberOfVariants})`}</span>
-              )}
-            </div>
-          ))}
+            ) : null
+          )}
         </Card.Subtitle>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
