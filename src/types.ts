@@ -5,16 +5,11 @@ interface Changeable {
   appears?: [number, number]
 }
 
-interface Pronunciation {
-  mainPronunciation?: string
-  numberOfVariants?: number
-  activeRules?: []
-}
-
-interface Keyword extends Changeable, Pronunciation {
+interface Keyword extends Changeable {
   word: string
   phonemic?: string[]
   concurrentPronunciations?: (string | PhoneticVariant)[]
+  activeRules?: []
 }
 
 interface PartOfSpeech {
@@ -30,10 +25,6 @@ interface WordUse extends Changeable {
   examples?: string[]
 }
 
-// interface Phonemic {
-//   phonemic: string[]
-// }
-
 // This is for sound change rules.
 interface Rule extends Changeable {
   target: string
@@ -47,8 +38,6 @@ interface PhoneticVariant extends Changeable {
 }
 
 type DataOptions = Keyword | PartOfSpeech | InflectionType | WordUse
-// | Phonemic
-// | Pronunciation
 
 interface Word {
   id: number

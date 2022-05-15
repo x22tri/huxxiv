@@ -1,12 +1,37 @@
-import { PhoneticVariant } from '../types'
+import { Keyword, PhoneticVariant } from '../types'
 
 import { RULES } from '../database/RULES'
+import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
 import { handleAppear } from './appearance-utils'
 
+const convertKeywordToPhonemes = (keyword: string): string[] => {
+  // Sort letters by length (longest to shortest) and make a Regex out of it.
+  const keywordBreakdownToLetters = keyword.match(
+    new RegExp(
+      GRAPH_TO_PHONEME.map(i => i.letter)
+        .sort()
+        .reverse()
+        .join('|'),
+      'gi'
+    )
+  )
+
+  let phonemicResult: string[] = []
+  keywordBreakdownToLetters?.forEach(letter => {
+    const phonemeObject = GRAPH_TO_PHONEME.find(i => i.letter === letter)
+    if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
+  })
+
+  return phonemicResult
+}
+
 const getPronunciation = (
-  phonemic: string[],
+  wordObject: Keyword,
   currentYear: number
-): (string | PhoneticVariant)[] => {
+): [string[], (string | PhoneticVariant)[]] => {
+  let phonemic: string[] =
+    wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
+
   const phoneticVariant: (string | PhoneticVariant)[] = JSON.parse(
     JSON.stringify(phonemic)
   )
@@ -46,7 +71,7 @@ const getPronunciation = (
 
   // console.log(phoneticVariant)
 
-  return phoneticVariant
+  return [phonemic, phoneticVariant]
 
   // actRules, To-Do!!!
 }
