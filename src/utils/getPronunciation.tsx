@@ -1,4 +1,4 @@
-import { Keyword, PhoneticVariant } from '../types'
+import { Keyword, ConcurrentPronunciation, Rule } from '../types'
 
 import { RULES } from '../database/RULES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
@@ -28,55 +28,68 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
 const getPronunciation = (
   wordObject: Keyword,
   currentYear: number
-): [string[], (string | PhoneticVariant)[]] => {
+): [string[], (string | ConcurrentPronunciation)[], Rule[]] => {
   let phonemic: string[] =
     wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
 
-  const phoneticVariant: (string | PhoneticVariant)[] = JSON.parse(
-    JSON.stringify(phonemic)
-  )
+  const concurrentPronunciations: (string | ConcurrentPronunciation)[] =
+    JSON.parse(JSON.stringify(phonemic))
+
+  const activeRules: Rule[] = []
 
   RULES.forEach(rule => {
-    phoneticVariant.forEach((phoneme, index) => {
+    concurrentPronunciations.forEach((phoneme, index) => {
       if (rule.target === phoneme && rule.change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
-            phoneticVariant[index] = {
+            concurrentPronunciations[index] = {
               main: rule.target,
               new: rule.change,
               appears: rule.appears,
             }
-            // !actRules.includes(rule) && actRules.push(rule)
+            !activeRules.includes(rule) && activeRules.push(rule)
             break
           case 'notReachedYet':
-            phoneticVariant[index] = rule.target
-            // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+            concurrentPronunciations[index] = rule.target
+            activeRules.includes(rule) &&
+              activeRules.splice(activeRules.indexOf(rule))
             break
           case 'gonePast':
-            phoneticVariant[index] = rule.change
-            // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+            concurrentPronunciations[index] = rule.change
+            activeRules.includes(rule) &&
+              activeRules.splice(activeRules.indexOf(rule))
             break
           case 'disappearanceInProgress':
-            phoneticVariant[index] = {
+            concurrentPronunciations[index] = {
               main: rule.change,
               old: rule.target,
               disappears: rule.disappears,
             }
-            // !actRules.includes(rule) && actRules.push(rule)
+            !activeRules.includes(rule) && activeRules.push(rule)
             break
         }
       }
     })
   })
 
-  // console.log(phoneticVariant)
+  // console.log(activeRules)
 
-  return [phonemic, phoneticVariant]
-
-  // actRules, To-Do!!!
+  return [phonemic, concurrentPronunciations, activeRules]
 }
 
-export default getPronunciation
+const getMainPronunciation = (
+  concurrentPronunciations: (string | ConcurrentPronunciation)[]
+) =>
+  concurrentPronunciations
+    .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
+    .join('')
+
+const getNumberOfVariants = (
+  concurrentPronunciations: (string | ConcurrentPronunciation)[]
+) =>
+  concurrentPronunciations.filter(element => typeof element === 'object').length
+
+export { getPronunciation, getMainPronunciation, getNumberOfVariants }
 
 // code v2:
 // check all rules for all phonemes in Phonemic

@@ -4,23 +4,23 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
-import { Keyword, DataOptions, WordUse, PhoneticVariant } from '../types'
+import {
+  Keyword,
+  ConcurrentPronunciation,
+  DataOptions,
+  WordUse,
+} from '../types'
 
 import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
+import {
+  getMainPronunciation,
+  getNumberOfVariants,
+} from '../utils/getPronunciation'
 import './WordOverview.css'
 
-const startingYear = 2000
 const iconColor = '#43456d'
 const Spacer = () => <span style={{ marginRight: '6px' }} />
-
-const getMainPronunciation = (phoneticVariant: (string | PhoneticVariant)[]) =>
-  phoneticVariant
-    .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
-    .join('')
-
-const getNumberOfVariants = (phoneticVariant: (string | PhoneticVariant)[]) =>
-  phoneticVariant.filter(element => typeof element === 'object').length
 
 const WordOverview = ({
   measuredRef,
@@ -29,6 +29,9 @@ const WordOverview = ({
   wordState,
   setWordState,
   initialState,
+  year,
+  setYear,
+  startingYear,
 }: {
   measuredRef: (node: HTMLDivElement | null) => void
   sidePaneMode: null | 'pronunciation' | 'inflection'
@@ -38,17 +41,17 @@ const WordOverview = ({
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
   initialState: DataOptions[]
+  year: number
+  setYear: Dispatch<SetStateAction<number>>
+  startingYear: number
 }) => {
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
   // Setting up state.
-  const [year, setYear] = useState(startingYear)
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
 
-  // const [activeRules, setActiveRules] = useState<object[]>([])
-
-  console.log(wordState)
+  // console.log(wordState)
 
   // Setting up the scroll / year connection.
   useEffect(() => {
@@ -60,7 +63,7 @@ const WordOverview = ({
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [year])
+  }, [year, setYear, startingYear])
 
   useUpdateCharBasedOnYear(initialState, setWordState, year)
 
@@ -75,8 +78,9 @@ const WordOverview = ({
       : []
   )
 
-  const phoneticList: (string | PhoneticVariant)[][] = keywordList.map(elem =>
-    'concurrentPronunciations' in elem ? elem.concurrentPronunciations! : []
+  const phoneticList: (string | ConcurrentPronunciation)[][] = keywordList.map(
+    elem =>
+      elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
   )
 
   // A dynamic style attribute that shows a yellow flash when an element appears.
@@ -97,7 +101,7 @@ const WordOverview = ({
 
   // The main return on the WordOverview component.
   return (
-    <Card ref={measuredRef} className='word-overview-card'>
+    <Card ref={measuredRef}>
       <Card.Header className='p-0' style={{ backgroundColor: '#fafbfe' }}>
         {/* Keyword */}
         <Card.Title as='h3' className='px-3 pt-3'>

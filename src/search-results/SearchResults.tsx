@@ -1,6 +1,5 @@
 import { useState, useCallback, Dispatch, SetStateAction } from 'react'
 
-import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
@@ -8,7 +7,10 @@ import Stack from 'react-bootstrap/Stack'
 
 import { DataOptions } from '../types'
 import WordOverview from './WordOverview'
+import PronunciationPane from './PronunciationPane'
 import './SearchResults.css'
+
+const startingYear = 2000
 
 const SearchResults = ({
   wordState,
@@ -17,6 +19,7 @@ const SearchResults = ({
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
 }) => {
+  const [year, setYear] = useState(startingYear)
   const [cardHeight, setCardHeight] = useState(0)
   const [sidePaneMode, setSidePaneMode] = useState<
     null | 'pronunciation' | 'inflection'
@@ -61,12 +64,15 @@ const SearchResults = ({
               wordState,
               setWordState,
               initialState,
+              year,
+              setYear,
+              startingYear,
             }}
           />
         </Col>
-        {sidePaneMode && (
+        {sidePaneMode === 'pronunciation' && (
           <Col xs={0} md={0} lg={3}>
-            <Card>test</Card>
+            <PronunciationPane {...{ wordState, year }} />
           </Col>
         )}
       </Row>

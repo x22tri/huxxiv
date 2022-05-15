@@ -5,11 +5,23 @@ interface Changeable {
   appears?: [number, number]
 }
 
+interface ConcurrentPronunciation extends Changeable {
+  main: string
+  new?: string
+  old?: string
+}
+
+// This is for sound change rules.
+interface Rule extends Changeable {
+  target: string
+  change?: string
+}
+
 interface Keyword extends Changeable {
   word: string
   phonemic?: string[]
-  concurrentPronunciations?: (string | PhoneticVariant)[]
-  activeRules?: []
+  concurrentPronunciations?: (string | ConcurrentPronunciation)[]
+  activeRules?: Rule[]
 }
 
 interface PartOfSpeech {
@@ -25,18 +37,6 @@ interface WordUse extends Changeable {
   examples?: string[]
 }
 
-// This is for sound change rules.
-interface Rule extends Changeable {
-  target: string
-  change?: string
-}
-
-interface PhoneticVariant extends Changeable {
-  main: string
-  new?: string
-  old?: string
-}
-
 type DataOptions = Keyword | PartOfSpeech | InflectionType | WordUse
 
 interface Word {
@@ -48,15 +48,18 @@ type ErrorMessage = string
 
 export type {
   Changeable,
+  ConcurrentPronunciation,
   DataOptions,
   ErrorMessage,
   InflectionType,
   Keyword,
   PartOfSpeech,
-  // Phonemic,
-  PhoneticVariant,
-  // Pronunciation,
   Rule,
   Word,
   WordUse,
 }
+
+// export const isKeyOfObject = <T>(
+//   key: string | number | symbol,
+//   obj: T
+// ): key is keyof T => key in obj
