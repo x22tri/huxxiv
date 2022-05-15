@@ -46,6 +46,7 @@ const getPronunciation = (
               main: rule.target,
               new: rule.change,
               appears: rule.appears,
+              note: rule.note,
             }
             !activeRules.includes(rule) && activeRules.push(rule)
             break
@@ -64,6 +65,7 @@ const getPronunciation = (
               main: rule.change,
               old: rule.target,
               disappears: rule.disappears,
+              note: rule.note,
             }
             !activeRules.includes(rule) && activeRules.push(rule)
             break

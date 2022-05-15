@@ -19,7 +19,7 @@ const CHARS: Word[] = [
       {
         meaning: '<Vmivel> kapcsolatos, összefüggésben lévő.',
         examples: ['az örökléssel kapcsos ügyek'],
-        appears: [2050, 2100],
+        appears: [2045, 2100],
       },
     ],
   },

@@ -4,8 +4,9 @@ const RULES: Rule[] = [
   {
     target: 'ɒ',
     change: 'ɑ',
-    appears: [2010, 2050],
+    appears: [2001, 2050],
     disappears: [2040, 2080],
+    note: 'Az <a> betűvel jelölt hang a XXI. század elejétől kezdve fokozatosan elveszti ajakkerekítéses jellegét.',
   },
   // { target: 'ɑ', change: 'ä', appears: [2060, 2090]}
 ]

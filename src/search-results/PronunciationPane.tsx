@@ -1,9 +1,11 @@
 import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
+import Row from 'react-bootstrap/Row'
 
 import { getMainPronunciation } from '../utils/getPronunciation'
 import { calculateOpacity } from '../utils/appearance-utils'
-import { DataOptions, Keyword } from '../types'
+import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
 
 const PronunciationPane = ({
   wordState,
@@ -12,12 +14,20 @@ const PronunciationPane = ({
   wordState: DataOptions[]
   year: number
 }) => {
-  let word = wordState.find(wordObject => 'word' in wordObject) as Keyword
+  const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
-  console.log(word.concurrentPronunciations)
+  if (!word || !word.concurrentPronunciations)
+    throw new Error('A szót nem sikerült lekérni.')
+  else {
+    const concurrent = word.concurrentPronunciations.filter(
+      element => typeof element === 'object'
+    ) as ConcurrentPronunciation[]
 
-  if (!word) return null
-  else
+    const ruleDisplay = (concurrentElement: ConcurrentPronunciation) =>
+      concurrentElement.new
+        ? `[${concurrentElement.main}] ~ [${concurrentElement.new}]`
+        : `[${concurrentElement.main}] ~ [${concurrentElement.old}]`
+
     return (
       <Card>
         <Card.Title as='h6' className='px-3 pt-3'>
@@ -27,27 +37,33 @@ const PronunciationPane = ({
           {word.concurrentPronunciations &&
             `[${getMainPronunciation(word.concurrentPronunciations)}]`}
         </Card.Subtitle>
-        {!!word.activeRules?.length && (
+        {!!concurrent.length && (
           <Card.Body className='px-3 pt-1'>
-            Variációk:
-            <ListGroup as='ul' variant='flush' className='px-3'>
-              {word.activeRules.map(rule => (
-                <ListGroup.Item
+            Változatok:
+            <ListGroup as='ul' variant='flush' className='ps-3'>
+              {concurrent.map(element => (
+                <Row
                   as='li'
                   className='fs-5 flash py-1 ps-0'
-                  key={`${rule.target} ~ ${rule.change}`}
+                  key={`${ruleDisplay(element)}`}
                   style={{
-                    color: `rgba(0, 0, 0, ${calculateOpacity(rule, year)}`,
+                    color: `rgba(0, 0, 0, ${calculateOpacity(element, year)}`,
                   }}
                 >
-                  {`• ${rule.target} ~ ${rule.change}`}
-                </ListGroup.Item>
+                  <Col xs='auto' className='px-0'>
+                    {`• ${ruleDisplay(element)}`}
+                  </Col>
+                  <Col className='pt-2' style={{ fontSize: '70%' }}>
+                    {element.note || null}
+                  </Col>
+                </Row>
               ))}
             </ListGroup>
           </Card.Body>
         )}
       </Card>
     )
+  }
 }
 
 export default PronunciationPane

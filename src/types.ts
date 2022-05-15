@@ -9,12 +9,14 @@ interface ConcurrentPronunciation extends Changeable {
   main: string
   new?: string
   old?: string
+  note?: string
 }
 
 // This is for sound change rules.
 interface Rule extends Changeable {
   target: string
   change?: string
+  note?: string
 }
 
 interface Keyword extends Changeable {
