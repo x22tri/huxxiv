@@ -11,6 +11,5 @@
 
 .side-pane-opener:hover {
   cursor: pointer;
-  transition: 0.2s;
   background-color: #d8d9f2;
 }

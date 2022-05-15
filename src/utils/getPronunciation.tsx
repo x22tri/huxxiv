@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { DataOptions, PhoneticVariant } from '../types'
 
 import { RULES } from '../database/RULES'
+import { appearanceStatus, handleAppear } from './appearance-utils'
 
 const alwaysShown = 'Mindig látható'
 const notReachedYet = 'Még nincs elérve'
@@ -14,7 +15,7 @@ const getPronunciation = (
   //phonemic: (string | PhoneticVariant)[][],
   wordState: DataOptions[],
   // setWordState: Dispatch<SetStateAction<DataOptions[]>>,
-  handleAppear: (rule: object) => string
+  currentYear: number
 ): { pron: string[]; numberOfVariants: number }[] => {
   const phonemic = wordState
     .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
@@ -30,8 +31,8 @@ const getPronunciation = (
     RULES.forEach(rule => {
       phonemicVariant.forEach((phoneme, index) => {
         if (rule.target === phoneme && rule.change) {
-          switch (handleAppear(rule)) {
-            case appearanceInProgress:
+          switch (handleAppear(rule, currentYear)) {
+            case 'appearanceInProgress':
               phonemicVariant[index] = {
                 main: rule.target,
                 new: rule.change,
@@ -39,15 +40,15 @@ const getPronunciation = (
               }
               // !actRules.includes(rule) && actRules.push(rule)
               break
-            case notReachedYet:
+            case 'notReachedYet':
               phonemicVariant[index] = rule.target
               // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
               break
-            case gonePast:
+            case 'gonePast':
               phonemicVariant[index] = rule.change
               // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
               break
-            case disappearanceInProgress:
+            case 'disappearanceInProgress':
               phonemicVariant[index] = {
                 main: rule.change,
                 old: rule.target,
