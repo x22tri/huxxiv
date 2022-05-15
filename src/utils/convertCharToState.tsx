@@ -1,5 +1,5 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react'
-import { DataOptions, ErrorMessage, Word } from '../types'
+import { useEffect, Dispatch, SetStateAction } from 'react'
+import { DataOptions } from '../types'
 import getPronunciation from './getPronunciation'
 
 const graphPhonemeDictionary = [
@@ -65,7 +65,6 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
     if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
   })
 
-  // return { phonemic: phonemicResult }
   return phonemicResult
 }
 
@@ -75,7 +74,7 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
 // 4. o - ɔ > ɒ
 // 5. a - ɑ > ä
 
-const convertCharToState = (word: DataOptions[], currentYear: number) => {
+const convertCharToState = (word: DataOptions[], year: number) => {
   let dataWithPhonemic = word.map(element => {
     if (!('word' in element)) return element
     else {
@@ -83,7 +82,7 @@ const convertCharToState = (word: DataOptions[], currentYear: number) => {
       return {
         ...element,
         phonemic: phonemic,
-        ...getPronunciation(phonemic, currentYear),
+        ...{ concurrentPronunciations: getPronunciation(phonemic, year) },
       }
     }
   })
@@ -91,43 +90,14 @@ const convertCharToState = (word: DataOptions[], currentYear: number) => {
   return dataWithPhonemic
 }
 
-// const isErrorMessage = (
-//   searchResult: Word | ErrorMessage
-// ): searchResult is ErrorMessage => {
-//   return typeof (searchResult as ErrorMessage) === 'string'
-// }
-
-// const useInitialFetch = (
-//   // searchResult: ErrorMessage | Word,
-//   wordState: DataOptions[],
-//   setWordState: Dispatch<SetStateAction<DataOptions[]>>
-//   // errorState: undefined | ErrorMessage,
-//   // setErrorState: Dispatch<SetStateAction<undefined | ErrorMessage>>
-// ) => {
-//   useEffect(() => {
-//     // if (isErrorMessage(searchResult)) {
-//     //   setWordState([])
-//     //   setErrorState(searchResult)
-//     // } else {
-//     // setErrorState(undefined)
-//     setWordState(convertCharToState(wordState, 2000))
-//     // }
-//   }, [setWordState])
-// }
-
 const useUpdateCharBasedOnYear = (
   initialState: DataOptions[],
   setWordState: Dispatch<SetStateAction<DataOptions[]>>,
-  currentYear: number
+  year: number
 ) => {
   useEffect(() => {
-    setWordState(convertCharToState(initialState, currentYear))
-  }, [currentYear, initialState, setWordState])
+    setWordState(convertCharToState(initialState, year))
+  }, [year, initialState, setWordState])
 }
-
-// Create "useInitialFetch" hook.
-// This hook will be a useEffect call that has access to wordState, setWordState and getPronunciation.
-// It will add the "phonemic" and "pronunciation" keys and data to all {word: ...}s on WordOverview mount.
-// After that, a "useScroll" hook will update the state on scroll (and change everything except the underlying phonemic representation).
 
 export { convertCharToState, useUpdateCharBasedOnYear }

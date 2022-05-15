@@ -1,38 +1,22 @@
-import { Dispatch, SetStateAction } from 'react'
-import { DataOptions, PhoneticVariant } from '../types'
+import { PhoneticVariant } from '../types'
 
 import { RULES } from '../database/RULES'
-import { appearanceStatus, handleAppear } from './appearance-utils'
+import { handleAppear } from './appearance-utils'
 
 const getPronunciation = (
-  // phonemic: (string | PhoneticVariant)[][],
   phonemic: string[],
-  // wordState: DataOptions[],
-  // word:
-  // setWordState: Dispatch<SetStateAction<DataOptions[]>>,
   currentYear: number
-): { main: string; numberOfVariants: number } => {
-  // const phonemic = wordState
-  //   .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
-  //   .map(element => element.phonemic)
-
-  // const changedPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
-  //   JSON.stringify(phonemic)
-  // )
-
-  const phonemicVariant: (string | PhoneticVariant)[] = JSON.parse(
+): (string | PhoneticVariant)[] => {
+  const phoneticVariant: (string | PhoneticVariant)[] = JSON.parse(
     JSON.stringify(phonemic)
   )
 
-  // console.log(changedPronunciation)
-
-  // changedPronunciation.forEach(phonemicVariant => {
   RULES.forEach(rule => {
-    phonemicVariant.forEach((phoneme, index) => {
+    phoneticVariant.forEach((phoneme, index) => {
       if (rule.target === phoneme && rule.change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
-            phonemicVariant[index] = {
+            phoneticVariant[index] = {
               main: rule.target,
               new: rule.change,
               appears: rule.appears,
@@ -40,15 +24,15 @@ const getPronunciation = (
             // !actRules.includes(rule) && actRules.push(rule)
             break
           case 'notReachedYet':
-            phonemicVariant[index] = rule.target
+            phoneticVariant[index] = rule.target
             // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
             break
           case 'gonePast':
-            phonemicVariant[index] = rule.change
+            phoneticVariant[index] = rule.change
             // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
             break
           case 'disappearanceInProgress':
-            phonemicVariant[index] = {
+            phoneticVariant[index] = {
               main: rule.change,
               old: rule.target,
               disappears: rule.disappears,
@@ -59,37 +43,11 @@ const getPronunciation = (
       }
     })
   })
-  // })
 
-  // return changedPronunciation.map(phonemicVariant => ({
-  //   pron: phonemicVariant.map(phoneme =>
-  //     typeof phoneme === 'string' ? phoneme : phoneme.main
-  //   ),
-  //   numberOfVariants: phonemicVariant.filter(
-  //     phoneme => typeof phoneme === 'object'
-  //   ).length,
-  // }))
+  // console.log(phoneticVariant)
 
-  console.log(phonemicVariant)
+  return phoneticVariant
 
-  // return phonemicVariant.map(phoneme => ({
-  //   pron:
-  //     typeof phoneme === 'string' ? phoneme : phoneme.main
-  //   ,
-  //   // numberOfVariants: phoneme.filter(
-  //   //   element => typeof element === 'object'
-  //   // ).length,
-  //   numberOfVariants: 1
-  // }))
-
-  return {
-    main: phonemicVariant
-      .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
-      .join(''),
-    numberOfVariants: phonemicVariant.filter(
-      element => typeof element === 'object'
-    ).length,
-  }
   // actRules, To-Do!!!
 }
 

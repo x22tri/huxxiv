@@ -6,13 +6,11 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
 import { CHARS } from './database/CHARSV2'
-import { ErrorMessage, Word, DataOptions } from './types'
+import { ErrorMessage, DataOptions } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
 import logo from './assets/hun2500logo.png'
 import './App.css'
-
-// type ErrorMessage = string
 
 const WordSearcher = ({
   searchTerm,

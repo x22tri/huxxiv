@@ -26,9 +26,8 @@ const SearchResults = ({
   const [initialState] = useState(wordState)
 
   // This is used to make sure '2000' is displayed at the middle of the card.
-  // It currently doesn't work properly.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) setCardHeight(node.getBoundingClientRect().height)
+    node && setCardHeight(node.getBoundingClientRect().height)
   }, [])
 
   return (

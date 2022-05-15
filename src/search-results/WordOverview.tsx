@@ -4,18 +4,23 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
-import { Keyword, DataOptions, WordUse } from '../types'
+import { Keyword, DataOptions, WordUse, PhoneticVariant } from '../types'
 
-import {
-  convertCharToState,
-  useUpdateCharBasedOnYear,
-} from '../utils/convertCharToState'
-import getPronunciation from '../utils/getPronunciation'
+import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
 import './WordOverview.css'
 
+const startingYear = 2000
 const iconColor = '#43456d'
 const Spacer = () => <span style={{ marginRight: '6px' }} />
+
+const getMainPronunciation = (phoneticVariant: (string | PhoneticVariant)[]) =>
+  phoneticVariant
+    .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
+    .join('')
+
+const getNumberOfVariants = (phoneticVariant: (string | PhoneticVariant)[]) =>
+  phoneticVariant.filter(element => typeof element === 'object').length
 
 const WordOverview = ({
   measuredRef,
@@ -37,63 +42,42 @@ const WordOverview = ({
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
   // Setting up state.
-  const [currentYear, setCurrentYear] = useState(2000)
+  const [year, setYear] = useState(startingYear)
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
 
-  const [activeRules, setActiveRules] = useState<object[]>([])
-
-  const [pronunciation, setPronunciation] = useState<
-    {
-      pron: string[]
-      numberOfVariants: number
-    }[]
-  >([{ pron: [], numberOfVariants: 0 }])
+  // const [activeRules, setActiveRules] = useState<object[]>([])
 
   console.log(wordState)
 
-  // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
-  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
-    'word' in wordObject && notOutOfBounds(wordObject, currentYear)
-      ? wordObject
-      : []
-  )
-
-  const useList: WordUse[] = wordState.flatMap(wordObject =>
-    'meaning' in wordObject && notOutOfBounds(wordObject, currentYear)
-      ? wordObject
-      : []
-  )
-
-  //  To-Do: make this into the main hook that updates state for the card?
   // Setting up the scroll / year connection.
   useEffect(() => {
-    // setPronunciation(getPronunciation(wordState, currentYear))
-
     const handleScroll = () => {
-      setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-      // setPronunciation(getPronunciation(wordState, currentYear))
-      // setWordState(prev => [
-      //   ...prev.map(item => {
-      //     if ('word' in item) {
-      //       return {
-      //         ...item,
-      //         pronunciation: getPronunciation(wordState, currentYear),
-      //       }
-      //     } else return item
-      //   }),
-      // ])
+      setYear(startingYear + Math.floor(window.scrollY / 10))
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [currentYear])
+  }, [year])
 
-  useUpdateCharBasedOnYear(initialState, setWordState, currentYear)
+  useUpdateCharBasedOnYear(initialState, setWordState, year)
 
-  // setPronunciation(wordState.filter(elem => 'main' in elem))
+  // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
+  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
+    'word' in wordObject && notOutOfBounds(wordObject, year) ? wordObject : []
+  )
+
+  const useList: WordUse[] = wordState.flatMap(wordObject =>
+    'meaning' in wordObject && notOutOfBounds(wordObject, year)
+      ? wordObject
+      : []
+  )
+
+  const phoneticList: (string | PhoneticVariant)[][] = keywordList.map(elem =>
+    'concurrentPronunciations' in elem ? elem.concurrentPronunciations! : []
+  )
 
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.
@@ -101,9 +85,7 @@ const WordOverview = ({
     <style type='text/css'>
       {`.flash {
             border-radius: 4px;
-            animation: yellow-fade ${
-              currentYear === 2000 ? 0 : 0.5
-            }s ease-in-out 0s;
+            animation: yellow-fade ${year === 2000 ? 0 : 0.5}s ease-in-out 0s;
           }`}
     </style>
   )
@@ -117,6 +99,7 @@ const WordOverview = ({
   return (
     <Card ref={measuredRef} className='word-overview-card'>
       <Card.Header className='p-0' style={{ backgroundColor: '#fafbfe' }}>
+        {/* Keyword */}
         <Card.Title as='h3' className='px-3 pt-3'>
           {keywordList.map((wordObject, index) => (
             <React.Fragment key={wordObject.word}>
@@ -124,10 +107,7 @@ const WordOverview = ({
               <span
                 className='flash'
                 style={{
-                  color: `rgba(0, 0, 0, ${calculateOpacity(
-                    wordObject,
-                    currentYear
-                  )}`,
+                  color: `rgba(0, 0, 0, ${calculateOpacity(wordObject, year)}`,
                 }}
               >
                 {index > 0 && ' / '}
@@ -136,58 +116,43 @@ const WordOverview = ({
             </React.Fragment>
           ))}
         </Card.Title>
-        <div>
-          <Card.Subtitle
-            className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
-              pronunciationHover ? '#43456d' : 'text-muted'
-            }`}
-            onMouseEnter={() => setPronunciationHover(true)}
-            onMouseLeave={() => setPronunciationHover(false)}
-            onClick={() =>
-              sidePaneMode === 'pronunciation'
-                ? setSidePaneMode(null)
-                : setSidePaneMode('pronunciation')
-            }
-          >
-            {pronunciationHover ? (
-              <EarFill color={iconColor} />
-            ) : (
-              <Ear color={iconColor} />
-            )}
-            <Spacer />
-            {/* {pronunciation.map((pronVersion, index) => (
+
+        {/* Main pronunciation (opens pronunciation pane on click) */}
+        <Card.Subtitle
+          className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
+            pronunciationHover ? '#43456d' : 'text-muted'
+          }`}
+          onMouseEnter={() => setPronunciationHover(true)}
+          onMouseLeave={() => setPronunciationHover(false)}
+          onClick={() =>
+            sidePaneMode === 'pronunciation'
+              ? setSidePaneMode(null)
+              : setSidePaneMode('pronunciation')
+          }
+        >
+          {pronunciationHover ? (
+            <EarFill color={iconColor} />
+          ) : (
+            <Ear color={iconColor} />
+          )}
+          <Spacer />
+          {phoneticList.map((wordObject, index) => {
+            return (
               <div key={index}>
-                <span>
-                  {index > 0 && ' / '}
-                  {`[${pronVersion.main.join('')}]`}
-                </span>
-                {!!pronVersion.numberOfVariants && (
+                {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
+                <span>{`[${getMainPronunciation(wordObject)}]`}</span>
+                {!!getNumberOfVariants(wordObject) && (
                   <span
                     className='number-of-variants'
                     // onClick={() => console.log(actRules)}
-                  >{`(+${pronVersion.numberOfVariants})`}</span>
+                  >{`(+${getNumberOfVariants(wordObject)})`}</span>
                 )}
               </div>
-            ))} */}
-            {wordState.map(
-              (wordObject, index) =>
-                'main' in wordObject && (
-                  <div key={index}>
-                    <span>
-                      {index > 0 && ' / '}
-                      {`[${wordObject?.main}]`}
-                    </span>
-                    {!!wordObject.numberOfVariants && (
-                      <span
-                        className='number-of-variants'
-                        // onClick={() => console.log(actRules)}
-                      >{`(+${wordObject.numberOfVariants})`}</span>
-                    )}
-                  </div>
-                )
-            )}
-          </Card.Subtitle>
-        </div>
+            )
+          })}
+        </Card.Subtitle>
+
+        {/* Part of Speech (opens inflection pane on click) */}
         <Card.Subtitle
           className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
             inflectionHover ? '#43456d' : 'text-muted'
@@ -215,6 +180,8 @@ const WordOverview = ({
           )}
         </Card.Subtitle>
       </Card.Header>
+
+      {/* Meanings and example sentences */}
       <Card.Body className='p-0'>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
@@ -224,10 +191,7 @@ const WordOverview = ({
                 as='li'
                 className='fs-5 p-3 d-flex align-items-start flash'
                 style={{
-                  color: `rgba(0, 0, 0, ${calculateOpacity(
-                    wordObject,
-                    currentYear
-                  )}`,
+                  color: `rgba(0, 0, 0, ${calculateOpacity(wordObject, year)}`,
                 }}
               >
                 <div className='d-flex flex-column w-100 justify-content-between ms-2'>
@@ -243,7 +207,7 @@ const WordOverview = ({
                           style={{
                             color: `rgba(108, 117, 125, ${calculateOpacity(
                               wordObject,
-                              currentYear
+                              year
                             )}`,
                           }}
                         >
