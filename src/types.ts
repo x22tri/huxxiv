@@ -7,6 +7,9 @@ interface Changeable {
 
 interface Keyword extends Changeable {
   word: string
+  phonemic?: string[]
+  main?: string
+  numberOfVariants?: number
 }
 
 interface PartOfSpeech {
@@ -22,9 +25,9 @@ interface WordUse extends Changeable {
   examples?: string[]
 }
 
-interface Phonemic {
-  phonemic: string[]
-}
+// interface Phonemic {
+//   phonemic: string[]
+// }
 
 // This is for sound change rules.
 interface Rule extends Changeable {
@@ -51,7 +54,7 @@ type DataOptions =
   | PartOfSpeech
   | InflectionType
   | WordUse
-  | Phonemic
+  // | Phonemic
   | Pronunciation
 
 interface Word {
@@ -68,7 +71,7 @@ export type {
   InflectionType,
   Keyword,
   PartOfSpeech,
-  Phonemic,
+  // Phonemic,
   PhoneticVariant,
   Pronunciation,
   Rule,

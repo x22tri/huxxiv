@@ -6,10 +6,16 @@ import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
 import { Keyword, DataOptions, WordUse } from '../types'
 
-import { convertCharToState } from '../utils/convertCharToState'
+import {
+  convertCharToState,
+  useUpdateCharBasedOnYear,
+} from '../utils/convertCharToState'
 import getPronunciation from '../utils/getPronunciation'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
 import './WordOverview.css'
+
+const iconColor = '#43456d'
+const Spacer = () => <span style={{ marginRight: '6px' }} />
 
 const WordOverview = ({
   measuredRef,
@@ -17,14 +23,16 @@ const WordOverview = ({
   setSidePaneMode,
   wordState,
   setWordState,
+  initialState,
 }: {
   measuredRef: (node: HTMLDivElement | null) => void
   sidePaneMode: null | 'pronunciation' | 'inflection'
   setSidePaneMode: Dispatch<
     SetStateAction<null | 'pronunciation' | 'inflection'>
   >
-  wordState: undefined | DataOptions[]
+  wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
+  initialState: DataOptions[]
 }) => {
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
@@ -60,28 +68,32 @@ const WordOverview = ({
   //  To-Do: make this into the main hook that updates state for the card?
   // Setting up the scroll / year connection.
   useEffect(() => {
-    setPronunciation(getPronunciation(wordState, currentYear))
+    // setPronunciation(getPronunciation(wordState, currentYear))
 
     const handleScroll = () => {
       setCurrentYear(2000 + Math.floor(window.scrollY / 10))
-      setPronunciation(getPronunciation(wordState, currentYear))
-      setWordState(prev => [
-        ...prev.map(item => {
-          if ('word' in item) {
-            return {
-              ...item,
-              pronunciation: getPronunciation(wordState, currentYear),
-            }
-          } else return item
-        }),
-      ])
+      // setPronunciation(getPronunciation(wordState, currentYear))
+      // setWordState(prev => [
+      //   ...prev.map(item => {
+      //     if ('word' in item) {
+      //       return {
+      //         ...item,
+      //         pronunciation: getPronunciation(wordState, currentYear),
+      //       }
+      //     } else return item
+      //   }),
+      // ])
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [wordState, setWordState, currentYear])
+  }, [currentYear])
+
+  useUpdateCharBasedOnYear(initialState, setWordState, currentYear)
+
+  // setPronunciation(wordState.filter(elem => 'main' in elem))
 
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.
@@ -138,16 +150,16 @@ const WordOverview = ({
             }
           >
             {pronunciationHover ? (
-              <EarFill color='#43456d' />
+              <EarFill color={iconColor} />
             ) : (
-              <Ear color='#43456d' />
+              <Ear color={iconColor} />
             )}
-            <span style={{ marginRight: '6px' }} />
-            {pronunciation.map((pronVersion, index) => (
+            <Spacer />
+            {/* {pronunciation.map((pronVersion, index) => (
               <div key={index}>
                 <span>
                   {index > 0 && ' / '}
-                  {`[${pronVersion.pron.join('')}]`}
+                  {`[${pronVersion.main.join('')}]`}
                 </span>
                 {!!pronVersion.numberOfVariants && (
                   <span
@@ -156,7 +168,24 @@ const WordOverview = ({
                   >{`(+${pronVersion.numberOfVariants})`}</span>
                 )}
               </div>
-            ))}
+            ))} */}
+            {wordState.map(
+              (wordObject, index) =>
+                'main' in wordObject && (
+                  <div key={index}>
+                    <span>
+                      {index > 0 && ' / '}
+                      {`[${wordObject?.main}]`}
+                    </span>
+                    {!!wordObject.numberOfVariants && (
+                      <span
+                        className='number-of-variants'
+                        // onClick={() => console.log(actRules)}
+                      >{`(+${wordObject.numberOfVariants})`}</span>
+                    )}
+                  </div>
+                )
+            )}
           </Card.Subtitle>
         </div>
         <Card.Subtitle
@@ -172,11 +201,11 @@ const WordOverview = ({
           }
         >
           {inflectionHover ? (
-            <PencilFill color='#43456d' />
+            <PencilFill color={iconColor} />
           ) : (
-            <Pencil color='#43456d' />
+            <Pencil color={iconColor} />
           )}
-          <span style={{ marginRight: '6px' }} />
+          <Spacer />
           {wordState.map(wordObject =>
             'partOfSpeech' in wordObject ? (
               <span key={wordObject.partOfSpeech}>

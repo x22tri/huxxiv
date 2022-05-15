@@ -28,3 +28,10 @@
   background-color: #535383;
   border-color: #43456d;
 }
+
+.error-field {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

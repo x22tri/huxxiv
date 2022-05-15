@@ -6,7 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
 import { CHARS } from './database/CHARSV2'
-import { ErrorMessage, Word } from './types'
+import { ErrorMessage, Word, DataOptions } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
 import logo from './assets/hun2500logo.png'
@@ -22,13 +22,15 @@ const WordSearcher = ({
 }: {
   searchTerm: string
   setSearchTerm: Dispatch<SetStateAction<string>>
-  setSearchResult: Dispatch<SetStateAction<Word | ErrorMessage | undefined>>
+  setSearchResult: Dispatch<
+    SetStateAction<DataOptions[] | ErrorMessage | undefined>
+  >
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
     setSearchResult(
-      CHARS.find(el => el.data.find(d => 'word' in d && d.word === word)) ??
-        'A szó nem található az adatbázisban.'
+      CHARS.find(el => el.data.find(d => 'word' in d && d.word === word))
+        ?.data ?? 'A szó nem található az adatbázisban.'
     )
   }
 
@@ -64,10 +66,16 @@ const WordSearcher = ({
   )
 }
 
+const isErrorMessage = (
+  searchResult: DataOptions[] | ErrorMessage
+): searchResult is ErrorMessage => {
+  return typeof (searchResult as ErrorMessage) === 'string'
+}
+
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResult, setSearchResult] = useState<
-    Word | ErrorMessage | undefined
+    DataOptions[] | ErrorMessage | undefined
   >()
 
   return (
@@ -97,7 +105,16 @@ const App = () => {
               />
             }
           />
-          <SearchResults {...{ searchResult }} />
+          {isErrorMessage(searchResult) ? (
+            <div className='error-field d-flex my-auto'>{searchResult}</div>
+          ) : (
+            <SearchResults
+              wordState={searchResult}
+              setWordState={
+                setSearchResult as Dispatch<SetStateAction<DataOptions[]>>
+              }
+            />
+          )}
         </>
       )}
     </div>

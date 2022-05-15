@@ -4,72 +4,92 @@ import { DataOptions, PhoneticVariant } from '../types'
 import { RULES } from '../database/RULES'
 import { appearanceStatus, handleAppear } from './appearance-utils'
 
-const alwaysShown = 'Mindig látható'
-const notReachedYet = 'Még nincs elérve'
-const gonePast = 'Meghaladva'
-const appearanceInProgress = 'Újonnan megjelenő elem'
-const disappearanceInProgress = 'Eltűnő elem'
-const concurrentVariants = 'Egyenértékű változatok'
-
 const getPronunciation = (
-  //phonemic: (string | PhoneticVariant)[][],
-  wordState: DataOptions[],
+  // phonemic: (string | PhoneticVariant)[][],
+  phonemic: string[],
+  // wordState: DataOptions[],
+  // word:
   // setWordState: Dispatch<SetStateAction<DataOptions[]>>,
   currentYear: number
-): { pron: string[]; numberOfVariants: number }[] => {
-  const phonemic = wordState
-    .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
-    .map(element => element.phonemic)
+): { main: string; numberOfVariants: number } => {
+  // const phonemic = wordState
+  //   .flatMap(wordObject => ('phonemic' in wordObject ? wordObject : []))
+  //   .map(element => element.phonemic)
 
-  const changedPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
+  // const changedPronunciation: (string | PhoneticVariant)[][] = JSON.parse(
+  //   JSON.stringify(phonemic)
+  // )
+
+  const phonemicVariant: (string | PhoneticVariant)[] = JSON.parse(
     JSON.stringify(phonemic)
   )
 
   // console.log(changedPronunciation)
 
-  changedPronunciation.forEach(phonemicVariant => {
-    RULES.forEach(rule => {
-      phonemicVariant.forEach((phoneme, index) => {
-        if (rule.target === phoneme && rule.change) {
-          switch (handleAppear(rule, currentYear)) {
-            case 'appearanceInProgress':
-              phonemicVariant[index] = {
-                main: rule.target,
-                new: rule.change,
-                appears: rule.appears,
-              }
-              // !actRules.includes(rule) && actRules.push(rule)
-              break
-            case 'notReachedYet':
-              phonemicVariant[index] = rule.target
-              // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-              break
-            case 'gonePast':
-              phonemicVariant[index] = rule.change
-              // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
-              break
-            case 'disappearanceInProgress':
-              phonemicVariant[index] = {
-                main: rule.change,
-                old: rule.target,
-                disappears: rule.disappears,
-              }
-              // !actRules.includes(rule) && actRules.push(rule)
-              break
-          }
+  // changedPronunciation.forEach(phonemicVariant => {
+  RULES.forEach(rule => {
+    phonemicVariant.forEach((phoneme, index) => {
+      if (rule.target === phoneme && rule.change) {
+        switch (handleAppear(rule, currentYear)) {
+          case 'appearanceInProgress':
+            phonemicVariant[index] = {
+              main: rule.target,
+              new: rule.change,
+              appears: rule.appears,
+            }
+            // !actRules.includes(rule) && actRules.push(rule)
+            break
+          case 'notReachedYet':
+            phonemicVariant[index] = rule.target
+            // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+            break
+          case 'gonePast':
+            phonemicVariant[index] = rule.change
+            // actRules.includes(rule) && actRules.splice(actRules.indexOf(rule))
+            break
+          case 'disappearanceInProgress':
+            phonemicVariant[index] = {
+              main: rule.change,
+              old: rule.target,
+              disappears: rule.disappears,
+            }
+            // !actRules.includes(rule) && actRules.push(rule)
+            break
         }
-      })
+      }
     })
   })
+  // })
 
-  return changedPronunciation.map(phonemicVariant => ({
-    pron: phonemicVariant.map(phoneme =>
-      typeof phoneme === 'string' ? phoneme : phoneme.main
-    ),
+  // return changedPronunciation.map(phonemicVariant => ({
+  //   pron: phonemicVariant.map(phoneme =>
+  //     typeof phoneme === 'string' ? phoneme : phoneme.main
+  //   ),
+  //   numberOfVariants: phonemicVariant.filter(
+  //     phoneme => typeof phoneme === 'object'
+  //   ).length,
+  // }))
+
+  console.log(phonemicVariant)
+
+  // return phonemicVariant.map(phoneme => ({
+  //   pron:
+  //     typeof phoneme === 'string' ? phoneme : phoneme.main
+  //   ,
+  //   // numberOfVariants: phoneme.filter(
+  //   //   element => typeof element === 'object'
+  //   // ).length,
+  //   numberOfVariants: 1
+  // }))
+
+  return {
+    main: phonemicVariant
+      .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
+      .join(''),
     numberOfVariants: phonemicVariant.filter(
-      phoneme => typeof phoneme === 'object'
+      element => typeof element === 'object'
     ).length,
-  }))
+  }
   // actRules, To-Do!!!
 }
 
