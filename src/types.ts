@@ -59,9 +59,12 @@ interface Word {
   data: DataOptions[]
 }
 
+type ErrorMessage = string
+
 export type {
   Changeable,
   DataOptions,
+  ErrorMessage,
   InflectionType,
   Keyword,
   PartOfSpeech,

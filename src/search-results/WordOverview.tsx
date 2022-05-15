@@ -1,35 +1,14 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react'
 
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { Ear, EarFill, Pencil, PencilFill } from 'react-bootstrap-icons'
 
-import {
-  Keyword,
-  DataOptions,
-  WordUse,
-  Word,
-  Phonemic,
-  PhoneticVariant,
-  Changeable,
-} from '../types'
+import { Keyword, DataOptions, WordUse } from '../types'
 
-import { RULES } from '../database/RULES'
-
-import convertCharToState from '../utils/convertCharToState'
+import { convertCharToState } from '../utils/convertCharToState'
 import getPronunciation from '../utils/getPronunciation'
-import {
-  appearanceStatus,
-  handleAppear,
-  notOutOfBounds,
-  calculateOpacity,
-} from '../utils/appearance-utils'
+import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
 import './WordOverview.css'
 
 const WordOverview = ({
@@ -102,7 +81,7 @@ const WordOverview = ({
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [wordState, handleAppear])
+  }, [wordState, setWordState, currentYear])
 
   // A dynamic style attribute that shows a yellow flash when an element appears.
   // Has to be placed next to the element (which should have the className "flash"), at the same level.

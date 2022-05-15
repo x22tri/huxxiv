@@ -6,20 +6,17 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Stack from 'react-bootstrap/Stack'
 
-import { DataOptions, Word } from '../types'
-import { ErrorMessage } from '../App'
+import { DataOptions, ErrorMessage, Word } from '../types'
+// import { ErrorMessage } from '../App'
 import WordOverview from './WordOverview'
-import convertCharToState from '../utils/convertCharToState'
+import {
+  convertCharToState,
+  useInitialFetch,
+} from '../utils/convertCharToState'
 import './SearchResults.css'
 
 const ErrorField = ({ error }: { error: ErrorMessage }) => {
   return <div className='error-field d-flex my-auto'>{error}</div>
-}
-
-const isErrorMessage = (
-  searchResult: Word | ErrorMessage
-): searchResult is ErrorMessage => {
-  return typeof (searchResult as ErrorMessage) === 'string'
 }
 
 const SearchResults = ({
@@ -33,21 +30,22 @@ const SearchResults = ({
   >(null)
 
   const [wordState, setWordState] = useState<DataOptions[]>([])
-
-  // const WordContext = createContext({})
+  const [errorState, setErrorState] = useState<ErrorMessage>()
 
   // This is used to make sure '2000' is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node !== null) setCardHeight(node.getBoundingClientRect().height)
   }, [])
 
-  useEffect(() => {
-    if (!isErrorMessage(searchResult)) {
-      setWordState(convertCharToState(searchResult)) // This will probably be a fetch call.
-    }
-  }, [searchResult])
+  useInitialFetch(
+    searchResult,
+    wordState,
+    setWordState,
+    errorState,
+    setErrorState
+  )
 
-  if (isErrorMessage(searchResult)) return <ErrorField error={searchResult} />
+  if (errorState) return <ErrorField error={errorState} />
   else if (!wordState) return <div>Betöltés...</div>
   else {
     // console.log(wordState)

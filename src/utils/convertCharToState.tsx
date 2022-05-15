@@ -1,4 +1,6 @@
-import { Word, Phonemic } from '../types'
+import { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { DataOptions, ErrorMessage, Word, Phonemic } from '../types'
+import getPronunciation from './getPronunciation'
 
 const graphPhonemeDictionary = [
   { letter: 'a', phoneme: 'ɒ', soundType: 'vowel' },
@@ -83,4 +85,33 @@ const convertCharToState = (word: Word) => {
   return dataWithPhonemic
 }
 
-export default convertCharToState
+const isErrorMessage = (
+  searchResult: Word | ErrorMessage
+): searchResult is ErrorMessage => {
+  return typeof (searchResult as ErrorMessage) === 'string'
+}
+
+const useInitialFetch = (
+  searchResult: ErrorMessage | Word,
+  wordState: undefined | DataOptions[],
+  setWordState: Dispatch<SetStateAction<DataOptions[]>>,
+  errorState: undefined | ErrorMessage,
+  setErrorState: Dispatch<SetStateAction<undefined | ErrorMessage>>
+) => {
+  useEffect(() => {
+    if (isErrorMessage(searchResult)) {
+      setWordState([])
+      setErrorState(searchResult)
+    } else {
+      setErrorState(undefined)
+      setWordState(convertCharToState(searchResult))
+    }
+  }, [searchResult, setWordState, setErrorState])
+}
+
+// Create "useInitialFetch" hook.
+// This hook will be a useEffect call that has access to wordState, setWordState and getPronunciation.
+// It will add the "phonemic" and "pronunciation" keys and data to all {word: ...}s on WordOverview mount.
+// After that, a "useScroll" hook will update the state on scroll (and change everything except the underlying phonemic representation).
+
+export { convertCharToState, useInitialFetch }
