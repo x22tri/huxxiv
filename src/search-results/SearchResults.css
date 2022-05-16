@@ -1,25 +1,19 @@
-.error-field {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.word-overview-container {
+#word-overview-container {
   height: 5400px;
   width: 100%;
   background-color: #fefefe;
   padding-top: 70px;
 }
 
-.fixed-row {
+#fixed-row {
   position: fixed;
   width: 100%;
   padding: 0 5px;
+  justify-content: center;
 }
 
-.fixed-row > div {
-  padding: 0 5px;
+#search-results-card-group {
+  flex-basis: 800px;
 }
 
 .year {
@@ -31,17 +25,8 @@ hr {
   z-index: 0;
 }
 
-.scroll-down-prompter {
+#scroll-down-prompter {
   width: 100%;
   justify-content: center;
   display: flex;
-}
-
-@keyframes yellow-fade {
-  from {
-    background: #f8edb0;
-  }
-  to {
-    background: #fff;
-  }
 }

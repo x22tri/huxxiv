@@ -18,6 +18,7 @@ import {
   getNumberOfVariants,
 } from '../utils/getPronunciation'
 import './WordOverview.css'
+import { usePreventFlashOnMount, Flash } from '../utils/usePreventFlashOnMount'
 
 const iconColor = '#43456d'
 const Spacer = () => <span style={{ marginRight: '6px' }} />
@@ -51,7 +52,7 @@ const WordOverview = ({
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
 
-  // console.log(wordState)
+  const preventFlashOnMount = usePreventFlashOnMount()
 
   // Setting up the scroll / year connection.
   useEffect(() => {
@@ -83,17 +84,6 @@ const WordOverview = ({
       elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
   )
 
-  // A dynamic style attribute that shows a yellow flash when an element appears.
-  // Has to be placed next to the element (which should have the className "flash"), at the same level.
-  const Flash = () => (
-    <style type='text/css'>
-      {`.flash {
-            border-radius: 4px;
-            animation: yellow-fade ${year === 2000 ? 0 : 0.5}s ease-in-out 0s;
-          }`}
-    </style>
-  )
-
   // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
   // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)
   // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
@@ -101,14 +91,15 @@ const WordOverview = ({
 
   // The main return on the WordOverview component.
   return (
-    <Card ref={measuredRef}>
+    <Card ref={measuredRef} id='word-overview-card' style={{ flexGrow: 1.5 }}>
       <Card.Header className='p-0' style={{ backgroundColor: '#fafbfe' }}>
         {/* Keyword */}
         <Card.Title as='h3' className='px-3 pt-3'>
           {keywordList.map((wordObject, index) => (
             <React.Fragment key={wordObject.word}>
-              <Flash />
+              <Flash {...{ preventFlashOnMount }} />
               <span
+                // className='flash'
                 className='flash'
                 style={{
                   color: `rgba(0, 0, 0, ${calculateOpacity(wordObject, year)}`,
@@ -190,7 +181,7 @@ const WordOverview = ({
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
             <React.Fragment key={wordObject.meaning}>
-              <Flash />
+              <Flash {...{ preventFlashOnMount }} />
               <ListGroup.Item
                 as='li'
                 className='fs-5 p-3 d-flex align-items-start flash'

@@ -13,3 +13,12 @@
   cursor: pointer;
   background-color: #d8d9f2;
 }
+
+@keyframes yellow-fade {
+  from {
+    background: #f8edb0;
+  }
+  to {
+    background: #fff;
+  }
+}

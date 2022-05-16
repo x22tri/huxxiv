@@ -1,6 +1,12 @@
-import { useState, useCallback, Dispatch, SetStateAction } from 'react'
+import {
+  useState,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
-import Col from 'react-bootstrap/Col'
+import CardGroup from 'react-bootstrap/CardGroup'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Stack from 'react-bootstrap/Stack'
@@ -11,6 +17,7 @@ import PronunciationPane from './PronunciationPane'
 import './SearchResults.css'
 
 const startingYear = 2000
+// const flashWhenParentNotMounted = true ? 'flash' : undefined
 
 const SearchResults = ({
   wordState,
@@ -34,8 +41,8 @@ const SearchResults = ({
   }, [])
 
   return (
-    <Container fluid className='word-overview-container'>
-      <p className='scroll-down-prompter'>
+    <Container fluid id='word-overview-container'>
+      <p id='scroll-down-prompter'>
         ↓ Görgess lefelé a szó fejlődésének megtekintéséhez ↓
       </p>
       {cardHeight && (
@@ -53,9 +60,8 @@ const SearchResults = ({
           )}
         </Stack>
       )}
-      <Row className='fixed-row'>
-        <Col xs={0} md={2} lg={3} />
-        <Col xs={12} md={8} lg={6}>
+      <Row id='fixed-row'>
+        <CardGroup id='search-results-card-group'>
           <WordOverview
             {...{
               measuredRef,
@@ -69,16 +75,8 @@ const SearchResults = ({
               startingYear,
             }}
           />
-        </Col>
-        <Col
-          xs={0}
-          lg={3}
-          style={{
-            visibility: sidePaneMode !== 'pronunciation' ? 'hidden' : 'visible',
-          }}
-        >
-          <PronunciationPane {...{ wordState, year }} />
-        </Col>
+          <PronunciationPane {...{ sidePaneMode, wordState, year }} />
+        </CardGroup>
       </Row>
     </Container>
   )
