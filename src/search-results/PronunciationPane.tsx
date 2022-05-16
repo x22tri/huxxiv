@@ -45,7 +45,7 @@ const PronunciationPane = ({
                 <Row
                   as='li'
                   className='fs-5 flash py-1 ps-0'
-                  key={`${ruleDisplay(element)}`}
+                  key={element.id}
                   style={{
                     color: `rgba(0, 0, 0, ${calculateOpacity(element, year)}`,
                   }}

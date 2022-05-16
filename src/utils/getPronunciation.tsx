@@ -43,6 +43,7 @@ const getPronunciation = (
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
             concurrentPronunciations[index] = {
+              id: rule.id,
               main: rule.target,
               new: rule.change,
               appears: rule.appears,
@@ -62,6 +63,7 @@ const getPronunciation = (
             break
           case 'disappearanceInProgress':
             concurrentPronunciations[index] = {
+              id: rule.id,
               main: rule.change,
               old: rule.target,
               disappears: rule.disappears,

@@ -2,6 +2,7 @@ import { Rule } from '../types'
 
 const RULES: Rule[] = [
   {
+    id: 1,
     target: 'ɒ',
     change: 'ɑ',
     appears: [2001, 2050],

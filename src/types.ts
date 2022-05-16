@@ -6,6 +6,7 @@ interface Changeable {
 }
 
 interface ConcurrentPronunciation extends Changeable {
+  id: number
   main: string
   new?: string
   old?: string
@@ -14,6 +15,7 @@ interface ConcurrentPronunciation extends Changeable {
 
 // This is for sound change rules.
 interface Rule extends Changeable {
+  id: number
   target: string
   change?: string
   note?: string

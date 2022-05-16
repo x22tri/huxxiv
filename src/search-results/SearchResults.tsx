@@ -30,7 +30,7 @@ const SearchResults = ({
 
   // This is used to make sure '2000' is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
-    node && setCardHeight(node.getBoundingClientRect().height)
+    if (node) setCardHeight(node.getBoundingClientRect().height)
   }, [])
 
   return (
@@ -70,11 +70,15 @@ const SearchResults = ({
             }}
           />
         </Col>
-        {sidePaneMode === 'pronunciation' && (
-          <Col xs={0} md={0} lg={3}>
-            <PronunciationPane {...{ wordState, year }} />
-          </Col>
-        )}
+        <Col
+          xs={0}
+          lg={3}
+          style={{
+            visibility: sidePaneMode !== 'pronunciation' ? 'hidden' : 'visible',
+          }}
+        >
+          <PronunciationPane {...{ wordState, year }} />
+        </Col>
       </Row>
     </Container>
   )
