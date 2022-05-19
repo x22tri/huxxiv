@@ -12,12 +12,12 @@
   justify-content: center;
 }
 
-/* #search-results-card-group {
-  flex-basis: 800px;
-} */
-
 #search-results-card {
   flex-basis: 800px;
+}
+
+#search-results-card-header {
+  background-color: #43456d;
 }
 
 .year {

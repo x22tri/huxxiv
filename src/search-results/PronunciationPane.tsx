@@ -46,7 +46,7 @@ const PronunciationPane = ({
             !!concurrent.length ? 'Elsődleges kiejtése' : 'Kiejtése'
           } ebben a korszakban:`}
         </Card.Title>
-        <Card.Subtitle className='px-3 pt-2 pb-3 fs-5'>
+        <Card.Subtitle className='px-3 pt-2 pb-3 fs-5 d-flex justify-content-center'>
           {word.concurrentPronunciations &&
             `[${getMainPronunciation(word.concurrentPronunciations)}]`}
         </Card.Subtitle>
