@@ -5,9 +5,11 @@ import Row from 'react-bootstrap/Row'
 
 import { getMainPronunciation } from '../utils/getPronunciation'
 import { calculateOpacity } from '../utils/appearance-utils'
-import { usePreventFlashOnMount, Flash } from '../utils/usePreventFlashOnMount'
+import {
+  usePreventFlashOnMount,
+  Flasher,
+} from '../utils/usePreventFlashOnMount'
 import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
-import React from 'react'
 
 const PronunciationPane = ({
   sidePaneMode,
@@ -47,8 +49,7 @@ const PronunciationPane = ({
             Változatok:
             <ListGroup as='ul' variant='flush' className='ps-3'>
               {concurrent.map(element => (
-                <React.Fragment key={element.id}>
-                  <Flash {...{ preventFlashOnMount }} />
+                <Flasher key={element.id} {...{ preventFlashOnMount }}>
                   <Row
                     as='li'
                     className='fs-5 flash py-1 ps-0'
@@ -63,7 +64,7 @@ const PronunciationPane = ({
                       {element.note || null}
                     </Col>
                   </Row>
-                </React.Fragment>
+                </Flasher>
               ))}
             </ListGroup>
           </Card.Body>

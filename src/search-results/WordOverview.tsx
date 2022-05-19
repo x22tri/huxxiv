@@ -18,7 +18,10 @@ import {
   getNumberOfVariants,
 } from '../utils/getPronunciation'
 import './WordOverview.css'
-import { usePreventFlashOnMount, Flash } from '../utils/usePreventFlashOnMount'
+import {
+  usePreventFlashOnMount,
+  Flasher,
+} from '../utils/usePreventFlashOnMount'
 
 const iconColor = '#43456d'
 const Spacer = () => <span style={{ marginRight: '6px' }} />
@@ -96,10 +99,8 @@ const WordOverview = ({
         {/* Keyword */}
         <Card.Title as='h3' className='px-3 pt-3'>
           {keywordList.map((wordObject, index) => (
-            <React.Fragment key={wordObject.word}>
-              <Flash {...{ preventFlashOnMount }} />
+            <Flasher key={wordObject.word} {...{ preventFlashOnMount }}>
               <span
-                // className='flash'
                 className='flash'
                 style={{
                   color: `rgba(0, 0, 0, ${calculateOpacity(wordObject, year)}`,
@@ -108,7 +109,7 @@ const WordOverview = ({
                 {index > 0 && ' / '}
                 {wordObject.word}
               </span>
-            </React.Fragment>
+            </Flasher>
           ))}
         </Card.Title>
 
@@ -180,8 +181,7 @@ const WordOverview = ({
       <Card.Body className='p-0'>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
-            <React.Fragment key={wordObject.meaning}>
-              <Flash {...{ preventFlashOnMount }} />
+            <Flasher key={wordObject.meaning} {...{ preventFlashOnMount }}>
               <ListGroup.Item
                 as='li'
                 className='fs-5 p-3 d-flex align-items-start flash'
@@ -212,7 +212,7 @@ const WordOverview = ({
                   </div>
                 </div>
               </ListGroup.Item>
-            </React.Fragment>
+            </Flasher>
           ))}
         </ListGroup>
       </Card.Body>
