@@ -18,10 +18,7 @@ import {
   getNumberOfVariants,
 } from '../utils/getPronunciation'
 import './WordOverview.css'
-import {
-  usePreventFlashOnMount,
-  Flasher,
-} from '../utils/usePreventFlashOnMount'
+import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const iconColor = '#43456d'
@@ -52,7 +49,7 @@ const WordOverview = ({
 }) => {
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
-  const preventFlashOnMount = usePreventFlashOnMount()
+  const preventFlashOnMount = useNoFlashOnMount()
 
   // Setting up state.
   // const [pronunciationHover, setPronunciationHover] = useState(false)

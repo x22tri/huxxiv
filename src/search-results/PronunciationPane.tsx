@@ -7,28 +7,21 @@ import Row from 'react-bootstrap/Row'
 
 import { getMainPronunciation } from '../utils/getPronunciation'
 import { calculateOpacity } from '../utils/appearance-utils'
-import {
-  usePreventFlashOnMount,
-  Flasher,
-} from '../utils/usePreventFlashOnMount'
+import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
 import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
 import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const PronunciationPane = ({
-  // sidePaneMode,
   initialState,
   wordState,
   setWordState,
-}: // year,
-{
-  // sidePaneMode: null | 'pronunciation' | 'inflection'
+}: {
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
   initialState: DataOptions[]
-  // year: number
 }) => {
-  const preventFlashOnMount = usePreventFlashOnMount()
+  const preventFlashOnMount = useNoFlashOnMount()
 
   const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
@@ -41,8 +34,6 @@ const PronunciationPane = ({
       element => typeof element === 'object'
     ) as ConcurrentPronunciation[]
 
-    console.log(year)
-
     const ruleDisplay = (concurrentElement: ConcurrentPronunciation) =>
       concurrentElement.new
         ? `[${concurrentElement.main}] ~ [${concurrentElement.new}]`
@@ -51,7 +42,9 @@ const PronunciationPane = ({
     return (
       <div>
         <Card.Title as='h6' className='px-3 pt-3'>
-          Elsődleges kiejtés ebben a korszakban:
+          {`${
+            !!concurrent.length ? 'Elsődleges kiejtése' : 'Kiejtése'
+          } ebben a korszakban:`}
         </Card.Title>
         <Card.Subtitle className='px-3 pt-2 pb-3 fs-5'>
           {word.concurrentPronunciations &&

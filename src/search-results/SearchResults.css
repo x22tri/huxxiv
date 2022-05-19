@@ -12,18 +12,13 @@
   justify-content: center;
 }
 
-#search-results-card-group {
+/* #search-results-card-group {
   flex-basis: 800px;
-}
+} */
 
 #search-results-card {
   flex-basis: 800px;
 }
-
-/* #tabs {
-  display: flex;
-  justify-content: space-evenly;
-} */
 
 .year {
   margin-bottom: 475px;

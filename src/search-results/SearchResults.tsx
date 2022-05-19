@@ -1,21 +1,23 @@
 import { useState, useCallback, Dispatch, SetStateAction } from 'react'
 
 import Card from 'react-bootstrap/Card'
-import CardGroup from 'react-bootstrap/CardGroup'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Nav from 'react-bootstrap/Nav'
-// import Tab from 'react-bootstrap/Tab'
 import Stack from 'react-bootstrap/Stack'
+import {
+  Ear,
+  EarFill,
+  Pencil,
+  PencilFill,
+  ChatLeftDots,
+} from 'react-bootstrap-icons'
 
 import { DataOptions, Keyword } from '../types'
 import WordOverview from './WordOverview'
 import PronunciationPane from './PronunciationPane'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
-import {
-  usePreventFlashOnMount,
-  Flasher,
-} from '../utils/usePreventFlashOnMount'
+import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 import './SearchResults.css'
 
@@ -28,9 +30,8 @@ const SearchResults = ({
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
 }) => {
-  const preventFlashOnMount = usePreventFlashOnMount()
+  const preventFlashOnMount = useNoFlashOnMount()
 
-  // const [year, setYear] = useState(startingYear)
   const [cardHeight, setCardHeight] = useState(0)
   const [sidePaneMode, setSidePaneMode] = useState<
     'meaning' | 'pronunciation' | 'inflection'
@@ -90,7 +91,7 @@ const SearchResults = ({
           )}
         </CardGroup> */}
         <Card id='search-results-card'>
-          <Card.Title as='h3' className='px-3 pt-3'>
+          <Card.Title as='h3' className='px-3 pt-3 mx-auto fw-bold'>
             {keywordList.map((wordObject, index) => (
               <Flasher key={wordObject.word} {...{ preventFlashOnMount }}>
                 <span
@@ -122,9 +123,18 @@ const SearchResults = ({
                 setSidePaneMode(selectedKey)
             }}
           >
-            <Nav.Link eventKey='meaning'>JELENTÉS</Nav.Link>
-            <Nav.Link eventKey='pronunciation'>KIEJTÉS</Nav.Link>
-            <Nav.Link eventKey='inflection'>RAGOZÁS</Nav.Link>
+            <Nav.Link eventKey='meaning'>
+              <ChatLeftDots />
+              <div>JELENTÉS</div>
+            </Nav.Link>
+            <Nav.Link eventKey='pronunciation'>
+              <Ear />
+              <div>KIEJTÉS</div>
+            </Nav.Link>
+            <Nav.Link eventKey='inflection'>
+              <Pencil />
+              <div>RAGOZÁS</div>
+            </Nav.Link>
           </Nav>
           {sidePaneMode === 'meaning' && (
             <WordOverview

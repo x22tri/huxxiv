@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const usePreventFlashOnMount = () => {
+const useNoFlashOnMount = () => {
   const [preventFlash, setPreventFlash] = useState(true)
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const usePreventFlashOnMount = () => {
 }
 
 // A wrapper that shows a yellow flash when the element wrapped in it appears.
-// const preventFlashOnMount = usePreventFlashOnMount() has to be initialized in the given component for it to work.
+// const preventFlashOnMount = useNoFlashOnMount() has to be initialized in the given component for it to work.
 const Flasher = ({
   preventFlashOnMount,
   children,
@@ -34,4 +34,4 @@ const Flasher = ({
   </React.Fragment>
 )
 
-export { usePreventFlashOnMount, Flasher }
+export { useNoFlashOnMount, Flasher }

@@ -1,23 +1,19 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { useState, useEffect } from 'react'
 
 const useChangeYearOnScroll = () => {
-  const startingYear = 2000
-  const [year, setYear] = useState(
-    startingYear + Math.floor(window.scrollY / 10)
-  )
-
-  console.log(year)
+  const startYear = 2000
+  const [year, setYear] = useState(startYear + Math.floor(window.scrollY / 10))
 
   useEffect(() => {
     const handleScroll = () => {
-      setYear(startingYear + Math.floor(window.scrollY / 10))
+      setYear(startYear + Math.floor(window.scrollY / 10))
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [year, setYear, startingYear])
+  }, [year, setYear, startYear])
 
   return year
 }
