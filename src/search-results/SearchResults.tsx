@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import { useState, useCallback, Dispatch, SetStateAction } from 'react'
 
 import CardGroup from 'react-bootstrap/CardGroup'
 import Container from 'react-bootstrap/Container'
@@ -17,7 +11,6 @@ import PronunciationPane from './PronunciationPane'
 import './SearchResults.css'
 
 const startingYear = 2000
-// const flashWhenParentNotMounted = true ? 'flash' : undefined
 
 const SearchResults = ({
   wordState,

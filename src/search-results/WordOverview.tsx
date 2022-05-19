@@ -48,11 +48,11 @@ const WordOverview = ({
 }) => {
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
+  const preventFlashOnMount = usePreventFlashOnMount()
+
   // Setting up state.
   const [pronunciationHover, setPronunciationHover] = useState(false)
   const [inflectionHover, setInflectionHover] = useState(false)
-
-  const preventFlashOnMount = usePreventFlashOnMount()
 
   // Setting up the scroll / year connection.
   useEffect(() => {

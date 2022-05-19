@@ -19,10 +19,8 @@ const PronunciationPane = ({
   year: number
 }) => {
   const preventFlashOnMount = usePreventFlashOnMount()
-  console.log(preventFlashOnMount)
-  const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
-  // console.log(preventFlashOnMount)
+  const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
   if (!word || !word.concurrentPronunciations) return null
   else {
