@@ -75,7 +75,9 @@ const SearchResults = ({
               startingYear,
             }}
           />
-          <PronunciationPane {...{ sidePaneMode, wordState, year }} />
+          {sidePaneMode === 'pronunciation' && (
+            <PronunciationPane {...{ sidePaneMode, wordState, year }} />
+          )}
         </CardGroup>
       </Row>
     </Container>

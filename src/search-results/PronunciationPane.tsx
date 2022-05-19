@@ -19,6 +19,7 @@ const PronunciationPane = ({
   year: number
 }) => {
   const preventFlashOnMount = usePreventFlashOnMount()
+  console.log(preventFlashOnMount)
   const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
   // console.log(preventFlashOnMount)
@@ -35,11 +36,7 @@ const PronunciationPane = ({
         : `[${concurrentElement.main}] ~ [${concurrentElement.old}]`
 
     return (
-      <Card
-        style={{
-          display: sidePaneMode === 'pronunciation' ? 'inline' : 'none',
-        }}
-      >
+      <Card>
         <Card.Title as='h6' className='px-3 pt-3'>
           Elsődleges kiejtés ebben a korszakban:
         </Card.Title>
@@ -57,7 +54,6 @@ const PronunciationPane = ({
                   <Row
                     as='li'
                     className='fs-5 flash py-1 ps-0'
-                    // key={element.id}
                     style={{
                       color: `rgba(0, 0, 0, ${calculateOpacity(element, year)}`,
                     }}
