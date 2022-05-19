@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from 'react'
+
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -9,20 +11,29 @@ import {
   usePreventFlashOnMount,
   Flasher,
 } from '../utils/usePreventFlashOnMount'
+import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
 import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
+import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const PronunciationPane = ({
-  sidePaneMode,
+  // sidePaneMode,
+  initialState,
   wordState,
-  year,
-}: {
-  sidePaneMode: null | 'pronunciation' | 'inflection'
+  setWordState,
+}: // year,
+{
+  // sidePaneMode: null | 'pronunciation' | 'inflection'
   wordState: DataOptions[]
-  year: number
+  setWordState: Dispatch<SetStateAction<DataOptions[]>>
+  initialState: DataOptions[]
+  // year: number
 }) => {
   const preventFlashOnMount = usePreventFlashOnMount()
 
   const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
+
+  let year = useChangeYearOnScroll()
+  useUpdateCharBasedOnYear(initialState, setWordState, year)
 
   if (!word || !word.concurrentPronunciations) return null
   else {
@@ -30,13 +41,15 @@ const PronunciationPane = ({
       element => typeof element === 'object'
     ) as ConcurrentPronunciation[]
 
+    console.log(year)
+
     const ruleDisplay = (concurrentElement: ConcurrentPronunciation) =>
       concurrentElement.new
         ? `[${concurrentElement.main}] ~ [${concurrentElement.new}]`
         : `[${concurrentElement.main}] ~ [${concurrentElement.old}]`
 
     return (
-      <Card>
+      <div>
         <Card.Title as='h6' className='px-3 pt-3'>
           Elsődleges kiejtés ebben a korszakban:
         </Card.Title>
@@ -69,7 +82,7 @@ const PronunciationPane = ({
             </ListGroup>
           </Card.Body>
         )}
-      </Card>
+      </div>
     )
   }
 }

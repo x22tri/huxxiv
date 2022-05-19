@@ -22,59 +22,49 @@ import {
   usePreventFlashOnMount,
   Flasher,
 } from '../utils/usePreventFlashOnMount'
+import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const iconColor = '#43456d'
 const Spacer = () => <span style={{ marginRight: '6px' }} />
 
 const WordOverview = ({
   measuredRef,
-  sidePaneMode,
-  setSidePaneMode,
+  // sidePaneMode,
+  // setSidePaneMode,
   wordState,
   setWordState,
   initialState,
-  year,
-  setYear,
-  startingYear,
-}: {
+}: // year,
+// setYear,
+// startingYear,
+{
   measuredRef: (node: HTMLDivElement | null) => void
-  sidePaneMode: null | 'pronunciation' | 'inflection'
+  sidePaneMode: 'meaning' | 'pronunciation' | 'inflection'
   setSidePaneMode: Dispatch<
-    SetStateAction<null | 'pronunciation' | 'inflection'>
+    SetStateAction<'meaning' | 'pronunciation' | 'inflection'>
   >
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
   initialState: DataOptions[]
-  year: number
-  setYear: Dispatch<SetStateAction<number>>
-  startingYear: number
+  // year: number
+  // setYear: Dispatch<SetStateAction<number>>
+  // startingYear: number
 }) => {
   if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
 
   const preventFlashOnMount = usePreventFlashOnMount()
 
   // Setting up state.
-  const [pronunciationHover, setPronunciationHover] = useState(false)
-  const [inflectionHover, setInflectionHover] = useState(false)
+  // const [pronunciationHover, setPronunciationHover] = useState(false)
+  // const [inflectionHover, setInflectionHover] = useState(false)
 
-  // Setting up the scroll / year connection.
-  useEffect(() => {
-    const handleScroll = () => {
-      setYear(startingYear + Math.floor(window.scrollY / 10))
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [year, setYear, startingYear])
-
+  let year = useChangeYearOnScroll()
   useUpdateCharBasedOnYear(initialState, setWordState, year)
 
   // TypeScript doesn't seem to allow the type guard with the regular "filter" function.
-  const keywordList: Keyword[] = wordState.flatMap(wordObject =>
-    'word' in wordObject && notOutOfBounds(wordObject, year) ? wordObject : []
-  )
+  // const keywordList: Keyword[] = wordState.flatMap(wordObject =>
+  //   'word' in wordObject && notOutOfBounds(wordObject, year) ? wordObject : []
+  // )
 
   const useList: WordUse[] = wordState.flatMap(wordObject =>
     'meaning' in wordObject && notOutOfBounds(wordObject, year)
@@ -82,10 +72,10 @@ const WordOverview = ({
       : []
   )
 
-  const phoneticList: (string | ConcurrentPronunciation)[][] = keywordList.map(
-    elem =>
-      elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
-  )
+  // const phoneticList: (string | ConcurrentPronunciation)[][] = keywordList.map(
+  //   elem =>
+  //     elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
+  // )
 
   // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
   // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)
@@ -94,10 +84,10 @@ const WordOverview = ({
 
   // The main return on the WordOverview component.
   return (
-    <Card ref={measuredRef} id='word-overview-card' style={{ flexGrow: 1.5 }}>
-      <Card.Header className='p-0' style={{ backgroundColor: '#fafbfe' }}>
-        {/* Keyword */}
-        <Card.Title as='h3' className='px-3 pt-3'>
+    <div ref={measuredRef} id='word-overview-card'>
+      {/* <Card.Header className='p-0' style={{ backgroundColor: '#fafbfe' }}> */}
+      {/* Keyword */}
+      {/* <Card.Title as='h3' className='px-3 pt-3'>
           {keywordList.map((wordObject, index) => (
             <Flasher key={wordObject.word} {...{ preventFlashOnMount }}>
               <span
@@ -111,10 +101,10 @@ const WordOverview = ({
               </span>
             </Flasher>
           ))}
-        </Card.Title>
+        </Card.Title> */}
 
-        {/* Main pronunciation (opens pronunciation pane on click) */}
-        <Card.Subtitle
+      {/* Main pronunciation (opens pronunciation pane on click) */}
+      {/* <Card.Subtitle
           className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
             pronunciationHover ? '#43456d' : 'text-muted'
           }`}
@@ -146,10 +136,10 @@ const WordOverview = ({
               </div>
             )
           })}
-        </Card.Subtitle>
+        </Card.Subtitle> */}
 
-        {/* Part of Speech (opens inflection pane on click) */}
-        <Card.Subtitle
+      {/* Part of Speech (opens inflection pane on click) */}
+      {/* <Card.Subtitle
           className={`side-pane-opener mx-2 px-2 pt-1 pb-2 mb-1 ${
             inflectionHover ? '#43456d' : 'text-muted'
           }`}
@@ -175,7 +165,7 @@ const WordOverview = ({
             ) : null
           )}
         </Card.Subtitle>
-      </Card.Header>
+      </Card.Header> */}
 
       {/* Meanings and example sentences */}
       <Card.Body className='p-0'>
@@ -216,7 +206,7 @@ const WordOverview = ({
           ))}
         </ListGroup>
       </Card.Body>
-    </Card>
+    </div>
   )
 }
 
