@@ -5,32 +5,22 @@ import ListGroup from 'react-bootstrap/ListGroup'
 
 import { DataOptions, WordUse } from '../types'
 
-import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
+import { useUpdateCharBasedOnYear } from '../utils/useUpdateCharBasedOnYear'
 import { calculateOpacity } from '../utils/appearance-utils'
 
 import './WordOverview.css'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const WordOverview = ({
   measuredRef,
-  wordState,
-  setWordState,
-  initialState,
   useList,
+  year,
 }: {
   measuredRef: (node: HTMLDivElement | null) => void
-  wordState: DataOptions[]
-  setWordState: Dispatch<SetStateAction<DataOptions[]>>
-  initialState: DataOptions[]
   useList: WordUse[]
+  year: number
 }) => {
-  if (!wordState) throw new Error('Hiba történt. Kérjük, próbálkozz később.')
-
   const preventFlashOnMount = useNoFlashOnMount()
-
-  let year = useChangeYearOnScroll()
-  useUpdateCharBasedOnYear(initialState, setWordState, year)
 
   // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
   // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)

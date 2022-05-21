@@ -24,7 +24,7 @@ import WordOverview from './WordOverview'
 import PronunciationPane from './PronunciationPane'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
+import { useUpdateCharBasedOnYear } from '../utils/useUpdateCharBasedOnYear'
 import {
   getMainPronunciation,
   getNumberOfVariants,
@@ -81,10 +81,10 @@ const SearchResults = ({
     'meaning' | 'pronunciation' | 'inflection'
   >('meaning')
 
-  let year = useChangeYearOnScroll()
-
   // This state provides an immutable starting point for all phonetic etc. processes.
   const [initialState] = useState(wordState)
+
+  let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
   // This is used to make sure '2000' is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
@@ -180,33 +180,30 @@ const SearchResults = ({
                 eventKey='pronunciation'
                 icon={Ear}
                 activeTitle='KIEJTÉS'
-                notActiveTitle={phoneticList.map((wordObject, index) => {
-                  return (
-                    <div key={index}>
-                      {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
-                      <span>{`[${getMainPronunciation(wordObject)}]`}</span>
-                      {!!getNumberOfVariants(wordObject) && (
-                        <span
-                          className='number-of-variants'
-                          // onClick={() => console.log(actRules)}
-                        >{`(+${getNumberOfVariants(wordObject)})`}</span>
-                      )}
-                    </div>
-                  )
-                })}
+                notActiveTitle={phoneticList.map((wordObject, index) => (
+                  <div key={index}>
+                    {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
+                    <span>{`[${getMainPronunciation(wordObject)}]`}</span>
+                    {!!getNumberOfVariants(wordObject) && (
+                      <span className='number-of-variants'>
+                        {`(+${getNumberOfVariants(wordObject)})`}
+                      </span>
+                    )}
+                  </div>
+                ))}
                 {...{ sidePaneMode }}
               />
               <NavIcon
                 eventKey='inflection'
                 icon={Pencil}
                 activeTitle='RAGOZÁS'
-                notActiveTitle={wordState.map(wordObject =>
+                notActiveTitle={wordState.map((wordObject, index) =>
                   'partOfSpeech' in wordObject ? (
                     <span key={wordObject.partOfSpeech}>
                       {wordObject.partOfSpeech}
                     </span>
                   ) : (
-                    <span />
+                    <span key={index} />
                   )
                 )}
                 {...{ sidePaneMode }}
@@ -217,16 +214,14 @@ const SearchResults = ({
             <WordOverview
               {...{
                 measuredRef,
-                wordState,
-                setWordState,
-                initialState,
                 useList,
+                year,
               }}
             />
           )}
 
           {sidePaneMode === 'pronunciation' && (
-            <PronunciationPane {...{ initialState, wordState, setWordState }} />
+            <PronunciationPane {...{ wordState, year }} />
           )}
         </Card>
       </Row>

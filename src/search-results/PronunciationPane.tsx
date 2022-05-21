@@ -8,25 +8,18 @@ import Row from 'react-bootstrap/Row'
 import { getMainPronunciation } from '../utils/getPronunciation'
 import { calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import { useUpdateCharBasedOnYear } from '../utils/convertCharToState'
+import { useUpdateCharBasedOnYear } from '../utils/useUpdateCharBasedOnYear'
 import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
-import useChangeYearOnScroll from '../utils/useChangeYearOnScroll'
 
 const PronunciationPane = ({
-  initialState,
   wordState,
-  setWordState,
+  year,
 }: {
   wordState: DataOptions[]
-  setWordState: Dispatch<SetStateAction<DataOptions[]>>
-  initialState: DataOptions[]
+  year: number
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
-
   const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
-
-  let year = useChangeYearOnScroll()
-  useUpdateCharBasedOnYear(initialState, setWordState, year)
 
   if (!word || !word.concurrentPronunciations) return null
   else {
