@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
-import { CHARS } from './database/CHARSV2'
+import { CHARS } from './database/CHARS'
 import { ErrorMessage, DataOptions } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'

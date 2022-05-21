@@ -1,4 +1,4 @@
-import { Keyword, ConcurrentPronunciation, Rule } from '../types'
+import { Keyword, ConcurrentPronunciation, Rule, PhoneticInfo } from '../types'
 
 import { RULES } from '../database/RULES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
@@ -28,70 +28,94 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
 const getPronunciation = (
   wordObject: Keyword,
   currentYear: number
-): [string[], (string | ConcurrentPronunciation)[], Rule[]] => {
+): [string[], PhoneticInfo[], Rule[]] => {
   let phonemic: string[] =
     wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
 
-  const concurrentPronunciations: (string | ConcurrentPronunciation)[] =
-    JSON.parse(JSON.stringify(phonemic))
+  const concurrentPronunciations: PhoneticInfo[] = JSON.parse(
+    JSON.stringify(phonemic.map(elem => ({ main: elem, variants: [] })))
+  )
 
   const activeRules: Rule[] = []
 
   RULES.forEach(rule => {
     concurrentPronunciations.forEach((phoneme, index) => {
-      if (rule.target === phoneme && rule.change) {
+      let currentSound = phoneme.main
+      // console.log(currentSound)
+
+      // console.log(currentSound)
+      // if (rule.change === currentSound) {
+      // console.log('change: ' + rule.change + ', sound: ' + currentSound)
+      // console.log(currentSound)
+      // }
+
+      // {
+      //   main: ..., variants: [{ id: 1, new: 2, appears}, {id: 2, old: 3, appears}]
+      // }
+
+      if (rule.target === currentSound && rule.change) {
+        // console.log(
+        //   currentYear + ': ' + rule.id + ' ' + handleAppear(rule, currentYear)
+        // )
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
-            concurrentPronunciations[index] = {
+            // case 'concurrentVariants':
+            phoneme.main = rule.target
+            phoneme.variants.push({
               id: rule.id,
-              main: rule.target,
               new: rule.change,
               appears: rule.appears,
               note: rule.note,
-            }
+            })
             !activeRules.includes(rule) && activeRules.push(rule)
             break
           case 'notReachedYet':
-            concurrentPronunciations[index] = rule.target
+            phoneme.main = rule.target
             activeRules.includes(rule) &&
               activeRules.splice(activeRules.indexOf(rule))
             break
           case 'gonePast':
-            concurrentPronunciations[index] = rule.change
+            phoneme.main = rule.change
             activeRules.includes(rule) &&
               activeRules.splice(activeRules.indexOf(rule))
             break
           case 'disappearanceInProgress':
-            concurrentPronunciations[index] = {
+            phoneme.main = rule.change
+            phoneme.variants.push({
               id: rule.id,
-              main: rule.change,
+
               old: rule.target,
               disappears: rule.disappears,
               note: rule.note,
-            }
+            })
             !activeRules.includes(rule) && activeRules.push(rule)
             break
         }
       }
+
+      //   console.log(handleAppear(rule, currentYear))
+
+      // console.log(rule.change)
+      // console.log(currentSound)
     })
   })
 
+  // console.log(getMainPronunciation(concurrentPronunciations))
+
+  // console.log(concurrentPronunciations)
   // console.log(activeRules)
 
   return [phonemic, concurrentPronunciations, activeRules]
 }
 
-const getMainPronunciation = (
-  concurrentPronunciations: (string | ConcurrentPronunciation)[]
-) =>
+const getMainPronunciation = (concurrentPronunciations: PhoneticInfo[]) =>
   concurrentPronunciations
     .map(phoneme => (typeof phoneme === 'string' ? phoneme : phoneme.main))
     .join('')
 
-const getNumberOfVariants = (
-  concurrentPronunciations: (string | ConcurrentPronunciation)[]
-) =>
-  concurrentPronunciations.filter(element => typeof element === 'object').length
+const getNumberOfVariants = (concurrentPronunciations: PhoneticInfo[]) =>
+  // concurrentPronunciations.filter(element => typeof element === 'object').length
+  concurrentPronunciations.filter(elem => elem.variants.length).length
 
 export { getPronunciation, getMainPronunciation, getNumberOfVariants }
 

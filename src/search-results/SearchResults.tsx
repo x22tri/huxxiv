@@ -19,6 +19,7 @@ import {
   Keyword,
   ConcurrentPronunciation,
   WordUse,
+  PhoneticInfo,
 } from '../types'
 import MeaningPane from './MeaningPane'
 import PronunciationPane from './PronunciationPane'
@@ -92,6 +93,8 @@ const SearchResults = ({
 
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
+  // console.log(wordState)
+
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node) setCardHeight(node.getBoundingClientRect().height)
@@ -109,9 +112,8 @@ const SearchResults = ({
       : []
   )
 
-  const phoneticList: (string | ConcurrentPronunciation)[][] = keywordList.map(
-    elem =>
-      elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
+  const phoneticList: PhoneticInfo[][] = keywordList.map(elem =>
+    elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
   )
 
   return (
@@ -186,17 +188,22 @@ const SearchResults = ({
                 eventKey='pronunciation'
                 icon={Ear}
                 activeTitle='KIEJTÉS'
-                notActiveTitle={phoneticList.map((wordObject, index) => (
-                  <div key={index}>
-                    {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
-                    <span>{`[${getMainPronunciation(wordObject)}]`}</span>
-                    {!!getNumberOfVariants(wordObject) && (
-                      <span className='number-of-variants'>
-                        {`(+${getNumberOfVariants(wordObject)})`}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                notActiveTitle={keywordList.map((wordObject, index) => {
+                  const pron = wordObject.concurrentPronunciations
+                  return pron ? (
+                    <div key={index}>
+                      {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
+                      <span>{`[${getMainPronunciation(pron)}]`}</span>
+                      {!!getNumberOfVariants(pron) && (
+                        <span className='number-of-variants'>
+                          {`(+${getNumberOfVariants(pron)})`}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span key={index} />
+                  )
+                })}
                 {...{ sidePaneMode }}
               />
               <NavIcon
