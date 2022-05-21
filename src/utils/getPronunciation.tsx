@@ -5,7 +5,7 @@ import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
 import { handleAppear } from './appearance-utils'
 
 const convertKeywordToPhonemes = (keyword: string): string[] => {
-  // Sort letters by length (longest to shortest) and make a Regex out of it.
+  // Sort letters by length (longest to shortest) to find trigraphs before digraphs before monographs.
   const keywordBreakdownToLetters = keyword.match(
     new RegExp(
       GRAPH_TO_PHONEME.map(i => i.letter)

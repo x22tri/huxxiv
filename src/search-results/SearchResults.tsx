@@ -20,7 +20,7 @@ import {
   ConcurrentPronunciation,
   WordUse,
 } from '../types'
-import WordOverview from './WordOverview'
+import MeaningPane from './MeaningPane'
 import PronunciationPane from './PronunciationPane'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
@@ -217,7 +217,7 @@ const SearchResults = ({
             </Nav>
           </Card.Header>
           {sidePaneMode === 'meaning' && (
-            <WordOverview
+            <MeaningPane
               {...{
                 measuredRef,
                 useList,
