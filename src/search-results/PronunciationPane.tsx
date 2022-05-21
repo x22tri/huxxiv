@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import Card from 'react-bootstrap/Card'
@@ -12,13 +11,8 @@ import {
 } from '../utils/getPronunciation'
 import { calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import { useUpdateCharBasedOnYear } from '../utils/useUpdateCharBasedOnYear'
-import {
-  ConcurrentPronunciation,
-  DataOptions,
-  Keyword,
-  PhoneticInfo,
-} from '../types'
+import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
+import ChangingPronunciation from './ChangingPronunciation'
 
 const PronunciationPane = ({
   wordState,
@@ -34,54 +28,24 @@ const PronunciationPane = ({
   else {
     const variants = word.concurrentPronunciations
       .map(c => {
-        let newProns = c.variants.filter(variant => variant.new)
-        let oldProns = c.variants.filter(variant => variant.old)
+        let newProns = c.variants.filter(n => n.new)
+        let oldProns = c.variants.filter(o => o.old)
 
         return !!(newProns.length || oldProns.length)
           ? {
-              main: c.main,
-              new: newProns,
-              old: oldProns,
+              main: {
+                main: c.main,
+                disappears: newProns.find(n => n.disappears)?.disappears,
+              },
+              new: newProns.map(n => ({ ...n, disappears: undefined })),
+              old: oldProns.map(o => ({ ...o, appears: undefined })),
               note:
-                newProns.find(variant => variant.note)?.note ||
-                oldProns.find(variant => variant.note)?.note,
+                newProns.find(n => n.note)?.note ||
+                oldProns.find(o => o.note)?.note,
             }
           : undefined
       })
       .filter(e => !!e)
-
-    const ruleDisplay = (
-      main?: string,
-      newPron?: ConcurrentPronunciation[],
-      oldPron?: ConcurrentPronunciation[]
-    ) => (
-      <>
-        •&nbsp;
-        {oldPron &&
-          oldPron.map((p, index) => (
-            <span
-              key={index}
-              style={{
-                color: `rgba(0, 0, 0, ${calculateOpacity(p, year)}`,
-              }}
-            >
-              {p.old}&nbsp;&gt;&nbsp;
-            </span>
-          ))}
-        {main && <span>{main}</span>}
-        {newPron &&
-          newPron.map((p, index) => (
-            <span
-              key={index}
-              style={{
-                color: `rgba(0, 0, 0, ${calculateOpacity(p, year)}`,
-              }}
-            >
-              &nbsp;&gt;&nbsp;{p.new}
-            </span>
-          ))}
-      </>
-    )
 
     return (
       <div>
@@ -104,7 +68,12 @@ const PronunciationPane = ({
                 <Flasher key={index} {...{ preventFlashOnMount }}>
                   <Row as='li' className='fs-5 flash py-1 ps-0'>
                     <Col xs={2} className=''>
-                      {ruleDisplay(element?.main, element?.new, element?.old)}
+                      <ChangingPronunciation
+                        main={element?.main}
+                        newPron={element?.new}
+                        oldPron={element?.old}
+                        {...{ year }}
+                      />
                     </Col>
                     <Col className='pt-2' style={{ fontSize: '70%' }}>
                       {element?.note ? (

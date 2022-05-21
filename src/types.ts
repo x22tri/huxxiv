@@ -35,7 +35,7 @@ interface WordUse extends Changeable {
 
 interface ConcurrentPronunciation extends Changeable {
   id: number
-  // main: string
+  main?: string
   new?: string
   old?: string
   note?: string

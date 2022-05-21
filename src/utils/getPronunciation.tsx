@@ -1,4 +1,4 @@
-import { Keyword, ConcurrentPronunciation, Rule, PhoneticInfo } from '../types'
+import { Keyword, Rule, PhoneticInfo } from '../types'
 
 import { RULES } from '../database/RULES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
@@ -41,22 +41,8 @@ const getPronunciation = (
   RULES.forEach(rule => {
     concurrentPronunciations.forEach((phoneme, index) => {
       let currentSound = phoneme.main
-      // console.log(currentSound)
-
-      // console.log(currentSound)
-      // if (rule.change === currentSound) {
-      // console.log('change: ' + rule.change + ', sound: ' + currentSound)
-      // console.log(currentSound)
-      // }
-
-      // {
-      //   main: ..., variants: [{ id: 1, new: 2, appears}, {id: 2, old: 3, appears}]
-      // }
 
       if (rule.target === currentSound && rule.change) {
-        // console.log(
-        //   currentYear + ': ' + rule.id + ' ' + handleAppear(rule, currentYear)
-        // )
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
             // case 'concurrentVariants':
@@ -65,6 +51,7 @@ const getPronunciation = (
               id: rule.id,
               new: rule.change,
               appears: rule.appears,
+              disappears: rule.disappears,
               note: rule.note,
             })
             !activeRules.includes(rule) && activeRules.push(rule)
@@ -83,8 +70,8 @@ const getPronunciation = (
             phoneme.main = rule.change
             phoneme.variants.push({
               id: rule.id,
-
               old: rule.target,
+              appears: rule.appears,
               disappears: rule.disappears,
               note: rule.note,
             })
@@ -92,18 +79,8 @@ const getPronunciation = (
             break
         }
       }
-
-      //   console.log(handleAppear(rule, currentYear))
-
-      // console.log(rule.change)
-      // console.log(currentSound)
     })
   })
-
-  // console.log(getMainPronunciation(concurrentPronunciations))
-
-  // console.log(concurrentPronunciations)
-  // console.log(activeRules)
 
   return [phonemic, concurrentPronunciations, activeRules]
 }
