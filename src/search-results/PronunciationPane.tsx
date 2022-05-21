@@ -5,14 +5,14 @@ import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Row from 'react-bootstrap/Row'
 
+import ChangingPronunciation from './ChangingPronunciation'
+
 import {
   getMainPronunciation,
   getNumberOfVariants,
 } from '../utils/getPronunciation'
-import { calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import { ConcurrentPronunciation, DataOptions, Keyword } from '../types'
-import ChangingPronunciation from './ChangingPronunciation'
+import { DataOptions, Keyword } from '../types'
 
 const PronunciationPane = ({
   wordState,

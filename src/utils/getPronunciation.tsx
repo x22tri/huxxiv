@@ -91,18 +91,6 @@ const getMainPronunciation = (concurrentPronunciations: PhoneticInfo[]) =>
     .join('')
 
 const getNumberOfVariants = (concurrentPronunciations: PhoneticInfo[]) =>
-  // concurrentPronunciations.filter(element => typeof element === 'object').length
   concurrentPronunciations.filter(elem => elem.variants.length).length
 
 export { getPronunciation, getMainPronunciation, getNumberOfVariants }
-
-// code v2:
-// check all rules for all phonemes in Phonemic
-// (phonemes in targets, as well as phonemes in "change" attributes with currentYear < disappears[1])
-// for every phoneme, if it has neither an "appears" or a "disappears", display it normally
-// if it has "disappears" but no "appears", throw error (a phoneme cannot disappear without something else taking its place?)
-// if it has "appears", add +1 if currentYear >= appears[0] (&& currentYear < disappears[1])
-// (i.e. if handleAppear = true)
-// clicking on +1 displays in a separate component like "target ~ change" (e.g. "ɒ ~ ɑ") and "note" if present.
-// if currentYear < appears[1], display new main pronunciation (replace target with change in Phonemic?)
-// and make it the basis of new changes

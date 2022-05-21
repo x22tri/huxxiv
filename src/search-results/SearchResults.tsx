@@ -21,13 +21,7 @@ import {
   ChatLeftDotsFill,
 } from 'react-bootstrap-icons'
 
-import {
-  DataOptions,
-  Keyword,
-  ConcurrentPronunciation,
-  WordUse,
-  PhoneticInfo,
-} from '../types'
+import { DataOptions, Keyword, WordUse } from '../types'
 import MeaningPane from './MeaningPane'
 import PronunciationPane from './PronunciationPane'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
@@ -102,8 +96,6 @@ const SearchResults = ({
   const [initialState] = useState(wordState)
 
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
-
-  // console.log(wordState)
 
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
