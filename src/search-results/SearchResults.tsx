@@ -31,8 +31,6 @@ import {
 } from '../utils/getPronunciation'
 import './SearchResults.css'
 
-const passiveColor = '#8182ae'
-
 const NavIcon = ({
   eventKey,
   icon,
@@ -47,21 +45,29 @@ const NavIcon = ({
   notActiveTitle: string | JSX.Element[]
 }) => {
   const active = !!(sidePaneMode === eventKey)
+  const [hovered, setHovered] = useState(false)
+  const passiveColor = '#8182ae'
+  const hoverColor = '#bbbce0'
+
   return (
-    <Nav.Link {...{ eventKey }}>
+    <Nav.Link
+      {...{ eventKey }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {React.createElement(icon, {
-        color: active ? 'white' : passiveColor,
+        color: active ? 'white' : hovered ? hoverColor : passiveColor,
       })}
       <div
         style={{
-          color: active ? 'white' : passiveColor,
+          color: active ? 'white' : hovered ? hoverColor : passiveColor,
           textDecorationLine: active ? 'underline' : undefined,
           textDecorationThickness: '1.5px',
           textUnderlineOffset: '4px',
           marginTop: '2px',
         }}
       >
-        {active ? activeTitle : notActiveTitle}
+        {active || hovered ? activeTitle : notActiveTitle}
       </div>
     </Nav.Link>
   )
@@ -86,7 +92,7 @@ const SearchResults = ({
 
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
-  // This is used to make sure '2000' is displayed at the middle of the card.
+  // This is used to make sure the first year, '2000', is displayed at the middle of the card.
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node) setCardHeight(node.getBoundingClientRect().height)
   }, [])
@@ -147,7 +153,7 @@ const SearchResults = ({
                       )}`,
                     }}
                   >
-                    {index > 0 && ' / '}
+                    {index > 0 && '/'}
                     {wordObject.word}
                   </span>
                 </Flasher>
