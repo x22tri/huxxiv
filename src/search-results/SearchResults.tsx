@@ -12,7 +12,14 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Nav from 'react-bootstrap/Nav'
 import Stack from 'react-bootstrap/Stack'
-import { Ear, Pencil, ChatLeftDots } from 'react-bootstrap-icons'
+import {
+  Ear,
+  Pencil,
+  ChatLeftDots,
+  EarFill,
+  PencilFill,
+  ChatLeftDotsFill,
+} from 'react-bootstrap-icons'
 
 import {
   DataOptions,
@@ -34,13 +41,15 @@ import './SearchResults.css'
 
 const NavIcon = ({
   eventKey,
-  icon,
+  passiveIcon,
+  activeIcon,
   sidePaneMode,
   activeTitle,
   notActiveTitle,
 }: {
   eventKey: string
-  icon: ComponentClass | FunctionComponent<any>
+  passiveIcon: ComponentClass | FunctionComponent<any>
+  activeIcon: ComponentClass | FunctionComponent<any>
   sidePaneMode: string
   activeTitle: string
   notActiveTitle: string | JSX.Element[]
@@ -49,6 +58,7 @@ const NavIcon = ({
   const [hovered, setHovered] = useState(false)
   const passiveColor = '#8182ae'
   const hoverColor = '#bbbce0'
+  const icon = active ? activeIcon : passiveIcon
 
   return (
     <Nav.Link
@@ -110,10 +120,6 @@ const SearchResults = ({
     'meaning' in wordObject && notOutOfBounds(wordObject, year)
       ? wordObject
       : []
-  )
-
-  const phoneticList: PhoneticInfo[][] = keywordList.map(elem =>
-    elem['concurrentPronunciations'] ? elem.concurrentPronunciations : []
   )
 
   return (
@@ -178,7 +184,8 @@ const SearchResults = ({
             >
               <NavIcon
                 eventKey='meaning'
-                icon={ChatLeftDots}
+                passiveIcon={ChatLeftDots}
+                activeIcon={ChatLeftDotsFill}
                 activeTitle='JELENTÉS'
                 notActiveTitle={`${useList.length} definíció`}
                 {...{ sidePaneMode }}
@@ -186,7 +193,8 @@ const SearchResults = ({
 
               <NavIcon
                 eventKey='pronunciation'
-                icon={Ear}
+                passiveIcon={Ear}
+                activeIcon={EarFill}
                 activeTitle='KIEJTÉS'
                 notActiveTitle={keywordList.map((wordObject, index) => {
                   const pron = wordObject.concurrentPronunciations
@@ -208,7 +216,8 @@ const SearchResults = ({
               />
               <NavIcon
                 eventKey='inflection'
-                icon={Pencil}
+                passiveIcon={Pencil}
+                activeIcon={PencilFill}
                 activeTitle='RAGOZÁS'
                 notActiveTitle={wordState.map((wordObject, index) =>
                   'partOfSpeech' in wordObject ? (
