@@ -5,8 +5,7 @@ const CHARS: Word[] = [
     id: 1,
     data: [
       { word: 'kapcsos' },
-      { partOfSpeech: 'melléknév' },
-      { inflectionType: '-osADJ' },
+      { partOfSpeech: 'melléknév', vowelHarmony: 'o' },
       {
         meaning: 'Olyan <tárgy, eszköz>, amelyen kapocs van.',
         examples: ['kapcsos ruha', 'kapcsos pénztárca'],

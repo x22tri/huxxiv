@@ -5,8 +5,6 @@ import { WordUse } from '../types'
 import { calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 
-import './MeaningPane.css'
-
 const MeaningPane = ({
   measuredRef,
   useList,

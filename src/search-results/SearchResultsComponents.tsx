@@ -18,6 +18,7 @@ import {
 } from 'react-bootstrap-icons'
 import {
   ActivePane,
+  Inflection,
   Keyword,
   PartOfSpeech,
   PhoneticInfo,
@@ -96,10 +97,10 @@ const PronunciationOverview = ({
   )
 
 const PartOfSpeechOverview = ({
-  partOfSpeech,
+  inflection,
 }: {
-  partOfSpeech: PartOfSpeech | undefined
-}) => (partOfSpeech ? <span>{partOfSpeech.partOfSpeech}</span> : <span />)
+  inflection: Inflection | undefined
+}) => (inflection ? <span>{inflection.partOfSpeech}</span> : <span />)
 
 const YearsBG = ({ cardHeight }: { cardHeight: number | undefined }) =>
   !!cardHeight ? (
@@ -150,13 +151,13 @@ const TabNavigation = ({
   activePane,
   setActivePane,
   mainKeyword,
-  partOfSpeech,
+  inflection,
   useList,
 }: {
   activePane: ActivePane
   setActivePane: Dispatch<SetStateAction<ActivePane>>
   mainKeyword: Keyword
-  partOfSpeech: PartOfSpeech
+  inflection: Inflection
   useList: WordUse[]
 }) => (
   <Nav
@@ -195,7 +196,7 @@ const TabNavigation = ({
       passiveIcon={Pencil}
       activeIcon={PencilFill}
       activeTitle='RAGOZÁS'
-      notActiveTitle={<PartOfSpeechOverview {...{ partOfSpeech }} />}
+      notActiveTitle={<PartOfSpeechOverview {...{ inflection }} />}
       {...{ activePane }}
     />
   </Nav>

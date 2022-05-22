@@ -1,5 +1,8 @@
+import { CASE_NAMES } from './database/CASE_NAMES'
+
 // A "changeable" type is one whose versions are prone to disappearing and appearing over time.
 // The first number of the tuple marks the "start date" while the second number marks the "end date" of the process.
+// For sound changes, "disappears" marks the timeframe in which the old pronunciation is disappearing.
 interface Changeable {
   disappears?: [number, number]
   appears?: [number, number]
@@ -21,12 +24,21 @@ interface Keyword extends Changeable {
   activeRules?: Rule[]
 }
 
-interface PartOfSpeech {
-  partOfSpeech: 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
+type CaseName = keyof typeof CASE_NAMES
+type CaseNameWithNumber = `${CaseName}_sg` | `${CaseName}_pl`
+
+type Declension = {
+  [K in CaseNameWithNumber]: string
 }
 
-interface InflectionType extends Changeable {
-  inflectionType: string
+type PartOfSpeech = 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
+type VowelHarmony = 'o' | 'e' | 'ö'
+type InflectionType = 'nyitótő' | 'hangkivető'
+
+interface Inflection extends Changeable {
+  partOfSpeech: PartOfSpeech
+  vowelHarmony: VowelHarmony
+  inflectionType?: InflectionType
 }
 
 interface WordUse extends Changeable {
@@ -47,12 +59,17 @@ interface PhoneticInfo {
   variants: ConcurrentPronunciation[]
 }
 
+// interface VowelHarmony {
+
+// }
+
 type DataOptions =
   | Keyword
-  | PartOfSpeech
-  | InflectionType
+  // | PartOfSpeech
+  | Inflection
   | WordUse
   | PhoneticInfo[]
+// | VowelHarmony
 
 interface Word {
   id: number
@@ -65,20 +82,20 @@ type ActivePane = 'meaning' | 'pronunciation' | 'inflection'
 
 export type {
   ActivePane,
+  CaseName,
+  CaseNameWithNumber,
   Changeable,
   ConcurrentPronunciation,
   DataOptions,
+  Declension,
   ErrorMessage,
+  Inflection,
   InflectionType,
   Keyword,
   PartOfSpeech,
   PhoneticInfo,
   Rule,
+  VowelHarmony,
   Word,
   WordUse,
 }
-
-// export const isKeyOfObject = <T>(
-//   key: string | number | symbol,
-//   obj: T
-// ): key is keyof T => key in obj

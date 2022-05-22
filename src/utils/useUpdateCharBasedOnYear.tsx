@@ -37,6 +37,7 @@ const useUpdateCharBasedOnYear = (
       initialState.map(element => {
         if (!('word' in element)) return element
         else {
+          // Add pronunciation based on word.
           const [phonemic, concurrentPronunciations, activeRules] =
             getPronunciation(element, year)
 

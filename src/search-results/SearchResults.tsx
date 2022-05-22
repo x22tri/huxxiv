@@ -8,6 +8,7 @@ import {
   ActivePane,
   DataOptions,
   Keyword,
+  Inflection,
   PartOfSpeech,
   WordUse,
 } from '../types'
@@ -61,9 +62,13 @@ const SearchResults = ({
       : []
   )
 
-  const partOfSpeech: PartOfSpeech | undefined = wordState.find(
+  // const partOfSpeech: PartOfSpeech | undefined = wordState.find(
+  //   wordObject => 'partOfSpeech' in wordObject
+  // ) as unknown as PartOfSpeech
+
+  const inflection: Inflection = wordState.find(
     wordObject => 'partOfSpeech' in wordObject
-  ) as unknown as PartOfSpeech
+  ) as Inflection
 
   return (
     <Container fluid id='word-overview-container'>
@@ -81,7 +86,7 @@ const SearchResults = ({
                 activePane,
                 setActivePane,
                 mainKeyword,
-                partOfSpeech,
+                inflection,
                 useList,
               }}
             />
@@ -99,8 +104,13 @@ const SearchResults = ({
                   }}
                 />
               ),
-              pronunciation: <PronunciationPane {...{ wordState, year }} />,
-              inflection: <InflectionPane />,
+              pronunciation: (
+                <PronunciationPane
+                  pron={mainKeyword.concurrentPronunciations}
+                  {...{ year }}
+                />
+              ),
+              inflection: <InflectionPane {...{ inflection, mainKeyword }} />,
             }[activePane]
           }
         </Card>

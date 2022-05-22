@@ -39,3 +39,12 @@ hr {
   font-size: 80%;
   margin-left: 5px;
 }
+
+@keyframes yellow-fade {
+  from {
+    background: #f8edb0;
+  }
+  to {
+    background: #fff;
+  }
+}

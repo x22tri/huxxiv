@@ -12,21 +12,20 @@ import {
   getNumberOfVariants,
 } from '../utils/getPronunciation'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import { DataOptions, Keyword } from '../types'
+import { PhoneticInfo } from '../types'
 
 const PronunciationPane = ({
-  wordState,
+  pron,
   year,
 }: {
-  wordState: DataOptions[]
+  pron: PhoneticInfo[] | undefined
   year: number
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
-  const word = wordState.find(wordObject => 'word' in wordObject) as Keyword
 
-  if (!word || !word.concurrentPronunciations) return null
+  if (!pron) throw new Error('A szó kiejtése nem található.')
   else {
-    const variants = word.concurrentPronunciations
+    const variants = pron
       .map(c => {
         let newProns = c.variants.filter(n => n.new)
         let oldProns = c.variants.filter(o => o.old)
@@ -37,8 +36,8 @@ const PronunciationPane = ({
                 main: c.main,
                 disappears: newProns.find(n => n.disappears)?.disappears,
               },
-              new: newProns.map(n => ({ ...n, disappears: undefined })),
-              old: oldProns.map(o => ({ ...o, appears: undefined })),
+              new: newProns.map(n => ({ ...n, disappears: undefined })), // taking "disappears" out because of calculateOpacity
+              old: oldProns.map(o => ({ ...o, appears: undefined })), // same
               note:
                 newProns.find(n => n.note)?.note ||
                 oldProns.find(o => o.note)?.note,
@@ -51,16 +50,13 @@ const PronunciationPane = ({
       <div>
         <Card.Title as='h6' className='px-3 pt-3'>
           {`${
-            !!getNumberOfVariants(word.concurrentPronunciations)
-              ? 'Elsődleges kiejtése'
-              : 'Kiejtése'
+            !!getNumberOfVariants(pron) ? 'Elsődleges kiejtése' : 'Kiejtése'
           } ebben a korszakban:`}
         </Card.Title>
         <Card.Subtitle className='px-3 pt-2 pb-3 fs-5 d-flex justify-content-center'>
-          {word.concurrentPronunciations &&
-            `[${getMainPronunciation(word.concurrentPronunciations)}]`}
+          {pron && `[${getMainPronunciation(pron)}]`}
         </Card.Subtitle>
-        {!!getNumberOfVariants(word.concurrentPronunciations) && (
+        {!!getNumberOfVariants(pron) && (
           <Card.Body className='px-3 pt-1'>
             Változatok:
             <ListGroup as='ul' variant='flush' className='ps-3'>
