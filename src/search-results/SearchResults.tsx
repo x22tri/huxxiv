@@ -21,7 +21,13 @@ import {
   ChatLeftDotsFill,
 } from 'react-bootstrap-icons'
 
-import { DataOptions, Keyword, WordUse } from '../types'
+import {
+  DataOptions,
+  Keyword,
+  PartOfSpeech,
+  PhoneticInfo,
+  WordUse,
+} from '../types'
 import MeaningPane from './MeaningPane'
 import PronunciationPane from './PronunciationPane'
 import { notOutOfBounds, calculateOpacity } from '../utils/appearance-utils'
@@ -46,7 +52,7 @@ const NavIcon = ({
   activeIcon: ComponentClass | FunctionComponent<any>
   sidePaneMode: string
   activeTitle: string
-  notActiveTitle: string | JSX.Element[]
+  notActiveTitle: string | JSX.Element | JSX.Element[]
 }) => {
   const active = !!(sidePaneMode === eventKey)
   const [hovered, setHovered] = useState(false)
@@ -78,6 +84,44 @@ const NavIcon = ({
   )
 }
 
+const PronunciationOverview = ({
+  pronunciations,
+}: {
+  pronunciations: PhoneticInfo[] | undefined
+}) =>
+  !!pronunciations ? (
+    <div>
+      <span>{`[${getMainPronunciation(pronunciations)}]`}</span>
+      {!!getNumberOfVariants(pronunciations) && (
+        <span className='number-of-variants'>
+          {`(+${getNumberOfVariants(pronunciations)})`}
+        </span>
+      )}
+    </div>
+  ) : (
+    <span />
+  )
+
+const PartOfSpeechOverview = ({
+  partOfSpeech,
+}: {
+  partOfSpeech: PartOfSpeech | undefined
+}) => (partOfSpeech ? <span>{partOfSpeech.partOfSpeech}</span> : <span />)
+
+const YearsBG = ({ cardHeight }: { cardHeight: number }) => (
+  <Stack
+    style={{ marginTop: cardHeight / 2, float: 'left' }}
+    className='px-5 w-100'
+  >
+    {[2000, 2050, 2100, 2150, 2200, 2250, 2300, 2350, 2400].map(element => (
+      <div key={element} className='year'>
+        {element}
+        <hr />
+      </div>
+    ))}
+  </Stack>
+)
+
 const SearchResults = ({
   wordState,
   setWordState,
@@ -108,32 +152,28 @@ const SearchResults = ({
     'word' in wordObject && notOutOfBounds(wordObject, year) ? wordObject : []
   )
 
+  const mainKeyword: Keyword | undefined =
+    keywordList.length === 1
+      ? keywordList[0]
+      : keywordList.find(word => 'main' in word && word.main === true)
+  if (!mainKeyword) throw new Error('Nincs megadva fő kulcsszó.')
+
   const useList: WordUse[] = wordState.flatMap(wordObject =>
     'meaning' in wordObject && notOutOfBounds(wordObject, year)
       ? wordObject
       : []
   )
 
+  const partOfSpeech: PartOfSpeech | undefined = wordState.find(
+    wordObject => 'partOfSpeech' in wordObject
+  ) as unknown as PartOfSpeech
+
   return (
     <Container fluid id='word-overview-container'>
       <p id='scroll-down-prompter'>
         ↓ Görgess lefelé a szó fejlődésének megtekintéséhez ↓
       </p>
-      {!!cardHeight && (
-        <Stack
-          style={{ marginTop: cardHeight / 2, float: 'left' }}
-          className='px-5 w-100'
-        >
-          {[2000, 2050, 2100, 2150, 2200, 2250, 2300, 2350, 2400].map(
-            element => (
-              <div key={element} className='year'>
-                {element}
-                <hr />
-              </div>
-            )
-          )}
-        </Stack>
-      )}
+      {!!cardHeight ? <YearsBG {...{ cardHeight }} /> : null}
       <Row id='fixed-row'>
         <Card id='search-results-card' className='px-0'>
           <Card.Header className='p-0' id='search-results-card-header'>
@@ -142,22 +182,19 @@ const SearchResults = ({
               id='keyword'
               className='pt-2 pb-2 mb-0 fw-bold d-flex justify-content-center'
             >
-              {keywordList.map((wordObject, index) => (
-                <Flasher key={wordObject.word} {...{ preventFlashOnMount }}>
-                  <span
-                    className='flash'
-                    style={{
-                      color: `rgba(255, 255, 255, ${calculateOpacity(
-                        wordObject,
-                        year
-                      )}`,
-                    }}
-                  >
-                    {index > 0 && '/'}
-                    {wordObject.word}
-                  </span>
-                </Flasher>
-              ))}
+              <Flasher key={mainKeyword.word} {...{ preventFlashOnMount }}>
+                <span
+                  className='flash'
+                  style={{
+                    color: `rgba(255, 255, 255, ${calculateOpacity(
+                      mainKeyword,
+                      year
+                    )}`,
+                  }}
+                >
+                  {mainKeyword.word}
+                </span>
+              </Flasher>
             </Card.Title>
             <hr />
             <Nav
@@ -188,22 +225,11 @@ const SearchResults = ({
                 passiveIcon={Ear}
                 activeIcon={EarFill}
                 activeTitle='KIEJTÉS'
-                notActiveTitle={keywordList.map((wordObject, index) => {
-                  const pron = wordObject.concurrentPronunciations
-                  return pron ? (
-                    <div key={index}>
-                      {index > 0 && <span style={{ margin: '0 5px' }}>/</span>}
-                      <span>{`[${getMainPronunciation(pron)}]`}</span>
-                      {!!getNumberOfVariants(pron) && (
-                        <span className='number-of-variants'>
-                          {`(+${getNumberOfVariants(pron)})`}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <span key={index} />
-                  )
-                })}
+                notActiveTitle={
+                  <PronunciationOverview
+                    pronunciations={mainKeyword.concurrentPronunciations}
+                  />
+                }
                 {...{ sidePaneMode }}
               />
               <NavIcon
@@ -211,15 +237,7 @@ const SearchResults = ({
                 passiveIcon={Pencil}
                 activeIcon={PencilFill}
                 activeTitle='RAGOZÁS'
-                notActiveTitle={wordState.map((wordObject, index) =>
-                  'partOfSpeech' in wordObject ? (
-                    <span key={wordObject.partOfSpeech}>
-                      {wordObject.partOfSpeech}
-                    </span>
-                  ) : (
-                    <span key={index} />
-                  )
-                )}
+                notActiveTitle={<PartOfSpeechOverview {...{ partOfSpeech }} />}
                 {...{ sidePaneMode }}
               />
             </Nav>

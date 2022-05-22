@@ -7,7 +7,7 @@ const RULES: Rule[] = [
     change: 'ɑ',
     appears: [2001, 2050],
     disappears: [2040, 2080],
-    note: `Az *a* betűvel jelölt hang a XXI. század elejétől kezdve fokozatosan elveszti ajakkerekítéses jellegét.`,
+    note: `Az *a* betűvel jelölt hang fokozatosan elveszti ajakkerekítéses jellegét.`,
   },
   {
     id: 2,

@@ -15,6 +15,7 @@ interface Rule extends Changeable {
 
 interface Keyword extends Changeable {
   word: string
+  main?: boolean
   phonemic?: string[]
   concurrentPronunciations?: PhoneticInfo[]
   activeRules?: Rule[]
