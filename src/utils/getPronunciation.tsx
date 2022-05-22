@@ -39,7 +39,7 @@ const getPronunciation = (
   const activeRules: Rule[] = []
 
   RULES.forEach(rule => {
-    concurrentPronunciations.forEach((phoneme, index) => {
+    concurrentPronunciations.forEach(phoneme => {
       let currentSound = phoneme.main
 
       if (rule.target === currentSound && rule.change) {

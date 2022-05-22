@@ -34,3 +34,8 @@ hr {
   justify-content: center;
   display: flex;
 }
+
+#number-of-variants {
+  font-size: 80%;
+  margin-left: 5px;
+}

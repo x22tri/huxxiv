@@ -18,11 +18,6 @@ const MeaningPane = ({
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
 
-  // 2010: main: kɒpcsos +1 -> ɒ ~ ɑ (kɑpcsos)
-  // 2051: main: kɑpcsos +1 -> ɑ ~ ɒ (kɒpcsos)
-  // 2060: main: kɑpcsos + 2 -> ɑ ~ ɒ (kɒpcsos), ɑ ~ ä (käpcsos)
-  // 2081: main: kɑpcsos + 1 -> ɑ ~ ä (käpcsos)
-
   // The main return on the MeaningPane component.
   return (
     <div ref={measuredRef} id='word-overview-card'>

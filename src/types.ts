@@ -61,7 +61,10 @@ interface Word {
 
 type ErrorMessage = string
 
+type ActivePane = 'meaning' | 'pronunciation' | 'inflection'
+
 export type {
+  ActivePane,
   Changeable,
   ConcurrentPronunciation,
   DataOptions,
