@@ -35,9 +35,12 @@ const PronunciationPane = ({
               main: {
                 main: c.main,
                 disappears: newProns.find(n => n.disappears)?.disappears,
+                // "Main" doesn't need "appears" since a pronunciation only becomes "main" after a "new" pronunciation's "appear" cycle.
               },
-              new: newProns.map(n => ({ ...n, disappears: undefined })), // taking "disappears" out because of calculateOpacity
-              old: oldProns.map(o => ({ ...o, appears: undefined })), // same
+              // Taking either "appears" or "disappears" out
+              // due to the line "dataObject.appears ?? dataObject.disappears" in calculateOpacity.
+              new: newProns.map(n => ({ ...n, disappears: undefined })),
+              old: oldProns.map(o => ({ ...o, appears: undefined })),
               note:
                 newProns.find(n => n.note)?.note ||
                 oldProns.find(o => o.note)?.note,

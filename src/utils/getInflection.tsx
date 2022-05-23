@@ -38,6 +38,8 @@ const getLinkingVowels = (
 const getInflection = (stem: string, inflection: Inflection): Declension => {
   const { vowelHarmony, partOfSpeech, inflectionType } = inflection
 
+  // To-Do: plural stem finder probably has to be done separately
+
   const [a, aa, o, oo, u, pl] = getLinkingVowels(
     vowelHarmony,
     inflectionType === 'nyitótő' || partOfSpeech === 'melléknév'

@@ -4,14 +4,7 @@ import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 
-import {
-  ActivePane,
-  DataOptions,
-  Keyword,
-  Inflection,
-  PartOfSpeech,
-  WordUse,
-} from '../types'
+import { ActivePane, DataOptions, Keyword, Inflection, WordUse } from '../types'
 import { KeywordRow, YearsBG, TabNavigation } from './SearchResultsComponents'
 import MeaningPane from './MeaningPane'
 import PronunciationPane from './PronunciationPane'
@@ -61,10 +54,6 @@ const SearchResults = ({
       ? wordObject
       : []
   )
-
-  // const partOfSpeech: PartOfSpeech | undefined = wordState.find(
-  //   wordObject => 'partOfSpeech' in wordObject
-  // ) as unknown as PartOfSpeech
 
   const inflection: Inflection = wordState.find(
     wordObject => 'partOfSpeech' in wordObject
