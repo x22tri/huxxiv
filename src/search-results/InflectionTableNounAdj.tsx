@@ -6,22 +6,6 @@ import './InflectionTableNounAdj.css'
 
 const caseNames = Object.keys(CASE_NAMES) as CaseName[]
 
-// const CaseVariants = ({
-//   variant,
-//   index,
-// }: {
-//   variant: string
-//   index: number
-// }) => {
-//   const [activeCase, setActiveCase] = useState(0)
-//   return (
-//     <p className='case-variant'>
-//       <span>{variant}</span>
-//       <span>{index}</span>
-//     </p>
-//   )
-// }
-
 const CaseVariants = ({ cases }: { cases: string[] }) => {
   const [activeCase, setActiveCase] = useState(0)
   return (
@@ -46,11 +30,16 @@ const CaseVariants = ({ cases }: { cases: string[] }) => {
 const InflectionTableNounAdj = ({
   inflection,
   mainKeyword,
+  year,
 }: {
   inflection: Inflection
   mainKeyword: Keyword
+  year: number
 }) => {
-  const cases = getInflection(mainKeyword.word, inflection) as Declension
+  const cases = getInflection(mainKeyword.word, inflection, year) as Declension
+  const isCaseArray = (caseOrCaseArray: string | string[]) =>
+    Array.isArray(caseOrCaseArray) && caseOrCaseArray.length > 1
+
   return (
     <>
       <thead>
@@ -67,10 +56,10 @@ const InflectionTableNounAdj = ({
               <strong>{CASE_NAMES[caseName]}</strong>
             </td>
             <td>
-              {!Array.isArray(cases[`${caseName}_sg`]) ? (
-                cases[`${caseName}_sg`]
-              ) : (
+              {isCaseArray(cases[`${caseName}_sg`]) ? (
                 <CaseVariants cases={cases[`${caseName}_sg`] as string[]} />
+              ) : (
+                cases[`${caseName}_sg`]
               )}
             </td>
             <td>{cases[`${caseName}_pl`]}</td>

@@ -99,7 +99,9 @@ const SearchResults = ({
                   {...{ year }}
                 />
               ),
-              inflection: <InflectionPane {...{ inflection, mainKeyword }} />,
+              inflection: (
+                <InflectionPane {...{ inflection, mainKeyword, year }} />
+              ),
             }[activePane]
           }
         </Card>
