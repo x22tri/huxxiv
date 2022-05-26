@@ -26,9 +26,13 @@ interface Keyword extends Changeable {
 
 type CaseName = keyof typeof CASE_NAMES
 type CaseNameWithNumber = `${CaseName}_sg` | `${CaseName}_pl`
+interface GrammaticalCase {
+  main: string
+  variants?: string[]
+}
 
 type Declension = {
-  [K in CaseNameWithNumber]: string | string[]
+  [K in CaseNameWithNumber]: GrammaticalCase
 }
 
 type PartOfSpeech = 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
@@ -89,6 +93,7 @@ export type {
   DataOptions,
   Declension,
   ErrorMessage,
+  GrammaticalCase,
   Inflection,
   InflectionType,
   Keyword,

@@ -1,31 +1,27 @@
 import { useState } from 'react'
 import getInflection, { Declension } from '../utils/getInflection'
-import { CaseName, Inflection, Keyword } from '../types'
+import { CaseName, GrammaticalCase, Inflection, Keyword } from '../types'
 import { CASE_NAMES, MISC_NAMES } from '../database/CASE_NAMES'
 import './InflectionTableNounAdj.css'
 
 const caseNames = Object.keys(CASE_NAMES) as CaseName[]
 
-const CaseVariants = ({ cases }: { cases: string[] }) => {
-  const [activeCase, setActiveCase] = useState(0)
-  return (
-    <p className='case-variant'>
-      <span>{cases[activeCase]}</span>
-      <span
-        className='case-changer-bullet-container'
-        onClick={() =>
-          setActiveCase(prev => (prev + 1 > cases.length - 1 ? 0 : prev + 1))
-        }
-      >
-        {cases.map((c, index) => (
-          <span className='case-changer-bullet' key={c}>
-            {index === activeCase ? '•' : '◦'}
-          </span>
+const CaseVariants = ({ cases }: { cases: GrammaticalCase }) => (
+  <p className='case-variants'>
+    <span>{cases.main}</span>
+    <span className='case-variants--variant'>
+      (
+      {cases.variants?.length &&
+        cases.variants.map((variant, index) => (
+          <>
+            {index >= 1 && ', '}
+            <span key={variant}>{variant}</span>
+          </>
         ))}
-      </span>
-    </p>
-  )
-}
+      )
+    </span>
+  </p>
+)
 
 const InflectionTableNounAdj = ({
   inflection,
@@ -37,8 +33,21 @@ const InflectionTableNounAdj = ({
   year: number
 }) => {
   const cases = getInflection(mainKeyword.word, inflection, year) as Declension
-  const isCaseArray = (caseOrCaseArray: string | string[]) =>
-    Array.isArray(caseOrCaseArray) && caseOrCaseArray.length > 1
+  // const isCaseArray = (caseOrCaseArray: GrammaticalCase) =>
+  //   caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0
+
+  const CaseDisplay = ({
+    caseOrCaseArray,
+  }: {
+    caseOrCaseArray: GrammaticalCase
+  }) =>
+    caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0 ? (
+      <CaseVariants cases={caseOrCaseArray} />
+    ) : (
+      <>{caseOrCaseArray.main}</>
+    )
+
+  console.log(cases)
 
   return (
     <>
@@ -56,13 +65,11 @@ const InflectionTableNounAdj = ({
               <strong>{CASE_NAMES[caseName]}</strong>
             </td>
             <td>
-              {isCaseArray(cases[`${caseName}_sg`]) ? (
-                <CaseVariants cases={cases[`${caseName}_sg`] as string[]} />
-              ) : (
-                cases[`${caseName}_sg`]
-              )}
+              <CaseDisplay caseOrCaseArray={cases[`${caseName}_sg`]} />
             </td>
-            <td>{cases[`${caseName}_pl`]}</td>
+            <td>
+              <CaseDisplay caseOrCaseArray={cases[`${caseName}_pl`]} />
+            </td>
           </tr>
         ))}
       </tbody>

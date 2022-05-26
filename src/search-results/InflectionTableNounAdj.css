@@ -1,10 +1,11 @@
-.case-variant {
+.case-variants {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  flex-direction: column;
   margin-bottom: 0;
   margin-right: 4px;
 }
 
-.case-changer-bullet-container {
-  cursor: pointer;
+.case-variants--variant {
+  font-size: 80%;
 }

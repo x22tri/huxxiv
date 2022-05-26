@@ -21,23 +21,25 @@ const getBaseInflection = (
   inflection: Inflection
 ): Declension => {
   const { vowelHarmony, partOfSpeech, inflectionType } = inflection
-  const lowVowelStem = !!(inflectionType === 'nyitótő')
-
-  const [a, aa, o, oo, u, pl] = getLinkingVowels(
-    vowelHarmony,
-    lowVowelStem || partOfSpeech === 'melléknév'
+  const lowVowelStem = !!(
+    inflectionType === 'nyitótő' || partOfSpeech === 'melléknév'
   )
+
+  const [a, aa, o, oo, u, pl] = getLinkingVowels(vowelHarmony, lowVowelStem)
 
   // To-Do: plural stem finder probably has to be done separately
   const plStem = `${stem}${pl}k`
 
   return {
-    nom_sg: stem,
-    acc_sg: [`${stem}${a}t`].concat(!lowVowelStem ? [`${stem}t`] : ''),
-    dat_sg: `${stem}n${a}k`,
-    nom_pl: `${plStem}`,
-    acc_pl: `${plStem}${a}t`,
-    dat_pl: `${plStem}n${a}k`,
+    nom_sg: { main: stem },
+    acc_sg: {
+      main: lowVowelStem ? `${stem}${a}t` : `${stem}t`,
+      variants: lowVowelStem ? [`${stem}t`] : [],
+    },
+    dat_sg: { main: `${stem}n${a}k` },
+    nom_pl: { main: `${plStem}` },
+    acc_pl: { main: `${plStem}${a}t` },
+    dat_pl: { main: `${plStem}n${a}k` },
   }
 }
 
