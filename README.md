@@ -1,4 +1,4 @@
-![alt text](https://raw.githubusercontent.com/x22tri/huxxiv/master/src/assets/huxxivwithtext.png)
+![Logo](https://raw.githubusercontent.com/x22tri/huxxiv/master/src/assets/huxxivwithtext.png =640x320)
 
 HUXXIV is a web application that tracks how Hungarian words will change in the next three centuries (hence the name HU-XXIV, as in "Hungarian"-"24").
 
