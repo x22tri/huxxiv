@@ -1,0 +1,10 @@
+.case-variant {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0;
+  margin-right: 4px;
+}
+
+.case-changer-bullet-container {
+  cursor: pointer;
+}

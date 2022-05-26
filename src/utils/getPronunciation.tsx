@@ -40,9 +40,7 @@ const getPronunciation = (
 
   RULES.forEach(rule => {
     concurrentPronunciations.forEach(phoneme => {
-      let currentSound = phoneme.main
-
-      if (rule.target === currentSound && rule.change) {
+      if (rule.target === phoneme.main && rule.change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
             // case 'concurrentVariants':

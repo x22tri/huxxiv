@@ -37,7 +37,7 @@ const calculateOpacity = (
   if (!dataObject.appears && !dataObject.disappears) return 1
   else {
     const minimumOpacity = 0.2
-    const type = dataObject.appears ?? dataObject.disappears
+    const type = dataObject.disappears ?? dataObject.appears
 
     const calculatorFunc = (start: number, end: number): number =>
       (currentYear - start) / (end - start)

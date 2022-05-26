@@ -28,7 +28,7 @@ type CaseName = keyof typeof CASE_NAMES
 type CaseNameWithNumber = `${CaseName}_sg` | `${CaseName}_pl`
 
 type Declension = {
-  [K in CaseNameWithNumber]: string
+  [K in CaseNameWithNumber]: string | string[]
 }
 
 type PartOfSpeech = 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'

@@ -1,8 +1,47 @@
+import { useState } from 'react'
 import getInflection, { Declension } from '../utils/getInflection'
 import { CaseName, Inflection, Keyword } from '../types'
 import { CASE_NAMES, MISC_NAMES } from '../database/CASE_NAMES'
+import './InflectionTableNounAdj.css'
 
 const caseNames = Object.keys(CASE_NAMES) as CaseName[]
+
+// const CaseVariants = ({
+//   variant,
+//   index,
+// }: {
+//   variant: string
+//   index: number
+// }) => {
+//   const [activeCase, setActiveCase] = useState(0)
+//   return (
+//     <p className='case-variant'>
+//       <span>{variant}</span>
+//       <span>{index}</span>
+//     </p>
+//   )
+// }
+
+const CaseVariants = ({ cases }: { cases: string[] }) => {
+  const [activeCase, setActiveCase] = useState(0)
+  return (
+    <p className='case-variant'>
+      <span>{cases[activeCase]}</span>
+      <span
+        className='case-changer-bullet-container'
+        onClick={() =>
+          setActiveCase(prev => (prev + 1 > cases.length - 1 ? 0 : prev + 1))
+        }
+      >
+        {cases.map((c, index) => (
+          <span className='case-changer-bullet' key={c}>
+            {index === activeCase ? '•' : '◦'}
+          </span>
+        ))}
+      </span>
+    </p>
+  )
+}
 
 const InflectionTableNounAdj = ({
   inflection,
@@ -12,9 +51,6 @@ const InflectionTableNounAdj = ({
   mainKeyword: Keyword
 }) => {
   const cases = getInflection(mainKeyword.word, inflection) as Declension
-
-  //   console.log(cases[caseName + '_sg'])
-
   return (
     <>
       <thead>
@@ -30,25 +66,16 @@ const InflectionTableNounAdj = ({
             <td>
               <strong>{CASE_NAMES[caseName]}</strong>
             </td>
-            <td>{cases[`${caseName}_sg`]}</td>
+            <td>
+              {!Array.isArray(cases[`${caseName}_sg`]) ? (
+                cases[`${caseName}_sg`]
+              ) : (
+                <CaseVariants cases={cases[`${caseName}_sg`] as string[]} />
+              )}
+            </td>
             <td>{cases[`${caseName}_pl`]}</td>
           </tr>
         ))}
-
-        {/* <tr>
-          <td>
-            <strong>tárgyeset</strong>
-          </td>
-          <td>{cases.acc_sg}</td>
-          <td>{cases.acc_pl}</td>
-        </tr>
-        <tr>
-          <td>
-            <strong>részes eset</strong>
-          </td>
-          <td>{cases.dat_sg}</td>
-          <td>{cases.dat_pl}</td>
-        </tr> */}
       </tbody>
     </>
   )
