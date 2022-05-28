@@ -1,38 +1,91 @@
-import React from 'react'
 import getInflection, { Declension } from '../utils/getInflection'
-import { CaseName, GrammaticalCase, Inflection, Keyword } from '../types'
+import { CaseName, GrammaticalCaseForm, Inflection, Keyword } from '../types'
 import { CASE_NAMES, MISC_NAMES } from '../database/CASE_NAMES'
+import { calculateOpacity } from '../utils/appearance-utils'
 import './InflectionTableNounAdj.css'
 
 const caseNames = Object.keys(CASE_NAMES) as CaseName[]
 
-const CaseVariants = ({ cases }: { cases: GrammaticalCase }) => (
-  <p className='case-variants'>
-    <span>{cases.main.form}</span>
-    <span className='case-variants--variant'>
-      (
-      {cases.variants?.length &&
-        cases.variants.map((variant, index) => (
-          <React.Fragment key={variant.form}>
-            {index >= 1 && ', '}
-            <span>{variant.form}</span>
-          </React.Fragment>
-        ))}
-      )
-    </span>
-  </p>
-)
+// To-Do: make elements take over the "main" inflection and make obsolete elements disappear
 
-const CaseDisplay = ({
-  caseOrCaseArray,
-}: {
-  caseOrCaseArray: GrammaticalCase
-}) =>
-  caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0 ? (
-    <CaseVariants cases={caseOrCaseArray} />
-  ) : (
-    <>{caseOrCaseArray.main.form}</>
+interface GrammaticalCaseFormWithOpacity extends GrammaticalCaseForm {
+  opacity: number
+}
+
+const findMaxOpacityElementIndex = (
+  array: GrammaticalCaseForm[],
+  year: number
+) => {
+  const arrayWithOpacities = array.map(elem => ({
+    ...elem,
+    opacity: calculateOpacity(elem, year),
+  }))
+
+  const maxOpacityElementIndex = arrayWithOpacities.findIndex(
+    elem => elem.opacity === Math.max(...arrayWithOpacities.map(e => e.opacity))
   )
+
+  return [
+    arrayWithOpacities[
+      maxOpacityElementIndex
+    ] as GrammaticalCaseFormWithOpacity,
+    arrayWithOpacities.filter(
+      (elem, index) => index !== maxOpacityElementIndex
+    ) as GrammaticalCaseFormWithOpacity[],
+  ]
+}
+const CaseDisplay = ({
+  caseArray,
+  year,
+}: {
+  caseArray: GrammaticalCaseForm[]
+  year: number
+}) => {
+  if (caseArray.length < 1) {
+    throw new Error('Nincs aktív morféma')
+    // To-Do: remove the row altogether
+  } else if (caseArray.length === 1) {
+    return (
+      <span
+        style={{
+          color: `rgba(0, 0, 0, ${calculateOpacity(caseArray[0], year)}`,
+        }}
+      >
+        {caseArray[0].form}
+      </span>
+    )
+  } else {
+    console.log(findMaxOpacityElementIndex(caseArray, year))
+    const [main, rest] = findMaxOpacityElementIndex(caseArray, year) as [
+      GrammaticalCaseFormWithOpacity,
+      GrammaticalCaseFormWithOpacity[]
+    ]
+    return (
+      <p className='case-variants'>
+        <span
+          style={{
+            color: `rgba(0, 0, 0, ${main.opacity}`,
+          }}
+        >
+          {main.form}
+        </span>
+        <span className='case-variants--variant'>
+          {rest.map((variant, index) => (
+            <span
+              key={variant.form}
+              style={{
+                color: `rgba(0, 0, 0, ${variant.opacity}`,
+              }}
+            >
+              {index >= 1 && ', '}
+              <span>{variant.form}</span>
+            </span>
+          ))}
+        </span>
+      </p>
+    )
+  }
+}
 
 const InflectionTableNounAdj = ({
   inflection,
@@ -60,10 +113,10 @@ const InflectionTableNounAdj = ({
               <strong>{CASE_NAMES[caseName]}</strong>
             </td>
             <td className='col-md-4'>
-              <CaseDisplay caseOrCaseArray={cases[`${caseName}_sg`]} />
+              <CaseDisplay caseArray={cases[`${caseName}_sg`]} {...{ year }} />
             </td>
             <td className='col-md-4'>
-              <CaseDisplay caseOrCaseArray={cases[`${caseName}_pl`]} />
+              <CaseDisplay caseArray={cases[`${caseName}_pl`]} {...{ year }} />
             </td>
           </tr>
         ))}

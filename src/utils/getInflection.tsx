@@ -1,5 +1,5 @@
 import INFLECTION_CHANGES from '../database/INFLECTION_CHANGES'
-import { Declension, Inflection } from '../types'
+import { Changeable, Declension, Inflection } from '../types'
 import { handleAppear } from './appearance-utils'
 
 const getLinkingVowels = (
@@ -16,6 +16,8 @@ const getLinkingVowels = (
   return [a, aa, o, oo, u, pl]
 }
 
+const getStems = () => {}
+
 const getBaseInflection = (
   stem: string,
   inflection: Inflection
@@ -30,19 +32,40 @@ const getBaseInflection = (
   // To-Do: plural stem finder probably has to be done separately
   const pluralStem = `${stem}${pl}k`
 
+  // return [
+  //   {
+  //     nom_sg: { main: { form: stem }, variants: [] },
+  //     acc_sg: {
+  //       main: lowVowelStem
+  //         ? { form: `${stem}${a}t`, disappears: [2050, 2100] }
+  //         : { form: `${stem}t` },
+  //       variants: lowVowelStem ? [{ form: `${stem}t` }] : [],
+  //     },
+  //     dat_sg: { main: { form: `${stem}n${a}k` }, variants: [] },
+  //     nom_pl: { main: { form: `${pluralStem}` }, variants: [] },
+  //     acc_pl: { main: { form: `${pluralStem}${a}t` }, variants: [] },
+  //     dat_pl: { main: { form: `${pluralStem}n${a}k` }, variants: [] },
+  //   },
+  //   pluralStem,
+  // ]
   return [
     {
-      nom_sg: { main: { form: stem }, variants: [] },
-      acc_sg: {
-        main: lowVowelStem
-          ? { form: `${stem}${a}t`, disappears: [2050, 2100] }
-          : { form: `${stem}t` },
-        variants: lowVowelStem ? [{ form: `${stem}t` }] : [],
-      },
-      dat_sg: { main: { form: `${stem}n${a}k` }, variants: [] },
-      nom_pl: { main: { form: `${pluralStem}` }, variants: [] },
-      acc_pl: { main: { form: `${pluralStem}${a}t` }, variants: [] },
-      dat_pl: { main: { form: `${pluralStem}n${a}k` }, variants: [] },
+      nom_sg: [{ form: stem }],
+      acc_sg: [
+        ...(lowVowelStem
+          ? [
+              {
+                form: `${stem}${a}t`,
+                disappears: [2050, 2100] as [number, number],
+              },
+            ]
+          : []),
+        { form: `${stem}t` },
+      ],
+      dat_sg: [{ form: `${stem}n${a}k` }],
+      nom_pl: [{ form: `${pluralStem}` }],
+      acc_pl: [{ form: `${pluralStem}${a}t` }],
+      dat_pl: [{ form: `${pluralStem}n${a}k` }],
     },
     pluralStem,
   ]
@@ -73,9 +96,9 @@ const getInflection = (
         switch (handleAppear(change, year)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
-            cases[change.targetForm as keyof Declension].variants.push({
-              form: stemReplacer(change.change),
-            })
+            // cases[change.targetForm as keyof Declension].variants.push({
+            //   form: stemReplacer(change.change),
+            // })
             break
           case 'notReachedYet':
             // phoneme.main = rule.target

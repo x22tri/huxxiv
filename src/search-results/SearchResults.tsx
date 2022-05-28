@@ -80,8 +80,7 @@ const SearchResults = ({
               }}
             />
           </Card.Header>
-          {/* The following is essentially a switch statement that renders the right component based on activePane.
-          Taken from https://stackoverflow.com/a/51432223 */}
+          {/* The following is essentially a switch statement that renders the right component based on activePane. */}
           {
             {
               meaning: (

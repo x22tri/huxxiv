@@ -52,12 +52,15 @@ const getPronunciation = (
               disappears: rule.disappears,
               note: rule.note,
             })
-            !activeSoundChanges.includes(rule) && activeSoundChanges.push(rule)
+            if (!activeSoundChanges.includes(rule)) {
+              activeSoundChanges.push(rule)
+            }
             break
           case 'gonePast':
             phoneme.main = rule.change
-            activeSoundChanges.includes(rule) &&
+            if (activeSoundChanges.includes(rule)) {
               activeSoundChanges.splice(activeSoundChanges.indexOf(rule))
+            }
             break
           case 'disappearanceInProgress':
             phoneme.main = rule.change
@@ -68,7 +71,9 @@ const getPronunciation = (
               disappears: rule.disappears,
               note: rule.note,
             })
-            !activeSoundChanges.includes(rule) && activeSoundChanges.push(rule)
+            if (activeSoundChanges.includes(rule)) {
+              activeSoundChanges.push(rule)
+            }
             break
         }
       }

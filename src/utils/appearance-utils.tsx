@@ -33,7 +33,7 @@ const notOutOfBounds = (dataObject: Changeable, currentYear: number): boolean =>
 const calculateOpacity = (
   dataObject: Changeable,
   currentYear: number
-): number | undefined => {
+): number => {
   if (!dataObject.appears && !dataObject.disappears) return 1
   else {
     const minimumOpacity = 0.2

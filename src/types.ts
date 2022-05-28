@@ -22,10 +22,12 @@ interface GrammaticalCaseForm extends Changeable {
   form: string
 }
 
-interface GrammaticalCase {
-  main: GrammaticalCaseForm
-  variants: GrammaticalCaseForm[]
-}
+// interface GrammaticalCase {
+//   main: GrammaticalCaseForm
+//   variants: GrammaticalCaseForm[]
+// }
+
+// type GrammaticalCase = GrammaticalCaseForm[]
 
 interface Inflection extends Changeable {
   partOfSpeech: PartOfSpeech
@@ -76,7 +78,7 @@ type CaseName = keyof typeof CASE_NAMES
 type CaseNameWithNumber = `${CaseName}_sg` | `${CaseName}_pl`
 type DataOptions = Keyword | Inflection | WordUse | PhoneticInfo[]
 type Declension = {
-  [K in CaseNameWithNumber]: GrammaticalCase
+  [K in CaseNameWithNumber]: GrammaticalCaseForm[]
 }
 type ErrorMessage = string
 type InflectionType = 'nyitótő' | 'hangkivető'
@@ -92,7 +94,7 @@ export type {
   DataOptions,
   Declension,
   ErrorMessage,
-  GrammaticalCase,
+  GrammaticalCaseForm,
   Inflection,
   InflectionChange,
   InflectionType,
