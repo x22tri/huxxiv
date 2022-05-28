@@ -1,6 +1,6 @@
-import { Rule } from '../types'
+import { SoundChange } from '../types'
 
-const RULES: Rule[] = [
+const RULES: SoundChange[] = [
   {
     id: 1,
     target: 'ɒ',

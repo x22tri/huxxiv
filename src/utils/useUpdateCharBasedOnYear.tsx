@@ -38,12 +38,14 @@ const useUpdateCharBasedOnYear = (
         if (!('word' in element)) return element
         else {
           // Add pronunciation based on word.
-          const [phonemic, concurrentPronunciations, activeRules] =
+          const [phonemic, concurrentPronunciations, activeSoundChanges] =
             getPronunciation(element, year)
 
           return {
             ...element,
-            ...{ ...{ phonemic, concurrentPronunciations, activeRules } },
+            ...{
+              ...{ phonemic, concurrentPronunciations, activeSoundChanges },
+            },
           }
         }
       })

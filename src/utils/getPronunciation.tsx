@@ -1,4 +1,4 @@
-import { Keyword, Rule, PhoneticInfo } from '../types'
+import { Keyword, PhoneticInfo, SoundChange } from '../types'
 
 import { RULES } from '../database/RULES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
@@ -28,7 +28,7 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
 const getPronunciation = (
   wordObject: Keyword,
   currentYear: number
-): [string[], PhoneticInfo[], Rule[]] => {
+): [string[], PhoneticInfo[], SoundChange[]] => {
   let phonemic: string[] =
     wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
 
@@ -36,14 +36,14 @@ const getPronunciation = (
     JSON.stringify(phonemic.map(elem => ({ main: elem, variants: [] })))
   )
 
-  const activeRules: Rule[] = []
+  const activeSoundChanges: SoundChange[] = []
 
   RULES.forEach(rule => {
     concurrentPronunciations.forEach(phoneme => {
       if (rule.target === phoneme.main && rule.change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
-            // case 'concurrentVariants':
+          case 'concurrentVariants':
             phoneme.main = rule.target
             phoneme.variants.push({
               id: rule.id,
@@ -52,17 +52,12 @@ const getPronunciation = (
               disappears: rule.disappears,
               note: rule.note,
             })
-            !activeRules.includes(rule) && activeRules.push(rule)
-            break
-          case 'notReachedYet':
-            phoneme.main = rule.target
-            activeRules.includes(rule) &&
-              activeRules.splice(activeRules.indexOf(rule))
+            !activeSoundChanges.includes(rule) && activeSoundChanges.push(rule)
             break
           case 'gonePast':
             phoneme.main = rule.change
-            activeRules.includes(rule) &&
-              activeRules.splice(activeRules.indexOf(rule))
+            activeSoundChanges.includes(rule) &&
+              activeSoundChanges.splice(activeSoundChanges.indexOf(rule))
             break
           case 'disappearanceInProgress':
             phoneme.main = rule.change
@@ -73,14 +68,14 @@ const getPronunciation = (
               disappears: rule.disappears,
               note: rule.note,
             })
-            !activeRules.includes(rule) && activeRules.push(rule)
+            !activeSoundChanges.includes(rule) && activeSoundChanges.push(rule)
             break
         }
       }
     })
   })
 
-  return [phonemic, concurrentPronunciations, activeRules]
+  return [phonemic, concurrentPronunciations, activeSoundChanges]
 }
 
 const getMainPronunciation = (concurrentPronunciations: PhoneticInfo[]) =>

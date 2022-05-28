@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React from 'react'
 import getInflection, { Declension } from '../utils/getInflection'
 import { CaseName, GrammaticalCase, Inflection, Keyword } from '../types'
 import { CASE_NAMES, MISC_NAMES } from '../database/CASE_NAMES'
@@ -8,20 +8,31 @@ const caseNames = Object.keys(CASE_NAMES) as CaseName[]
 
 const CaseVariants = ({ cases }: { cases: GrammaticalCase }) => (
   <p className='case-variants'>
-    <span>{cases.main}</span>
+    <span>{cases.main.form}</span>
     <span className='case-variants--variant'>
       (
       {cases.variants?.length &&
         cases.variants.map((variant, index) => (
-          <>
+          <React.Fragment key={variant.form}>
             {index >= 1 && ', '}
-            <span key={variant}>{variant}</span>
-          </>
+            <span>{variant.form}</span>
+          </React.Fragment>
         ))}
       )
     </span>
   </p>
 )
+
+const CaseDisplay = ({
+  caseOrCaseArray,
+}: {
+  caseOrCaseArray: GrammaticalCase
+}) =>
+  caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0 ? (
+    <CaseVariants cases={caseOrCaseArray} />
+  ) : (
+    <>{caseOrCaseArray.main.form}</>
+  )
 
 const InflectionTableNounAdj = ({
   inflection,
@@ -33,22 +44,6 @@ const InflectionTableNounAdj = ({
   year: number
 }) => {
   const cases = getInflection(mainKeyword.word, inflection, year) as Declension
-  // const isCaseArray = (caseOrCaseArray: GrammaticalCase) =>
-  //   caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0
-
-  const CaseDisplay = ({
-    caseOrCaseArray,
-  }: {
-    caseOrCaseArray: GrammaticalCase
-  }) =>
-    caseOrCaseArray.variants && caseOrCaseArray.variants.length > 0 ? (
-      <CaseVariants cases={caseOrCaseArray} />
-    ) : (
-      <>{caseOrCaseArray.main}</>
-    )
-
-  console.log(cases)
-
   return (
     <>
       <thead>
@@ -61,13 +56,13 @@ const InflectionTableNounAdj = ({
       <tbody>
         {caseNames.map(caseName => (
           <tr key={caseName}>
-            <td>
+            <td className='col-md-2'>
               <strong>{CASE_NAMES[caseName]}</strong>
             </td>
-            <td>
+            <td className='col-md-4'>
               <CaseDisplay caseOrCaseArray={cases[`${caseName}_sg`]} />
             </td>
-            <td>
+            <td className='col-md-4'>
               <CaseDisplay caseOrCaseArray={cases[`${caseName}_pl`]} />
             </td>
           </tr>

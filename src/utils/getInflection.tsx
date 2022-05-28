@@ -19,7 +19,7 @@ const getLinkingVowels = (
 const getBaseInflection = (
   stem: string,
   inflection: Inflection
-): Declension => {
+): [Declension, string] => {
   const { vowelHarmony, partOfSpeech, inflectionType } = inflection
   const lowVowelStem = !!(
     inflectionType === 'nyitótő' || partOfSpeech === 'melléknév'
@@ -28,19 +28,24 @@ const getBaseInflection = (
   const [a, aa, o, oo, u, pl] = getLinkingVowels(vowelHarmony, lowVowelStem)
 
   // To-Do: plural stem finder probably has to be done separately
-  const plStem = `${stem}${pl}k`
+  const pluralStem = `${stem}${pl}k`
 
-  return {
-    nom_sg: { main: stem },
-    acc_sg: {
-      main: lowVowelStem ? `${stem}${a}t` : `${stem}t`,
-      variants: lowVowelStem ? [`${stem}t`] : [],
+  return [
+    {
+      nom_sg: { main: { form: stem }, variants: [] },
+      acc_sg: {
+        main: lowVowelStem
+          ? { form: `${stem}${a}t`, disappears: [2050, 2100] }
+          : { form: `${stem}t` },
+        variants: lowVowelStem ? [{ form: `${stem}t` }] : [],
+      },
+      dat_sg: { main: { form: `${stem}n${a}k` }, variants: [] },
+      nom_pl: { main: { form: `${pluralStem}` }, variants: [] },
+      acc_pl: { main: { form: `${pluralStem}${a}t` }, variants: [] },
+      dat_pl: { main: { form: `${pluralStem}n${a}k` }, variants: [] },
     },
-    dat_sg: { main: `${stem}n${a}k` },
-    nom_pl: { main: `${plStem}` },
-    acc_pl: { main: `${plStem}${a}t` },
-    dat_pl: { main: `${plStem}n${a}k` },
-  }
+    pluralStem,
+  ]
 }
 
 const getInflection = (
@@ -48,24 +53,29 @@ const getInflection = (
   inflection: Inflection,
   year: number
 ): Declension => {
-  let cases = getBaseInflection(stem, inflection)
+  let [cases, pluralStem] = getBaseInflection(stem, inflection)
+
+  const stemMap = new Map([
+    ['%STEM%', stem],
+    ['%PLURAL_STEM%', pluralStem],
+  ])
+
+  const stemReplacer = (change: string): string =>
+    change.replace(
+      new RegExp(Array.from(stemMap.keys()).join('|'), 'gi'),
+      matched => stemMap.get(matched) || 'Hiba'
+    )
 
   INFLECTION_CHANGES.forEach(change => {
     Object.keys(cases).forEach(grammaticalCase => {
-      // console.log(grammaticalCase)
       if (change.targetForm === grammaticalCase) {
+        // console.log(handleAppear(change, year))
         switch (handleAppear(change, year)) {
           case 'appearanceInProgress':
-            console.log(grammaticalCase)
-            // phoneme.main = rule.target
-            // phoneme.variants.push({
-            //   id: rule.id,
-            //   new: rule.change,
-            //   appears: rule.appears,
-            //   disappears: rule.disappears,
-            //   note: rule.note,
-            // })
-            // !activeRules.includes(rule) && activeRules.push(rule)
+          case 'concurrentVariants':
+            cases[change.targetForm as keyof Declension].variants.push({
+              form: stemReplacer(change.change),
+            })
             break
           case 'notReachedYet':
             // phoneme.main = rule.target

@@ -1,22 +1,20 @@
-import { Changeable } from '../types'
+import { InflectionChange } from '../types'
 
-let STEM
-
-interface InflectionChange extends Changeable {
-  id: number
-  targetForm: string
-  change: string
-}
+const STEM = '%STEM%'
+const PLURAL_STEM = '%PLURAL_STEM%'
 
 const INFLECTION_CHANGES: InflectionChange[] = [
   {
     id: 1,
-    // affects: '-osADJ',
-    targetForm: 'acc_sg',
-    change: `${STEM}test`,
+    targetForm: 'dat_sg',
+    change: `${STEM} számára`,
     appears: [2001, 2050],
-    disappears: [2040, 2080],
-    //   note: `test`,
+  },
+  {
+    id: 2,
+    targetForm: 'dat_pl',
+    change: `${PLURAL_STEM} számára`,
+    appears: [2001, 2050],
   },
 ]
 
