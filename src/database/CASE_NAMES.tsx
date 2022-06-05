@@ -2,6 +2,7 @@ const CASE_NAMES = {
   nom: 'alanyeset',
   acc: 'tárgyeset',
   dat: 'részes eset',
+  spe: 'szuperesszívusz',
 }
 
 const MISC_NAMES = {

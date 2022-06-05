@@ -23,16 +23,17 @@ interface GrammaticalCaseForm extends Changeable {
 }
 
 interface Inflection extends Changeable {
-  classes?: PartOfSpeech | VowelHarmony | InflectionType
+  classes?: (PartOfSpeech | VowelHarmony | InflectionType)[]
   partOfSpeech: PartOfSpeech
   vowelHarmony: VowelHarmony
-  inflectionType?: InflectionType
+  //inflectionType?: InflectionType
 }
 
 interface InflectionChange extends Changeable {
   id: number
   targetForm: string
   change: string
+  classes?: (PartOfSpeech | VowelHarmony | InflectionType)[]
 }
 
 interface Keyword extends Changeable {

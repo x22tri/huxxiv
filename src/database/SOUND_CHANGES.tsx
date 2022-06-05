@@ -1,6 +1,6 @@
 import { SoundChange } from '../types'
 
-const RULES: SoundChange[] = [
+const SOUND_CHANGES: SoundChange[] = [
   {
     id: 1,
     target: 'ɒ',
@@ -19,6 +19,14 @@ const RULES: SoundChange[] = [
   },
   {
     id: 3,
+    target: 'aː',
+    change: 'æː',
+    appears: [2010, 2050],
+    disappears: [2035, 2080],
+    note: 'Az *á* betűvel jelölt hang képzése előrébb kerül.',
+  },
+  {
+    id: 4,
     target: 'ɔ',
     change: 'ɒ',
     appears: [2050, 2090],
@@ -26,7 +34,7 @@ const RULES: SoundChange[] = [
     note: 'Az *o* betűvel jelölt hang képzése még lazábbá válik, a 2000-es évek *a* betűvel jelölt hangjáig.',
   },
   {
-    id: 4,
+    id: 5,
     target: 'ɑ',
     change: 'ä',
     appears: [2060, 2085],
@@ -35,4 +43,4 @@ const RULES: SoundChange[] = [
   },
 ]
 
-export { RULES }
+export { SOUND_CHANGES }

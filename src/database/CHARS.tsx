@@ -22,6 +22,17 @@ const CHARS: Word[] = [
       },
     ],
   },
+  {
+    id: 2,
+    data: [
+      { word: 'szamár' },
+      {
+        partOfSpeech: 'főnév',
+        vowelHarmony: 'o',
+        classes: ['rövidülő', 'nyitótő'],
+      },
+    ],
+  },
 ]
 
 export { CHARS }

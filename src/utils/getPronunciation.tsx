@@ -1,6 +1,6 @@
 import { Keyword, PhoneticInfo, SoundChange } from '../types'
 
-import { RULES } from '../database/RULES'
+import { SOUND_CHANGES } from '../database/SOUND_CHANGES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
 import { handleAppear } from './appearance-utils'
 
@@ -39,7 +39,7 @@ const getPronunciation = (
 
   const activeSoundChanges: SoundChange[] = []
 
-  for (let rule of RULES) {
+  for (let rule of SOUND_CHANGES) {
     for (let phoneme of concurrentPronunciations) {
       if (rule.target === phoneme.main && rule.change) {
         switch (handleAppear(rule, currentYear)) {

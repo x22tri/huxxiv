@@ -1,74 +1,95 @@
 import INFLECTION_CHANGES from '../database/INFLECTION_CHANGES'
-import {
-  Changeable,
-  CaseNameWithNumber,
-  Declension,
-  GrammaticalCaseForm,
-  Inflection,
-} from '../types'
+import { CaseNameWithNumber, Declension, Inflection } from '../types'
 import { handleAppear, notOutOfBounds } from './appearance-utils'
 import { convertKeywordToLetters } from './getPronunciation'
 
+// A list of vowels used in suffixes. Destructured as [a, aa, o, oo, u].
 const linkingVowelDictionary = {
   o: ['a', 'á', 'o', 'ó', 'u'],
   e: ['e', 'é', 'e', 'ő', 'ü'],
   ö: ['e', 'é', 'ö', 'ő', 'ü'],
 }
 
+// A function used to get the base inflection (in 2000) which the changes will build on.
 const getBaseInflection = (
   mainKeyword: string,
   inflection: Inflection
-): [Declension, string] => {
-  const { vowelHarmony, partOfSpeech, inflectionType } = inflection
-  const lowVowelStem = !!(
-    inflectionType === 'nyitótő' || partOfSpeech === 'melléknév'
-  )
+): [Declension, string, string] => {
+  const { vowelHarmony, partOfSpeech, classes } = inflection
+  const lowStem = classes?.includes('nyitótő') || partOfSpeech === 'melléknév'
 
   const [a, aa, o, oo, u] = linkingVowelDictionary[vowelHarmony]
-  const lowVowel = lowVowelStem ? a : o
+  const lowVowel = lowStem ? a : o
 
-  let accStem, speStem, plStem
   let stem2Base = mainKeyword
+  let letters = convertKeywordToLetters(mainKeyword)
+  if (!letters) throw new Error('A szót nem lehetett betűire bontani.')
 
-  const vowelChangeStem = !!(
-    inflectionType === 'hangkivető' || inflectionType === 'rövidülő'
-  )
-
-  // Finds the vowel to elide in vowel elision stems.
-  if (vowelChangeStem) {
-    let converted = convertKeywordToLetters(mainKeyword)
-    if (converted) {
-      console.log(converted)
-      converted.splice(converted.length - 2, 1)
-      stem2Base = converted.join('')
-    }
+  // Finds the vowel to elide or change in vowel elision / shortening stems.
+  if (classes?.includes('hangkivető')) {
+    letters.splice(letters.length - 2, 1)
+    stem2Base = letters.join('')
   }
 
-  accStem = `${stem2Base}${lowVowel}`
-  plStem = `${stem2Base}${lowVowel}`
+  if (classes?.includes('rövidülő')) {
+    letters[letters.length - 2] = letters[letters.length - 2]
+      .replace('á', 'a')
+      .replace('é', 'e')
+    stem2Base = letters.join('')
+  }
 
-  const disappearingSibilantLinkVowel = true // To-Do: make class or rule for this
+  let accStem = `${stem2Base}${lowVowel}`,
+    speStem = `${mainKeyword}${o}`,
+    lowVowelSpeStem = `${stem2Base}${o}`,
+    plStem = `${stem2Base}${lowVowel}`
 
-  const acc_sg = disappearingSibilantLinkVowel
+  const disappearingSibilantLinkVowel =
+    letters[letters.length - 1] === 's' && partOfSpeech === 'melléknév'
+  // To-Do: 's' should be sibilant category
+
+  let acc_sg
+
+  if (disappearingSibilantLinkVowel) {
+    acc_sg = [
+      {
+        form: `${accStem}t`,
+        disappears: [2050, 2100] as [number, number],
+      },
+      { form: `${mainKeyword}t` },
+    ]
+  } else if (classes?.includes('rövidülő')) {
+    acc_sg = [
+      {
+        form: `${accStem}t`,
+        disappears: [2070, 2120] as [number, number],
+      },
+    ]
+  } else {
+    acc_sg = [{ form: `${accStem}t` }]
+  }
+
+  const spe_sg = classes?.includes('rövidülő')
     ? [
         {
-          form: `${accStem}t`,
-          disappears: [2050, 2100] as [number, number],
+          form: `${speStem}n`,
+          disappears: [2080, 2120] as [number, number],
         },
-        { form: `${mainKeyword}t` },
       ]
-    : [{ form: `${mainKeyword}t` }]
+    : [{ form: `${speStem}n` }]
 
   return [
     {
       nom_sg: [{ form: mainKeyword }],
-      acc_sg: acc_sg,
-      dat_sg: [{ form: `${mainKeyword}n${a}k` }],
+      acc_sg,
+      dat_sg: [{ form: `${mainKeyword}n${a}k`, disappears: [2100, 2200] }],
+      spe_sg,
       nom_pl: [{ form: `${plStem}k` }],
       acc_pl: [{ form: `${plStem}k${a}t` }],
-      dat_pl: [{ form: `${plStem}kn${a}k` }],
+      dat_pl: [{ form: `${plStem}kn${a}k`, disappears: [2100, 2200] }],
+      spe_pl: [{ form: `${plStem}k${o}n` }],
     },
     plStem,
+    lowVowelSpeStem,
   ]
 }
 
@@ -77,7 +98,10 @@ const getInflection = (
   inflection: Inflection,
   year: number
 ): Declension => {
-  let [cases, pluralStem] = getBaseInflection(mainKeyword, inflection)
+  let [cases, plStem, lowVowelSpeStem] = getBaseInflection(
+    mainKeyword,
+    inflection
+  )
 
   // Makes disappearing elements in the base inflection disappear.
   for (let grammaticalCase of Object.keys(cases)) {
@@ -88,7 +112,8 @@ const getInflection = (
 
   const stemMap = new Map([
     ['%STEM%', mainKeyword],
-    ['%PLURAL_STEM%', pluralStem],
+    ['%PLURAL_STEM%', plStem],
+    ['%LOW_VOWEL_SUPERESSIVE_STEM%', lowVowelSpeStem], // works for front but not back vowels: tehenek - tehenen but szamarak - szamaron. fix!
   ])
 
   const stemReplacer = (change: string): string =>
@@ -101,30 +126,38 @@ const getInflection = (
   for (let change of INFLECTION_CHANGES) {
     for (let grammaticalCase of Object.keys(cases)) {
       if (change.targetForm === grammaticalCase) {
-        switch (handleAppear(change, year)) {
-          case 'appearanceInProgress':
-          case 'concurrentVariants':
-            cases[change.targetForm as keyof Declension].push({
-              form: stemReplacer(change.change),
-              appears: change.appears,
-            })
-            break
-          case 'gonePast':
-            // phoneme.main = rule.change
-            // activeRules.includes(rule) &&
-            //   activeRules.splice(activeRules.indexOf(rule))
-            break
-          case 'disappearanceInProgress':
-            // phoneme.main = rule.change
-            // phoneme.variants.push({
-            //   id: rule.id,
-            //   old: rule.target,
-            //   appears: rule.appears,
-            //   disappears: rule.disappears,
-            //   note: rule.note,
-            // })
-            // !activeRules.includes(rule) && activeRules.push(rule)
-            break
+        // Don't run if the change has a class and it doesn't match the word's classes.
+        if (
+          change.classes &&
+          !change.classes?.some(c => inflection.classes?.includes(c))
+        ) {
+          break
+        } else {
+          switch (handleAppear(change, year)) {
+            case 'appearanceInProgress':
+            case 'concurrentVariants':
+              cases[change.targetForm as keyof Declension].push({
+                form: stemReplacer(change.change),
+                appears: change.appears,
+              })
+              break
+            case 'gonePast':
+              // phoneme.main = rule.change
+              // activeRules.includes(rule) &&
+              //   activeRules.splice(activeRules.indexOf(rule))
+              break
+            case 'disappearanceInProgress':
+              // phoneme.main = rule.change
+              // phoneme.variants.push({
+              //   id: rule.id,
+              //   old: rule.target,
+              //   appears: rule.appears,
+              //   disappears: rule.disappears,
+              //   note: rule.note,
+              // })
+              // !activeRules.includes(rule) && activeRules.push(rule)
+              break
+          }
         }
       }
     }
@@ -134,9 +167,11 @@ const getInflection = (
     nom_sg: cases.nom_sg,
     acc_sg: cases.acc_sg,
     dat_sg: cases.dat_sg,
+    spe_sg: cases.spe_sg,
     nom_pl: cases.nom_pl,
     acc_pl: cases.acc_pl,
     dat_pl: cases.dat_pl,
+    spe_pl: cases.spe_pl,
   }
 }
 
