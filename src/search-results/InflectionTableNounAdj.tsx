@@ -6,8 +6,6 @@ import './InflectionTableNounAdj.css'
 
 const caseNames = Object.keys(CASE_NAMES) as CaseName[]
 
-// To-Do: make elements take over the "main" inflection and make obsolete elements disappear
-
 interface GrammaticalCaseFormWithOpacity extends GrammaticalCaseForm {
   opacity: number
 }
@@ -15,25 +13,19 @@ interface GrammaticalCaseFormWithOpacity extends GrammaticalCaseForm {
 const findMaxOpacityElementIndex = (
   array: GrammaticalCaseForm[],
   year: number
-) => {
+): [GrammaticalCaseFormWithOpacity, GrammaticalCaseFormWithOpacity[]] => {
   const arrayWithOpacities = array.map(elem => ({
     ...elem,
     opacity: calculateOpacity(elem, year),
   }))
-
-  console.log(arrayWithOpacities)
 
   const maxOpacityElementIndex = arrayWithOpacities.findIndex(
     elem => elem.opacity === Math.max(...arrayWithOpacities.map(e => e.opacity))
   )
 
   return [
-    arrayWithOpacities[
-      maxOpacityElementIndex
-    ] as GrammaticalCaseFormWithOpacity,
-    arrayWithOpacities.filter(
-      (_, index) => index !== maxOpacityElementIndex
-    ) as GrammaticalCaseFormWithOpacity[],
+    arrayWithOpacities[maxOpacityElementIndex],
+    arrayWithOpacities.filter((_, index) => index !== maxOpacityElementIndex),
   ]
 }
 const CaseDisplay = ({
@@ -44,8 +36,7 @@ const CaseDisplay = ({
   year: number
 }) => {
   if (caseArray.length < 1) {
-    throw new Error('Nincs aktív morféma')
-    // To-Do: remove the row altogether
+    return <span>Hiba: Nincs aktív morféma.</span>
   } else if (caseArray.length === 1) {
     return (
       <span
@@ -57,11 +48,8 @@ const CaseDisplay = ({
       </span>
     )
   } else {
-    // console.log(findMaxOpacityElementIndex(caseArray, year))
-    const [main, rest] = findMaxOpacityElementIndex(caseArray, year) as [
-      GrammaticalCaseFormWithOpacity,
-      GrammaticalCaseFormWithOpacity[]
-    ]
+    const [main, rest] = findMaxOpacityElementIndex(caseArray, year)
+
     return (
       <p className='case-variants'>
         <span

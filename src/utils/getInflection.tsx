@@ -1,6 +1,12 @@
 import INFLECTION_CHANGES from '../database/INFLECTION_CHANGES'
-import { Changeable, Declension, Inflection } from '../types'
-import { handleAppear } from './appearance-utils'
+import {
+  Changeable,
+  CaseNameWithNumber,
+  Declension,
+  GrammaticalCaseForm,
+  Inflection,
+} from '../types'
+import { handleAppear, notOutOfBounds } from './appearance-utils'
 
 const getLinkingVowels = (
   vowelHarmony: 'o' | 'e' | 'ö',
@@ -62,6 +68,13 @@ const getInflection = (
 ): Declension => {
   let [cases, pluralStem] = getBaseInflection(stem, inflection)
 
+  // Make disappearing elements in the base inflection disappear.
+  for (let grammaticalCase of Object.keys(cases)) {
+    cases[grammaticalCase as CaseNameWithNumber] = cases[
+      grammaticalCase as CaseNameWithNumber
+    ].filter(gc => notOutOfBounds(gc, year))
+  }
+
   const stemMap = new Map([
     ['%STEM%', stem],
     ['%PLURAL_STEM%', pluralStem],
@@ -73,10 +86,10 @@ const getInflection = (
       matched => stemMap.get(matched) || 'Hiba'
     )
 
+  // Add new inflection changes on top of the base inflection.
   for (let change of INFLECTION_CHANGES) {
     for (let grammaticalCase of Object.keys(cases)) {
       if (change.targetForm === grammaticalCase) {
-        // console.log(handleAppear(change, year))
         switch (handleAppear(change, year)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
@@ -85,11 +98,6 @@ const getInflection = (
               appears: change.appears,
             })
             break
-          // case 'notReachedYet':
-          // phoneme.main = rule.target
-          // activeRules.includes(rule) &&
-          //   activeRules.splice(activeRules.indexOf(rule))
-          // break
           case 'gonePast':
             // phoneme.main = rule.change
             // activeRules.includes(rule) &&

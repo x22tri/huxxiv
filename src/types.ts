@@ -22,13 +22,6 @@ interface GrammaticalCaseForm extends Changeable {
   form: string
 }
 
-// interface GrammaticalCase {
-//   main: GrammaticalCaseForm
-//   variants: GrammaticalCaseForm[]
-// }
-
-// type GrammaticalCase = GrammaticalCaseForm[]
-
 interface Inflection extends Changeable {
   partOfSpeech: PartOfSpeech
   vowelHarmony: VowelHarmony
