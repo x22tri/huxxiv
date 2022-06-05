@@ -13,7 +13,7 @@ const INFLECTION_CHANGES: InflectionChange[] = [
   {
     id: 2,
     targetForm: 'dat_pl',
-    change: `${PLURAL_STEM} számára`,
+    change: `${PLURAL_STEM}k számára`,
     appears: [2001, 2050],
   },
 ]

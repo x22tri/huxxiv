@@ -23,6 +23,7 @@ interface GrammaticalCaseForm extends Changeable {
 }
 
 interface Inflection extends Changeable {
+  classes?: PartOfSpeech | VowelHarmony | InflectionType
   partOfSpeech: PartOfSpeech
   vowelHarmony: VowelHarmony
   inflectionType?: InflectionType
@@ -74,7 +75,7 @@ type Declension = {
   [K in CaseNameWithNumber]: GrammaticalCaseForm[]
 }
 type ErrorMessage = string
-type InflectionType = 'nyitótő' | 'hangkivető'
+type InflectionType = 'nyitótő' | 'hangkivető' | 'rövidülő'
 type PartOfSpeech = 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
 type VowelHarmony = 'o' | 'e' | 'ö'
 

@@ -4,9 +4,9 @@ import { RULES } from '../database/RULES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
 import { handleAppear } from './appearance-utils'
 
-const convertKeywordToPhonemes = (keyword: string): string[] => {
+const convertKeywordToLetters = (keyword: string): string[] | null =>
   // Sort letters by length (longest to shortest) to find trigraphs before digraphs before monographs.
-  const keywordBreakdownToLetters = keyword.match(
+  keyword.match(
     new RegExp(
       GRAPH_TO_PHONEME.map(i => i.letter)
         .sort()
@@ -16,8 +16,9 @@ const convertKeywordToPhonemes = (keyword: string): string[] => {
     )
   )
 
+const convertKeywordToPhonemes = (keyword: string): string[] => {
   let phonemicResult: string[] = []
-  keywordBreakdownToLetters?.forEach(letter => {
+  convertKeywordToLetters(keyword)?.forEach(letter => {
     const phonemeObject = GRAPH_TO_PHONEME.find(i => i.letter === letter)
     if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
   })
@@ -91,4 +92,9 @@ const getMainPronunciation = (concurrentPronunciations: PhoneticInfo[]) =>
 const getNumberOfVariants = (concurrentPronunciations: PhoneticInfo[]) =>
   concurrentPronunciations.filter(elem => elem.variants.length).length
 
-export { getPronunciation, getMainPronunciation, getNumberOfVariants }
+export {
+  convertKeywordToLetters,
+  getPronunciation,
+  getMainPronunciation,
+  getNumberOfVariants,
+}

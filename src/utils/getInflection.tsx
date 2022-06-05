@@ -7,25 +7,16 @@ import {
   Inflection,
 } from '../types'
 import { handleAppear, notOutOfBounds } from './appearance-utils'
+import { convertKeywordToLetters } from './getPronunciation'
 
-const getLinkingVowels = (
-  vowelHarmony: 'o' | 'e' | 'ö',
-  lowVowelStem: boolean = false
-) => {
-  const linkingVowelDictionary = {
-    o: ['a', 'á', 'o', 'ó', 'u', lowVowelStem ? 'a' : 'o'],
-    e: ['e', 'é', 'e', 'ő', 'ü', 'e'],
-    ö: ['e', 'é', 'ö', 'ő', 'ü', lowVowelStem ? 'e' : 'ö'],
-  }
-
-  let [a, aa, o, oo, u, pl] = linkingVowelDictionary[vowelHarmony]
-  return [a, aa, o, oo, u, pl]
+const linkingVowelDictionary = {
+  o: ['a', 'á', 'o', 'ó', 'u'],
+  e: ['e', 'é', 'e', 'ő', 'ü'],
+  ö: ['e', 'é', 'ö', 'ő', 'ü'],
 }
 
-const getStems = () => {}
-
 const getBaseInflection = (
-  stem: string,
+  mainKeyword: string,
   inflection: Inflection
 ): [Declension, string] => {
   const { vowelHarmony, partOfSpeech, inflectionType } = inflection
@@ -33,42 +24,62 @@ const getBaseInflection = (
     inflectionType === 'nyitótő' || partOfSpeech === 'melléknév'
   )
 
-  const [a, aa, o, oo, u, pl] = getLinkingVowels(vowelHarmony, lowVowelStem)
+  const [a, aa, o, oo, u] = linkingVowelDictionary[vowelHarmony]
+  const lowVowel = lowVowelStem ? a : o
 
-  // To-Do: plural stem finder probably has to be done separately
-  const pluralStem = `${stem}${pl}k`
+  let accStem, speStem, plStem
+  let stem2Base = mainKeyword
+
+  const vowelChangeStem = !!(
+    inflectionType === 'hangkivető' || inflectionType === 'rövidülő'
+  )
+
+  // Finds the vowel to elide in vowel elision stems.
+  if (vowelChangeStem) {
+    let converted = convertKeywordToLetters(mainKeyword)
+    if (converted) {
+      console.log(converted)
+      converted.splice(converted.length - 2, 1)
+      stem2Base = converted.join('')
+    }
+  }
+
+  accStem = `${stem2Base}${lowVowel}`
+  plStem = `${stem2Base}${lowVowel}`
+
+  const disappearingSibilantLinkVowel = true // To-Do: make class or rule for this
+
+  const acc_sg = disappearingSibilantLinkVowel
+    ? [
+        {
+          form: `${accStem}t`,
+          disappears: [2050, 2100] as [number, number],
+        },
+        { form: `${mainKeyword}t` },
+      ]
+    : [{ form: `${mainKeyword}t` }]
 
   return [
     {
-      nom_sg: [{ form: stem }],
-      acc_sg: [
-        ...(lowVowelStem
-          ? [
-              {
-                form: `${stem}${a}t`,
-                disappears: [2050, 2100] as [number, number],
-              },
-            ]
-          : []),
-        { form: `${stem}t` },
-      ],
-      dat_sg: [{ form: `${stem}n${a}k` }],
-      nom_pl: [{ form: `${pluralStem}` }],
-      acc_pl: [{ form: `${pluralStem}${a}t` }],
-      dat_pl: [{ form: `${pluralStem}n${a}k` }],
+      nom_sg: [{ form: mainKeyword }],
+      acc_sg: acc_sg,
+      dat_sg: [{ form: `${mainKeyword}n${a}k` }],
+      nom_pl: [{ form: `${plStem}k` }],
+      acc_pl: [{ form: `${plStem}k${a}t` }],
+      dat_pl: [{ form: `${plStem}kn${a}k` }],
     },
-    pluralStem,
+    plStem,
   ]
 }
 
 const getInflection = (
-  stem: string,
+  mainKeyword: string,
   inflection: Inflection,
   year: number
 ): Declension => {
-  let [cases, pluralStem] = getBaseInflection(stem, inflection)
+  let [cases, pluralStem] = getBaseInflection(mainKeyword, inflection)
 
-  // Make disappearing elements in the base inflection disappear.
+  // Makes disappearing elements in the base inflection disappear.
   for (let grammaticalCase of Object.keys(cases)) {
     cases[grammaticalCase as CaseNameWithNumber] = cases[
       grammaticalCase as CaseNameWithNumber
@@ -76,7 +87,7 @@ const getInflection = (
   }
 
   const stemMap = new Map([
-    ['%STEM%', stem],
+    ['%STEM%', mainKeyword],
     ['%PLURAL_STEM%', pluralStem],
   ])
 
@@ -86,7 +97,7 @@ const getInflection = (
       matched => stemMap.get(matched) || 'Hiba'
     )
 
-  // Add new inflection changes on top of the base inflection.
+  // Adds new inflection changes on top of the base inflection.
   for (let change of INFLECTION_CHANGES) {
     for (let grammaticalCase of Object.keys(cases)) {
       if (change.targetForm === grammaticalCase) {

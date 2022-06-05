@@ -16,7 +16,8 @@ const InflectionPane = ({
 
   return (
     <Table bordered responsive className='mb-0'>
-      {inflection.partOfSpeech === 'melléknév' && (
+      {(inflection.partOfSpeech === 'melléknév' ||
+        inflection.partOfSpeech === 'főnév') && (
         <InflectionTableNounAdj {...{ inflection, mainKeyword, year }} />
       )}
     </Table>
