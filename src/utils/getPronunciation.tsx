@@ -38,8 +38,8 @@ const getPronunciation = (
 
   const activeSoundChanges: SoundChange[] = []
 
-  RULES.forEach(rule => {
-    concurrentPronunciations.forEach(phoneme => {
+  for (let rule of RULES) {
+    for (let phoneme of concurrentPronunciations) {
       if (rule.target === phoneme.main && rule.change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
@@ -77,8 +77,8 @@ const getPronunciation = (
             break
         }
       }
-    })
-  })
+    }
+  }
 
   return [phonemic, concurrentPronunciations, activeSoundChanges]
 }

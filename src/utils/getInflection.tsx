@@ -32,22 +32,6 @@ const getBaseInflection = (
   // To-Do: plural stem finder probably has to be done separately
   const pluralStem = `${stem}${pl}k`
 
-  // return [
-  //   {
-  //     nom_sg: { main: { form: stem }, variants: [] },
-  //     acc_sg: {
-  //       main: lowVowelStem
-  //         ? { form: `${stem}${a}t`, disappears: [2050, 2100] }
-  //         : { form: `${stem}t` },
-  //       variants: lowVowelStem ? [{ form: `${stem}t` }] : [],
-  //     },
-  //     dat_sg: { main: { form: `${stem}n${a}k` }, variants: [] },
-  //     nom_pl: { main: { form: `${pluralStem}` }, variants: [] },
-  //     acc_pl: { main: { form: `${pluralStem}${a}t` }, variants: [] },
-  //     dat_pl: { main: { form: `${pluralStem}n${a}k` }, variants: [] },
-  //   },
-  //   pluralStem,
-  // ]
   return [
     {
       nom_sg: [{ form: stem }],
@@ -89,22 +73,23 @@ const getInflection = (
       matched => stemMap.get(matched) || 'Hiba'
     )
 
-  INFLECTION_CHANGES.forEach(change => {
-    Object.keys(cases).forEach(grammaticalCase => {
+  for (let change of INFLECTION_CHANGES) {
+    for (let grammaticalCase of Object.keys(cases)) {
       if (change.targetForm === grammaticalCase) {
         // console.log(handleAppear(change, year))
         switch (handleAppear(change, year)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
-            // cases[change.targetForm as keyof Declension].variants.push({
-            //   form: stemReplacer(change.change),
-            // })
+            cases[change.targetForm as keyof Declension].push({
+              form: stemReplacer(change.change),
+              appears: change.appears,
+            })
             break
-          case 'notReachedYet':
-            // phoneme.main = rule.target
-            // activeRules.includes(rule) &&
-            //   activeRules.splice(activeRules.indexOf(rule))
-            break
+          // case 'notReachedYet':
+          // phoneme.main = rule.target
+          // activeRules.includes(rule) &&
+          //   activeRules.splice(activeRules.indexOf(rule))
+          // break
           case 'gonePast':
             // phoneme.main = rule.change
             // activeRules.includes(rule) &&
@@ -123,8 +108,8 @@ const getInflection = (
             break
         }
       }
-    })
-  })
+    }
+  }
 
   return {
     nom_sg: cases.nom_sg,

@@ -21,6 +21,8 @@ const findMaxOpacityElementIndex = (
     opacity: calculateOpacity(elem, year),
   }))
 
+  console.log(arrayWithOpacities)
+
   const maxOpacityElementIndex = arrayWithOpacities.findIndex(
     elem => elem.opacity === Math.max(...arrayWithOpacities.map(e => e.opacity))
   )
@@ -30,7 +32,7 @@ const findMaxOpacityElementIndex = (
       maxOpacityElementIndex
     ] as GrammaticalCaseFormWithOpacity,
     arrayWithOpacities.filter(
-      (elem, index) => index !== maxOpacityElementIndex
+      (_, index) => index !== maxOpacityElementIndex
     ) as GrammaticalCaseFormWithOpacity[],
   ]
 }
@@ -55,7 +57,7 @@ const CaseDisplay = ({
       </span>
     )
   } else {
-    console.log(findMaxOpacityElementIndex(caseArray, year))
+    // console.log(findMaxOpacityElementIndex(caseArray, year))
     const [main, rest] = findMaxOpacityElementIndex(caseArray, year) as [
       GrammaticalCaseFormWithOpacity,
       GrammaticalCaseFormWithOpacity[]
