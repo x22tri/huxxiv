@@ -22,7 +22,8 @@ const getBaseInflection = (
   const lowVowel = lowStem ? a : o
 
   let stem2Base = mainKeyword
-  let letters = convertKeywordToLetters(mainKeyword)
+
+  const letters = convertKeywordToLetters(mainKeyword)
   if (!letters) throw new Error('A szót nem lehetett betűire bontani.')
 
   // Finds the vowel to elide or change in vowel elision / shortening stems.

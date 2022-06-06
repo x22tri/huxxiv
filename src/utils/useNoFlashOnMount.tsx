@@ -6,7 +6,7 @@ const useNoFlashOnMount = () => {
   useEffect(() => {
     let timer = setTimeout(() => {
       setPreventFlash(false)
-    }, 500) // The timeout cannot be shorter than the flash or else the flash will still be visible.
+    }, 650) // The timeout cannot be shorter than the flash or else the flash will still be visible.
 
     return () => clearTimeout(timer)
   }, [])

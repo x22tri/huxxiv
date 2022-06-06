@@ -16,6 +16,7 @@ const WordSearcher = ({
   searchTerm,
   setSearchTerm,
   setSearchResult,
+  setInitialState,
   navbarView = false,
 }: {
   searchTerm: string
@@ -23,13 +24,17 @@ const WordSearcher = ({
   setSearchResult: Dispatch<
     SetStateAction<DataOptions[] | ErrorMessage | undefined>
   >
+  setInitialState: Dispatch<
+    SetStateAction<DataOptions[] | ErrorMessage | undefined>
+  >
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
-    setSearchResult(
-      CHARS.find(el => el.data.find(d => 'word' in d && d.word === word))
-        ?.data ?? 'A szó nem található az adatbázisban.'
-    )
+    let foundWord = CHARS.find(el =>
+      el.data.find(d => 'word' in d && d.word === word)
+    )?.data
+    setSearchResult(foundWord ?? 'A szó nem található az adatbázisban.')
+    if (foundWord) setInitialState(foundWord)
   }
 
   return (
@@ -66,14 +71,18 @@ const WordSearcher = ({
 
 const isErrorMessage = (
   searchResult: DataOptions[] | ErrorMessage
-): searchResult is ErrorMessage => {
-  return typeof (searchResult as ErrorMessage) === 'string'
-}
+): searchResult is ErrorMessage =>
+  !!(typeof (searchResult as ErrorMessage) === 'string')
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResult, setSearchResult] = useState<
     DataOptions[] | ErrorMessage | undefined
+  >()
+
+  // This state provides an immutable starting point for all phonetic etc. processes.
+  const [initialState, setInitialState] = useState<
+    string | DataOptions[] | undefined
   >()
 
   return (
@@ -91,7 +100,9 @@ const App = () => {
           <div className='text-white-50 noselect' id='huxxiv-pinyin'>
             [ˈhukːsiv]
           </div>
-          <WordSearcher {...{ searchTerm, setSearchTerm, setSearchResult }} />
+          <WordSearcher
+            {...{ searchTerm, setSearchTerm, setSearchResult, setInitialState }}
+          />
         </Container>
       ) : (
         <>
@@ -99,7 +110,12 @@ const App = () => {
             wordSearcher={
               <WordSearcher
                 navbarView
-                {...{ searchTerm, setSearchTerm, setSearchResult }}
+                {...{
+                  searchTerm,
+                  setSearchTerm,
+                  setSearchResult,
+                  setInitialState,
+                }}
               />
             }
           />
@@ -107,10 +123,12 @@ const App = () => {
             <div className='error-field d-flex my-auto'>{searchResult}</div>
           ) : (
             <SearchResults
+              key={searchTerm}
               wordState={searchResult}
               setWordState={
                 setSearchResult as Dispatch<SetStateAction<DataOptions[]>>
               }
+              initialState={initialState as DataOptions[]}
             />
           )}
         </>

@@ -18,17 +18,17 @@ import './SearchResults.css'
 const SearchResults = ({
   wordState,
   setWordState,
+  initialState,
 }: {
   wordState: DataOptions[]
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
+  initialState: DataOptions[]
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
+  // console.log(preventFlashOnMount)
 
-  const [cardHeight, setCardHeight] = useState(0)
+  const [cardHeight, setCardHeight] = useState<number>(0)
   const [activePane, setActivePane] = useState<ActivePane>('meaning')
-
-  // This state provides an immutable starting point for all phonetic etc. processes.
-  const [initialState] = useState(wordState)
 
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
