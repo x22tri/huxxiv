@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const useNoFlashOnMount = () => {
   const [preventFlash, setPreventFlash] = useState(true)
@@ -23,7 +23,7 @@ const Flasher = ({
   preventFlashOnMount: number
   children: JSX.Element
 }) => (
-  <React.Fragment>
+  <>
     <style type='text/css'>
       {`.flash {
             border-radius: 4px;
@@ -31,7 +31,7 @@ const Flasher = ({
           }`}
     </style>
     {children}
-  </React.Fragment>
+  </>
 )
 
 export { useNoFlashOnMount, Flasher }

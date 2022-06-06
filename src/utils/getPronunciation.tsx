@@ -30,7 +30,7 @@ const getPronunciation = (
   wordObject: Keyword,
   currentYear: number
 ): [string[], PhoneticInfo[], SoundChange[]] => {
-  let phonemic: string[] =
+  const phonemic: string[] =
     wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
 
   const concurrentPronunciations: PhoneticInfo[] = JSON.parse(

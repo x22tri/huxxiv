@@ -6,7 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
 import { CHARS } from './database/CHARS'
-import { ErrorMessage, DataOptions } from './types'
+import { ActivePane, DataOptions, ErrorMessage } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
 import logo from './assets/hun2500logo.png'
@@ -80,6 +80,9 @@ const App = () => {
     DataOptions[] | ErrorMessage | undefined
   >()
 
+  // The active pane needed to be lifted up here so it stays constant between rerenders.
+  const [activePane, setActivePane] = useState<ActivePane>('meaning')
+
   // This state provides an immutable starting point for all phonetic etc. processes.
   const [initialState, setInitialState] = useState<
     string | DataOptions[] | undefined
@@ -123,12 +126,13 @@ const App = () => {
             <div className='error-field d-flex my-auto'>{searchResult}</div>
           ) : (
             <SearchResults
-              key={searchTerm}
+              key={JSON.stringify(searchResult)}
               wordState={searchResult}
               setWordState={
                 setSearchResult as Dispatch<SetStateAction<DataOptions[]>>
               }
               initialState={initialState as DataOptions[]}
+              {...{ activePane, setActivePane }}
             />
           )}
         </>

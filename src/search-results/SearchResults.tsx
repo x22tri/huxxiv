@@ -16,20 +16,22 @@ import { useUpdateCharBasedOnYear } from '../utils/useUpdateCharBasedOnYear'
 import './SearchResults.css'
 
 const SearchResults = ({
-  wordState,
-  setWordState,
+  activePane,
   initialState,
+  setActivePane,
+  setWordState,
+  wordState,
 }: {
-  wordState: DataOptions[]
-  setWordState: Dispatch<SetStateAction<DataOptions[]>>
+  activePane: ActivePane
   initialState: DataOptions[]
+  wordState: DataOptions[]
+  setActivePane: Dispatch<SetStateAction<ActivePane>>
+  setWordState: Dispatch<SetStateAction<DataOptions[]>>
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
-  // console.log(preventFlashOnMount)
-
   const [cardHeight, setCardHeight] = useState<number>(0)
-  const [activePane, setActivePane] = useState<ActivePane>('meaning')
 
+  // The core of HUXXIV's business logic, a hook that updates the card on scroll.
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.

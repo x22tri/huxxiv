@@ -1,26 +1,26 @@
-import React, {
-  useState,
-  Dispatch,
-  SetStateAction,
-  FunctionComponent,
+import {
   ComponentClass,
+  createElement,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+  useState,
 } from 'react'
 import Card from 'react-bootstrap/Card'
 import Nav from 'react-bootstrap/Nav'
 import Stack from 'react-bootstrap/Stack'
 import {
-  Ear,
-  Pencil,
   ChatLeftDots,
-  EarFill,
-  PencilFill,
   ChatLeftDotsFill,
+  Ear,
+  EarFill,
+  Pencil,
+  PencilFill,
 } from 'react-bootstrap-icons'
 import {
   ActivePane,
   Inflection,
   Keyword,
-  PartOfSpeech,
   PhoneticInfo,
   WordUse,
 } from '../types'
@@ -60,7 +60,7 @@ const NavIcon = ({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {React.createElement(icon, {
+      {createElement(icon, {
         color: active ? 'white' : hovered ? hoverColor : passiveColor,
       })}
       <div
@@ -144,31 +144,25 @@ const KeywordRow = ({
   </Card.Title>
 )
 
-const isActivePaneType = (string: string): string is ActivePane =>
-  string === 'meaning' || string === 'pronunciation' || string === 'inflection'
-
 const TabNavigation = ({
   activePane,
-  setActivePane,
   mainKeyword,
   inflection,
+  setActivePane,
   useList,
 }: {
   activePane: ActivePane
-  setActivePane: Dispatch<SetStateAction<ActivePane>>
   mainKeyword: Keyword
   inflection: Inflection
+  setActivePane: Dispatch<SetStateAction<ActivePane>>
   useList: WordUse[]
 }) => (
   <Nav
-    defaultActiveKey='meaning'
+    defaultActiveKey={activePane}
     fill
     justify
     id='tabs'
-    onSelect={selectedKey => {
-      if (selectedKey && isActivePaneType(selectedKey))
-        setActivePane(selectedKey)
-    }}
+    onSelect={selectedKey => setActivePane(selectedKey as ActivePane)}
   >
     <NavIcon
       eventKey='meaning'
@@ -178,7 +172,6 @@ const TabNavigation = ({
       notActiveTitle={`${useList.length} definíció`}
       {...{ activePane }}
     />
-
     <NavIcon
       eventKey='pronunciation'
       passiveIcon={Ear}

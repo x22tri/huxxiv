@@ -23,7 +23,7 @@ const PronunciationPane = ({
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
 
-  if (!pron) throw new Error('A szó kiejtése nem található.')
+  if (!pron) return null
   else {
     const variants = pron
       .map(c => {
