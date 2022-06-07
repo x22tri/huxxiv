@@ -2,16 +2,11 @@ import { useState, useEffect, Dispatch, SetStateAction } from 'react'
 import { DataOptions } from '../types'
 import { getPronunciation } from './getPronunciation'
 
-// 1. a - ɒ > ɑ
-// 2. o -  o > ɔ
-// 3. á - a: > æ(ː)
-// 4. o - ɔ > ɒ
-// 5. a - ɑ > ä
-
 const useChangeYearOnScroll = () => {
   const startYear = 2000
   const [year, setYear] = useState(startYear + Math.floor(window.scrollY / 10))
 
+  // To-Do: add debounce
   useEffect(() => {
     const handleScroll = () => {
       setYear(startYear + Math.floor(window.scrollY / 10))
@@ -34,21 +29,14 @@ const useUpdateCharBasedOnYear = (
 
   useEffect(() => {
     setWordState(
-      initialState.map(element => {
-        if (!('word' in element)) return element
-        else {
-          // Add pronunciation based on word.
-          const [phonemic, concurrentPronunciations, activeSoundChanges] =
-            getPronunciation(element, year)
-
-          return {
-            ...element,
-            ...{
-              ...{ phonemic, concurrentPronunciations, activeSoundChanges },
-            },
-          }
-        }
-      })
+      initialState.map(element =>
+        'word' in element
+          ? {
+              ...element,
+              concurrentPronunciations: getPronunciation(element, year),
+            }
+          : element
+      )
     )
   }, [year, initialState, setWordState])
 

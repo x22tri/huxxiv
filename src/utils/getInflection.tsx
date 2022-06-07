@@ -1,7 +1,7 @@
 import INFLECTION_CHANGES from '../database/INFLECTION_CHANGES'
 import { CaseNameWithNumber, Declension, Inflection } from '../types'
 import { handleAppear, notOutOfBounds } from './appearance-utils'
-import { convertKeywordToLetters } from './getPronunciation'
+import { convertWordToLetters } from './getPronunciation'
 
 // A list of vowels used in suffixes. Destructured as [a, aa, o, oo, u].
 const linkingVowelDictionary = {
@@ -23,7 +23,7 @@ const getBaseInflection = (
 
   let stem2Base = mainKeyword
 
-  const letters = convertKeywordToLetters(mainKeyword)
+  const letters = convertWordToLetters(mainKeyword)
   if (!letters) throw new Error('A szót nem lehetett betűire bontani.')
 
   // Finds the vowel to elide or change in vowel elision / shortening stems.

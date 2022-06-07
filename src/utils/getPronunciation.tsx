@@ -1,46 +1,68 @@
 import { Keyword, PhoneticInfo, SoundChange } from '../types'
-
 import { SOUND_CHANGES, CATEGORIES } from '../database/SOUND_CHANGES'
-import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
+import PHONEMES from '../database/PHONEMES'
 import { handleAppear } from './appearance-utils'
 
-const convertKeywordToLetters = (keyword: string): string[] | null =>
-  // Sort letters by length (longest to shortest) to find trigraphs before digraphs before monographs.
-  keyword.match(
-    new RegExp([...GRAPH_TO_PHONEME.keys()].sort().reverse().join('|'), 'gi')
-  )
+// Sort letters by length (longest to shortest) to find trigraphs before digraphs before monographs.
+const convertWordToLetters = (word: string): string[] | null =>
+  word.match(new RegExp([...PHONEMES.keys()].sort().reverse().join('|'), 'gi'))
 
-const convertKeywordToPhonemes = (keyword: string): string[] =>
-  convertKeywordToLetters(keyword)?.map(
-    letter => GRAPH_TO_PHONEME.get(letter) || ''
-  ) || []
+const convertWordToPhonemes = (word: string): string[] =>
+  convertWordToLetters(word)?.map(letter => PHONEMES.get(letter) || '') || []
 
-const getPronunciation = (
-  wordObject: Keyword,
-  currentYear: number
-): [string[], PhoneticInfo[], SoundChange[]] => {
-  const phonemic: string[] =
-    wordObject.phonemic || convertKeywordToPhonemes(wordObject.word)
+// Does roughly the same as convertWordToLetters, but is used for strings of phonemes.
+const splitPhonemes = (str: string): string[] | null =>
+  str.match(new RegExp([...PHONEMES.values()].sort().reverse().join('|'), 'gi'))
 
-  const concurrentPronunciations: PhoneticInfo[] = JSON.parse(
-    JSON.stringify(phonemic.map(elem => ({ main: elem, variants: [] })))
-  )
+const getPronunciation = (wordObject: Keyword, year: number) => {
+  const phonemic = wordObject.phonemic || convertWordToPhonemes(wordObject.word)
 
-  const activeSoundChanges: SoundChange[] = []
+  const concurrentPronunciations: PhoneticInfo[] = phonemic.map(elem => ({
+    main: elem,
+    variants: [],
+  }))
+
+  // k a ptS o S
+  // k a tS: o S
+
+  // ar r a
+  // a: r a - merge phonemes
 
   for (let rule of SOUND_CHANGES) {
-    //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
     const [target, change, environment, exception, els] = rule.change.split('/')
+    let splitRule = splitPhonemes(target) || []
+    if (!splitRule?.length) continue
+    console.log(splitRule)
 
     for (let phoneme of concurrentPronunciations) {
-      // If target is a category, check if the current phoneme is in that category.
-      // If target is a regular phoneme, check if the current phoneme is that phoneme.
-      let found = Object.keys(CATEGORIES).includes(target)
-        ? !!CATEGORIES[target as keyof typeof CATEGORIES].includes(phoneme.main)
-        : !!(target === phoneme.main)
+      //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
+
+      let found
+      if (splitRule.length === 1) {
+        // If target is a category, check if the current phoneme is in that category.
+        // If target is a regular phoneme, check if the current phoneme is that phoneme.
+        found = Object.keys(CATEGORIES).includes(target)
+          ? !!CATEGORIES[target as keyof typeof CATEGORIES].includes(
+              phoneme.main
+            )
+          : !!(target === phoneme.main)
+      }
+
+      // if (splitRule.length > 1) {
+      //   let groupFound = true
+      //   for (let i = 0; i < splitRule.length; i++) {
+      //     let x = Object.keys(CATEGORIES).includes(splitRule[i])
+      //       ? !!CATEGORIES[splitRule[i] as keyof typeof CATEGORIES].includes(
+      //           phoneme.main
+      //         )
+      //       : !!(splitRule[i] === phoneme.main)
+      //     console.log(x + ': ' + splitRule[i] + '(' + phoneme.main + ')')
+
+      //   }
+      // }
 
       if (found) {
-        switch (handleAppear(rule, currentYear)) {
+        switch (handleAppear(rule, year)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
             phoneme.variants.push({
@@ -50,18 +72,10 @@ const getPronunciation = (
               disappears: rule.disappears,
               note: rule.note,
             })
-            if (!activeSoundChanges.includes(rule)) {
-              activeSoundChanges.push(rule)
-            }
             break
-
           case 'gonePast':
             phoneme.main = change
-            if (activeSoundChanges.includes(rule)) {
-              activeSoundChanges.splice(activeSoundChanges.indexOf(rule))
-            }
             break
-
           case 'disappearanceInProgress':
             phoneme.variants.push({
               id: rule.id,
@@ -71,16 +85,13 @@ const getPronunciation = (
               note: rule.note,
             })
             phoneme.main = change
-            if (activeSoundChanges.includes(rule)) {
-              activeSoundChanges.push(rule)
-            }
             break
         }
       }
     }
   }
 
-  return [phonemic, concurrentPronunciations, activeSoundChanges]
+  return concurrentPronunciations
 }
 
 const getMainPronunciation = (concurrentPronunciations: PhoneticInfo[]) =>
@@ -92,7 +103,7 @@ const getNumberOfVariants = (concurrentPronunciations: PhoneticInfo[]) =>
   concurrentPronunciations.filter(elem => elem.variants.length).length
 
 export {
-  convertKeywordToLetters,
+  convertWordToLetters,
   getPronunciation,
   getMainPronunciation,
   getNumberOfVariants,
