@@ -42,9 +42,16 @@ const SOUND_CHANGES: SoundChange[] = [
   },
   {
     id: 6,
-    change: 'V/e',
-    appears: [2100, 2125],
-    disappears: [2160, 2260],
+    change: 'pt͡ʃ/t͡ʃː',
+    appears: [2060, 2085],
+    disappears: [2080, 2130],
+    // note: 'Az *a* betűvel jelölt hang képzése előrébb kerül, hogy elkülönüljön az *o* betűvel jelölt hangtól, amely az [ɒ] felé tolódik.',
+  },
+  {
+    id: 7,
+    change: 'k/g/#_',
+    appears: [2060, 2085],
+    disappears: [2080, 2130],
     // note: 'Az *a* betűvel jelölt hang képzése előrébb kerül, hogy elkülönüljön az *o* betűvel jelölt hangtól, amely az [ɒ] felé tolódik.',
   },
 ]

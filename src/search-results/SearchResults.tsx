@@ -29,12 +29,13 @@ const SearchResults = ({
   setWordState: Dispatch<SetStateAction<DataOptions[]>>
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
-  const [cardHeight, setCardHeight] = useState<number>(0)
 
   // The core of HUXXIV's business logic, a hook that updates the card on scroll.
   let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.
+  const [cardHeight, setCardHeight] = useState<number>(0)
+
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node) setCardHeight(node.getBoundingClientRect().height)
   }, [])
@@ -68,7 +69,7 @@ const SearchResults = ({
       </p>
       <YearsBG {...{ cardHeight }} />
       <Row id='fixed-row'>
-        <Card id='search-results-card' className='px-0'>
+        <Card id='search-results-card' className='px-0' ref={measuredRef}>
           <Card.Header className='p-0' id='search-results-card-header'>
             <KeywordRow {...{ mainKeyword, preventFlashOnMount, year }} />
             <hr />
@@ -85,15 +86,7 @@ const SearchResults = ({
           {/* The following is essentially a switch statement that renders the right component based on activePane. */}
           {
             {
-              meaning: (
-                <MeaningPane
-                  {...{
-                    measuredRef,
-                    useList,
-                    year,
-                  }}
-                />
-              ),
+              meaning: <MeaningPane {...{ useList, year }} />,
               pronunciation: (
                 <PronunciationPane
                   pron={mainKeyword.concurrentPronunciations}

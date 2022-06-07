@@ -6,11 +6,9 @@ import { calculateOpacity } from '../utils/appearance-utils'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 
 const MeaningPane = ({
-  measuredRef,
   useList,
   year,
 }: {
-  measuredRef: (node: HTMLDivElement | null) => void
   useList: WordUse[]
   year: number
 }) => {
@@ -18,7 +16,7 @@ const MeaningPane = ({
 
   // The main return on the MeaningPane component.
   return (
-    <div ref={measuredRef} id='word-overview-card'>
+    <>
       <Card.Body className='p-0'>
         <ListGroup as='ol' variant='flush' numbered>
           {useList.map(wordObject => (
@@ -57,7 +55,7 @@ const MeaningPane = ({
           ))}
         </ListGroup>
       </Card.Body>
-    </div>
+    </>
   )
 }
 

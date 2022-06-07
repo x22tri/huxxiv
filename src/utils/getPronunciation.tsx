@@ -40,6 +40,8 @@ const getPronunciation = (
   const activeSoundChanges: SoundChange[] = []
 
   for (let rule of SOUND_CHANGES) {
+    //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
+
     for (let phoneme of concurrentPronunciations) {
       const [target, change, environment, exception, elseChange] =
         rule.change.split('/')

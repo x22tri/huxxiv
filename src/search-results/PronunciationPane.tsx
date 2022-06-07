@@ -50,7 +50,7 @@ const PronunciationPane = ({
       .filter(e => !!e)
 
     return (
-      <div>
+      <>
         <Card.Title as='h6' className='px-3 pt-3'>
           {`${
             !!getNumberOfVariants(pron) ? 'Elsődleges kiejtése' : 'Kiejtése'
@@ -85,7 +85,7 @@ const PronunciationPane = ({
             </ListGroup>
           </Card.Body>
         )}
-      </div>
+      </>
     )
   }
 }
