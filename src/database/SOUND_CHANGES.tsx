@@ -1,5 +1,9 @@
 import { SoundChange } from '../types'
 
+const CATEGORIES = {
+  V: ['a', 'o', 'ɔ', 'ɒ', 'ɑ', 'ä'], // vowels
+}
+
 const SOUND_CHANGES: SoundChange[] = [
   {
     id: 1,
@@ -36,6 +40,13 @@ const SOUND_CHANGES: SoundChange[] = [
     disappears: [2080, 2130],
     note: 'Az *a* betűvel jelölt hang képzése előrébb kerül, hogy elkülönüljön az *o* betűvel jelölt hangtól, amely az [ɒ] felé tolódik.',
   },
+  {
+    id: 6,
+    change: 'V/e',
+    appears: [2100, 2125],
+    disappears: [2160, 2260],
+    // note: 'Az *a* betűvel jelölt hang képzése előrébb kerül, hogy elkülönüljön az *o* betűvel jelölt hangtól, amely az [ɒ] felé tolódik.',
+  },
 ]
 
-export { SOUND_CHANGES }
+export { SOUND_CHANGES, CATEGORIES }

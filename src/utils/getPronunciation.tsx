@@ -1,6 +1,6 @@
 import { Keyword, PhoneticInfo, SoundChange } from '../types'
 
-import { SOUND_CHANGES } from '../database/SOUND_CHANGES'
+import { SOUND_CHANGES, CATEGORIES } from '../database/SOUND_CHANGES'
 import GRAPH_TO_PHONEME from '../database/GRAPH_TO_PHONEME'
 import { handleAppear } from './appearance-utils'
 
@@ -41,12 +41,19 @@ const getPronunciation = (
 
   for (let rule of SOUND_CHANGES) {
     for (let phoneme of concurrentPronunciations) {
-      let [target, change] = rule.change.split('/')
-      if (target === phoneme.main && change) {
+      const [target, change, environment, exception, elseChange] =
+        rule.change.split('/')
+
+      // If target is a category, check if the current phoneme is in that category.
+      // If target is a regular phoneme, check if the current phoneme is that phoneme.
+      let found = Object.keys(CATEGORIES).includes(target)
+        ? !!CATEGORIES[target as keyof typeof CATEGORIES].includes(phoneme.main)
+        : !!(target === phoneme.main)
+
+      if (found) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
-            phoneme.main = target
             phoneme.variants.push({
               id: rule.id,
               new: change,
@@ -58,21 +65,23 @@ const getPronunciation = (
               activeSoundChanges.push(rule)
             }
             break
+
           case 'gonePast':
             phoneme.main = change
             if (activeSoundChanges.includes(rule)) {
               activeSoundChanges.splice(activeSoundChanges.indexOf(rule))
             }
             break
+
           case 'disappearanceInProgress':
-            phoneme.main = change
             phoneme.variants.push({
               id: rule.id,
-              old: target,
+              old: phoneme.main,
               appears: rule.appears,
               disappears: rule.disappears,
               note: rule.note,
             })
+            phoneme.main = change
             if (activeSoundChanges.includes(rule)) {
               activeSoundChanges.push(rule)
             }
