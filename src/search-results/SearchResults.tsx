@@ -35,7 +35,6 @@ const SearchResults = ({
 
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.
   const [cardHeight, setCardHeight] = useState<number>(0)
-
   const measuredRef = useCallback((node: HTMLDivElement | null) => {
     if (node) setCardHeight(node.getBoundingClientRect().height)
   }, [])

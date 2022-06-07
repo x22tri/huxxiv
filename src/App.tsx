@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
-import { CHARS } from './database/CHARS'
+import { WORDS } from './database/WORDS'
 import { ActivePane, DataOptions, ErrorMessage } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
@@ -24,17 +24,13 @@ const WordSearcher = ({
   setSearchResult: Dispatch<
     SetStateAction<DataOptions[] | ErrorMessage | undefined>
   >
-  setInitialState: Dispatch<
-    SetStateAction<DataOptions[] | ErrorMessage | undefined>
-  >
+  setInitialState: Dispatch<SetStateAction<DataOptions[] | undefined>>
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
-    let foundWord = CHARS.find(el =>
-      el.data.find(d => 'word' in d && d.word === word)
-    )?.data
-    setSearchResult(foundWord ?? 'A szó nem található az adatbázisban.')
-    if (foundWord) setInitialState(foundWord)
+    let w = WORDS.find(el => el.data.find(d => 'word' in d && d.word === word))
+    setSearchResult(w?.data ?? 'A szó nem található az adatbázisban.')
+    setInitialState(w?.data ?? undefined)
   }
 
   return (
@@ -69,11 +65,6 @@ const WordSearcher = ({
   )
 }
 
-const isErrorMessage = (
-  searchResult: DataOptions[] | ErrorMessage
-): searchResult is ErrorMessage =>
-  !!(typeof (searchResult as ErrorMessage) === 'string')
-
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResult, setSearchResult] = useState<
@@ -84,14 +75,11 @@ const App = () => {
   const [activePane, setActivePane] = useState<ActivePane>('meaning')
 
   // This state provides an immutable starting point for all phonetic etc. processes.
-  const [initialState, setInitialState] = useState<
-    string | DataOptions[] | undefined
-  >()
+  const [initialState, setInitialState] = useState<DataOptions[] | undefined>()
 
   return (
     <div className='App'>
-      {/* Show main page before user looks up a word. */}
-      {!searchResult ? (
+      {!searchResult ? ( // Show main page before user looks up a word.
         <Container
           fluid
           className='d-flex flex-column align-items-center p-2'
@@ -124,10 +112,10 @@ const App = () => {
               />
             }
           />
-          {isErrorMessage(searchResult) ? (
+          {typeof searchResult === 'string' ? ( // Show error.
             <div className='error-field d-flex my-auto'>{searchResult}</div>
           ) : (
-            <SearchResults
+            <SearchResults // Show search result card.
               key={JSON.stringify(searchResult)}
               wordState={searchResult}
               setWordState={

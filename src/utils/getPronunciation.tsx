@@ -7,24 +7,13 @@ import { handleAppear } from './appearance-utils'
 const convertKeywordToLetters = (keyword: string): string[] | null =>
   // Sort letters by length (longest to shortest) to find trigraphs before digraphs before monographs.
   keyword.match(
-    new RegExp(
-      GRAPH_TO_PHONEME.map(i => i.letter)
-        .sort()
-        .reverse()
-        .join('|'),
-      'gi'
-    )
+    new RegExp([...GRAPH_TO_PHONEME.keys()].sort().reverse().join('|'), 'gi')
   )
 
-const convertKeywordToPhonemes = (keyword: string): string[] => {
-  let phonemicResult: string[] = []
-  convertKeywordToLetters(keyword)?.forEach(letter => {
-    const phonemeObject = GRAPH_TO_PHONEME.find(i => i.letter === letter)
-    if (phonemeObject) phonemicResult.push(phonemeObject.phoneme)
-  })
-
-  return phonemicResult
-}
+const convertKeywordToPhonemes = (keyword: string): string[] =>
+  convertKeywordToLetters(keyword)?.map(
+    letter => GRAPH_TO_PHONEME.get(letter) || ''
+  ) || []
 
 const getPronunciation = (
   wordObject: Keyword,
@@ -41,11 +30,9 @@ const getPronunciation = (
 
   for (let rule of SOUND_CHANGES) {
     //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
+    const [target, change, environment, exception, els] = rule.change.split('/')
 
     for (let phoneme of concurrentPronunciations) {
-      const [target, change, environment, exception, elseChange] =
-        rule.change.split('/')
-
       // If target is a category, check if the current phoneme is in that category.
       // If target is a regular phoneme, check if the current phoneme is that phoneme.
       let found = Object.keys(CATEGORIES).includes(target)
