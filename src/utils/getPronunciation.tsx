@@ -41,14 +41,15 @@ const getPronunciation = (
 
   for (let rule of SOUND_CHANGES) {
     for (let phoneme of concurrentPronunciations) {
-      if (rule.target === phoneme.main && rule.change) {
+      let [target, change] = rule.change.split('/')
+      if (target === phoneme.main && change) {
         switch (handleAppear(rule, currentYear)) {
           case 'appearanceInProgress':
           case 'concurrentVariants':
-            phoneme.main = rule.target
+            phoneme.main = target
             phoneme.variants.push({
               id: rule.id,
-              new: rule.change,
+              new: change,
               appears: rule.appears,
               disappears: rule.disappears,
               note: rule.note,
@@ -58,16 +59,16 @@ const getPronunciation = (
             }
             break
           case 'gonePast':
-            phoneme.main = rule.change
+            phoneme.main = change
             if (activeSoundChanges.includes(rule)) {
               activeSoundChanges.splice(activeSoundChanges.indexOf(rule))
             }
             break
           case 'disappearanceInProgress':
-            phoneme.main = rule.change
+            phoneme.main = change
             phoneme.variants.push({
               id: rule.id,
-              old: rule.target,
+              old: target,
               appears: rule.appears,
               disappears: rule.disappears,
               note: rule.note,

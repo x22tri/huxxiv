@@ -80,7 +80,7 @@ const App = () => {
     DataOptions[] | ErrorMessage | undefined
   >()
 
-  // The active pane needed to be lifted up here so it stays constant between rerenders.
+  // The active pane state needed to be lifted up here so it stays constant between rerenders.
   const [activePane, setActivePane] = useState<ActivePane>('meaning')
 
   // This state provides an immutable starting point for all phonetic etc. processes.
@@ -90,6 +90,7 @@ const App = () => {
 
   return (
     <div className='App'>
+      {/* Show main page before user looks up a word. */}
       {!searchResult ? (
         <Container
           fluid
@@ -108,6 +109,7 @@ const App = () => {
           />
         </Container>
       ) : (
+        // Show navbar on top and word card / error below after user has looked up a word.
         <>
           <AppNavbar
             wordSearcher={

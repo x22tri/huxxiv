@@ -26,7 +26,6 @@ interface Inflection extends Changeable {
   classes?: (PartOfSpeech | VowelHarmony | InflectionType)[]
   partOfSpeech: PartOfSpeech
   vowelHarmony: VowelHarmony
-  //inflectionType?: InflectionType
 }
 
 interface InflectionChange extends Changeable {
@@ -51,8 +50,11 @@ interface PhoneticInfo {
 
 interface SoundChange extends Changeable {
   id: number
-  target: string
-  change?: string
+  change:
+    | `${SoundChangeTarget}/${SoundChangeChangeTo}`
+    | `${SoundChangeTarget}/${SoundChangeChangeTo}/${SoundChangeEnvironment}`
+    | `${SoundChangeTarget}/${SoundChangeChangeTo}/${SoundChangeEnvironment}/${SoundChangeException}`
+    | `${SoundChangeTarget}/${SoundChangeChangeTo}/${SoundChangeEnvironment}/${SoundChangeException}/${SoundChangeElse}`
   note?: string
 }
 
@@ -78,6 +80,11 @@ type Declension = {
 type ErrorMessage = string
 type InflectionType = 'nyitótő' | 'hangkivető' | 'rövidülő'
 type PartOfSpeech = 'főnév' | 'ige' | 'melléknév' | 'névutó' | 'határozószó'
+type SoundChangeTarget = string
+type SoundChangeChangeTo = string
+type SoundChangeEnvironment = string
+type SoundChangeException = string
+type SoundChangeElse = string
 type VowelHarmony = 'o' | 'e' | 'ö'
 
 export type {
