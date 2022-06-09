@@ -62,7 +62,7 @@ const getBaseInflection = (
     acc_sg = [
       {
         form: `${accStem}t`,
-        disappears: [2070, 2120] as [number, number],
+        disappears: [2080, 2140] as [number, number],
       },
     ]
   } else {
@@ -73,7 +73,7 @@ const getBaseInflection = (
     ? [
         {
           form: `${speStem}n`,
-          disappears: [2080, 2120] as [number, number],
+          disappears: [2100, 2150] as [number, number],
         },
       ]
     : [{ form: `${speStem}n` }]

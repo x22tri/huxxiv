@@ -2,6 +2,7 @@ import { SoundChange } from '../types'
 
 const CATEGORIES = {
   V: ['a', 'o', 'ɔ', 'ɒ', 'ɑ', 'ä'], // vowels
+  P: ['p', 'b'],
 }
 
 const SOUND_CHANGES: SoundChange[] = [
@@ -42,22 +43,22 @@ const SOUND_CHANGES: SoundChange[] = [
   },
   {
     id: 6,
-    change: 'pt͡ʃ/t͡ʃː',
+    change: 'Pt͡ʃ/t͡ʃː',
     appears: [2060, 2085],
     disappears: [2080, 2130],
   },
-  {
-    id: 7,
-    change: 'k/g/#_',
-    appears: [2060, 2085],
-    disappears: [2080, 2130],
-  },
-  {
-    id: 8,
-    change: 'V/e',
-    appears: [2060, 2085],
-    disappears: [2080, 2130],
-  },
+  // {
+  //   id: 7,
+  //   change: 'k/g/#_',
+  //   appears: [2060, 2085],
+  //   disappears: [2080, 2130],
+  // },
+  // {
+  //   id: 8,
+  //   change: 'V/e',
+  //   appears: [2060, 2085],
+  //   disappears: [2080, 2130],
+  // },
 ]
 
 export { SOUND_CHANGES, CATEGORIES }

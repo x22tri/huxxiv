@@ -11,8 +11,13 @@ const convertWordToPhonemes = (word: string): string[] =>
   convertWordToLetters(word)?.map(letter => PHONEMES.get(letter) || '') || []
 
 // Does roughly the same as convertWordToLetters, but is used for strings of phonemes.
-const splitPhonemes = (str: string): string[] | null =>
-  str.match(new RegExp([...PHONEMES.values()].sort().reverse().join('|'), 'gi'))
+// const splitPhonemes = (str: string): string[] | null =>
+//   str.match(new RegExp([...PHONEMES.values()].sort().reverse().join('|'), 'gi'))
+
+const isMatch = (phonemeElement: string, symbol: string) =>
+  Object.keys(CATEGORIES).includes(symbol)
+    ? !!CATEGORIES[symbol as keyof typeof CATEGORIES].includes(phonemeElement)
+    : !!(symbol === phonemeElement)
 
 const getPronunciation = (wordObject: Keyword, year: number) => {
   const phonemic = wordObject.phonemic || convertWordToPhonemes(wordObject.word)
@@ -22,6 +27,9 @@ const getPronunciation = (wordObject: Keyword, year: number) => {
     variants: [],
   }))
 
+  // This is needed to break up affricates in IPA (with tie bars) that count as multiple characters.
+  let word = phonemic.join('').split('')
+
   // k a ptS o S
   // k a tS: o S
 
@@ -30,65 +38,101 @@ const getPronunciation = (wordObject: Keyword, year: number) => {
 
   for (let rule of SOUND_CHANGES) {
     const [target, change, environment, exception, els] = rule.change.split('/')
-    let splitRule = splitPhonemes(target) || []
-    if (!splitRule?.length) continue
-    console.log(splitRule)
+    // console.log(target)
+    // let splitRule = splitPhonemes(target) || []
+    // if (!splitRule?.length) continue
+    // console.log(splitRule)
+    // for (let ph of phonemic) {
+    // for (let phoneme of concurrentPronunciations) {
+    //   //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
+    //   console.log(phoneme)
 
-    for (let phoneme of concurrentPronunciations) {
-      //To-Do: check if target is multiple phonemes, if it is, split and check if found in phoneme array.
+    // let idx = 0
+    // while (idx < word.length) {
+    //   idx++
+    // }
 
-      let found
-      if (splitRule.length === 1) {
-        // If target is a category, check if the current phoneme is in that category.
-        // If target is a regular phoneme, check if the current phoneme is that phoneme.
-        found = Object.keys(CATEGORIES).includes(target)
-          ? !!CATEGORIES[target as keyof typeof CATEGORIES].includes(
-              phoneme.main
-            )
-          : !!(target === phoneme.main)
-      }
+    // console.log(target.split('').map(e => Object.keys(CATEGORIES).includes(e)))
+    // console.log(word.split(''))
 
-      // if (splitRule.length > 1) {
-      //   let groupFound = true
-      //   for (let i = 0; i < splitRule.length; i++) {
-      //     let x = Object.keys(CATEGORIES).includes(splitRule[i])
-      //       ? !!CATEGORIES[splitRule[i] as keyof typeof CATEGORIES].includes(
-      //           phoneme.main
-      //         )
-      //       : !!(splitRule[i] === phoneme.main)
-      //     console.log(x + ': ' + splitRule[i] + '(' + phoneme.main + ')')
-
-      //   }
-      // }
-
-      if (found) {
-        switch (handleAppear(rule, year)) {
-          case 'appearanceInProgress':
-          case 'concurrentVariants':
-            phoneme.variants.push({
-              id: rule.id,
-              new: change,
-              appears: rule.appears,
-              disappears: rule.disappears,
-              note: rule.note,
-            })
-            break
-          case 'gonePast':
-            phoneme.main = change
-            break
-          case 'disappearanceInProgress':
-            phoneme.variants.push({
-              id: rule.id,
-              old: phoneme.main,
-              appears: rule.appears,
-              disappears: rule.disappears,
-              note: rule.note,
-            })
-            phoneme.main = change
-            break
+    // console.log(target)
+    for (let [index, element] of word.entries()) {
+      // Finds the first character or category in the rule target.
+      if (isMatch(element, target[0])) {
+        let allMatch = true
+        let changedFrom = [element]
+        // Verifies multi-character matches.
+        for (let j = 1; j < target.split('').length; j++) {
+          !(word[index + j] && isMatch(word[index + j], target[j]))
+            ? (allMatch = false)
+            : changedFrom.push(word[index + j])
+        }
+        if (allMatch) {
+          let changedFromStr = changedFrom.join('')
+          word = word.join('').replaceAll(changedFromStr, change).split('')
+          console.log(changedFromStr + ', ' + change)
         }
       }
     }
+
+    // console.log(target)
+    // console.log(change)
+
+    // word = word.replaceAll(target, change)
+    // console.log(word)
+
+    // let found
+    // // if (splitRule.length === 1) {
+    // // If target is a category, check if the current phoneme is in that category.
+    // // If target is a regular phoneme, check if the current phoneme is that phoneme.
+    // found = Object.keys(CATEGORIES).includes(target)
+    //   ? !!CATEGORIES[target as keyof typeof CATEGORIES].includes(ph)
+    //   : !!(target === ph)
+    // // }
+
+    // console.log(found)
+
+    //   // if (splitRule.length > 1) {
+    //   //   let groupFound = true
+    //   //   for (let i = 0; i < splitRule.length; i++) {
+    //   //     let x = Object.keys(CATEGORIES).includes(splitRule[i])
+    //   //       ? !!CATEGORIES[splitRule[i] as keyof typeof CATEGORIES].includes(
+    //   //           phoneme.main
+    //   //         )
+    //   //       : !!(splitRule[i] === phoneme.main)
+    //   //     console.log(x + ': ' + splitRule[i] + '(' + phoneme.main + ')')
+
+    //   //   }
+    //   // }
+
+    //   if (found) {
+    //     switch (handleAppear(rule, year)) {
+    //       case 'appearanceInProgress':
+    //       case 'concurrentVariants':
+    //         phoneme.variants.push({
+    //           id: rule.id,
+    //           new: change,
+    //           appears: rule.appears,
+    //           disappears: rule.disappears,
+    //           note: rule.note,
+    //         })
+    //         break
+    //       case 'gonePast':
+    //         phoneme.main = change
+    //         break
+    //       case 'disappearanceInProgress':
+    //         phoneme.variants.push({
+    //           id: rule.id,
+    //           old: phoneme.main,
+    //           appears: rule.appears,
+    //           disappears: rule.disappears,
+    //           note: rule.note,
+    //         })
+    //         phoneme.main = change
+    //         break
+    //     }
+    //   }
+    // }
   }
 
   return concurrentPronunciations
