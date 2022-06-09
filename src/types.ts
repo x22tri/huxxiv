@@ -39,8 +39,8 @@ interface Keyword extends Changeable {
   word: string
   main?: boolean
   phonemic?: string[]
-  concurrentPronunciations?: PhoneticInfo[]
-  activeSoundChanges?: SoundChange[]
+  activeSoundChanges?: PronunciationChange[][]
+  mainPronunciation?: string
 }
 
 interface PhoneticInfo {
@@ -48,7 +48,12 @@ interface PhoneticInfo {
   variants: ConcurrentPronunciation[]
 }
 
-interface SoundChange extends Changeable {
+interface PronunciationChange extends Changeable {
+  sound: string
+  note?: string
+}
+
+interface SoundChangeRule extends Changeable {
   id: number
   change:
     | `${SoundChangeTarget}/${SoundChangeChangeTo}`
@@ -103,7 +108,8 @@ export type {
   Keyword,
   PartOfSpeech,
   PhoneticInfo,
-  SoundChange,
+  PronunciationChange,
+  SoundChangeRule,
   VowelHarmony,
   Word,
   WordUse,

@@ -61,6 +61,8 @@ const SearchResults = ({
     wordObject => 'partOfSpeech' in wordObject
   ) as Inflection
 
+  const { activeSoundChanges, mainPronunciation } = mainKeyword
+
   return (
     <Container fluid id='word-overview-container'>
       <p id='scroll-down-prompter'>
@@ -79,6 +81,7 @@ const SearchResults = ({
                 mainKeyword,
                 inflection,
                 useList,
+                year,
               }}
             />
           </Card.Header>
@@ -88,8 +91,7 @@ const SearchResults = ({
               meaning: <MeaningPane {...{ useList, year }} />,
               pronunciation: (
                 <PronunciationPane
-                  pron={mainKeyword.concurrentPronunciations}
-                  {...{ year }}
+                  {...{ activeSoundChanges, mainPronunciation, year }}
                 />
               ),
               inflection: (

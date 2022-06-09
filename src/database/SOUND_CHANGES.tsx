@@ -1,11 +1,11 @@
-import { SoundChange } from '../types'
+import { SoundChangeRule } from '../types'
 
 const CATEGORIES = {
   V: ['a', 'o', 'ɔ', 'ɒ', 'ɑ', 'ä'], // vowels
   P: ['p', 'b'],
 }
 
-const SOUND_CHANGES: SoundChange[] = [
+const SOUND_CHANGES: SoundChangeRule[] = [
   {
     id: 1,
     change: 'ɒ/ɑ',

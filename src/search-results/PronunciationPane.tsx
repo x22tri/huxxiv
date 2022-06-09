@@ -5,89 +5,73 @@ import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Row from 'react-bootstrap/Row'
 
-import ChangingPronunciation from './ChangingPronunciation'
-
-import {
-  getMainPronunciation,
-  getNumberOfVariants,
-} from '../utils/getPronunciation'
+import { getNumberOfVariants } from '../utils/getPronunciation'
 import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
-import { PhoneticInfo } from '../types'
+import { calculateOpacity } from '../utils/appearance-utils'
+import { PronunciationChange } from '../types'
 
 const PronunciationPane = ({
-  pron,
+  activeSoundChanges,
+  mainPronunciation,
   year,
 }: {
-  pron: PhoneticInfo[] | undefined
+  activeSoundChanges: PronunciationChange[][] | undefined
+  mainPronunciation: string | undefined
   year: number
 }) => {
   const preventFlashOnMount = useNoFlashOnMount()
 
-  if (!pron) return null
-  else {
-    const variants = pron
-      .map(c => {
-        let newProns = c.variants.filter(n => n.new)
-        let oldProns = c.variants.filter(o => o.old)
-
-        return !!(newProns.length || oldProns.length)
-          ? {
-              main: {
-                main: c.main,
-                disappears: newProns.find(n => n.disappears)?.disappears,
-                // "Main" doesn't need "appears" since a pronunciation only becomes "main" after a "new" pronunciation's "appear" cycle.
-              },
-              // Taking either "appears" or "disappears" out
-              // due to the line "dataObject.appears ?? dataObject.disappears" in calculateOpacity.
-              new: newProns.map(n => ({ ...n, disappears: undefined })),
-              old: oldProns.map(o => ({ ...o, appears: undefined })),
-              note:
-                newProns.find(n => n.note)?.note ||
-                oldProns.find(o => o.note)?.note,
-            }
-          : undefined
-      })
-      .filter(e => !!e)
-
-    return (
-      <>
-        <Card.Title as='h6' className='px-3 pt-3'>
-          {`${
-            !!getNumberOfVariants(pron) ? 'Elsődleges kiejtése' : 'Kiejtése'
-          } ebben a korszakban:`}
-        </Card.Title>
-        <Card.Subtitle className='px-3 pt-2 pb-3 fs-5 d-flex justify-content-center'>
-          {pron && `[${getMainPronunciation(pron)}]`}
-        </Card.Subtitle>
-        {!!getNumberOfVariants(pron) && (
-          <Card.Body className='px-3 pt-1'>
-            Változatok:
-            <ListGroup as='ul' variant='flush' className='ps-3'>
-              {variants.map((element, index) => (
+  return !mainPronunciation || !activeSoundChanges ? null : (
+    <>
+      <Card.Title as='h6' className='px-3 pt-3'>
+        {`${
+          !!getNumberOfVariants(activeSoundChanges, year)
+            ? 'Elsődleges kiejtése'
+            : 'Kiejtése'
+        } ebben a korszakban:`}
+      </Card.Title>
+      <Card.Subtitle className='px-3 pt-2 pb-3 fs-5 d-flex justify-content-center'>
+        {`[${mainPronunciation}]`}
+      </Card.Subtitle>
+      {!!getNumberOfVariants(activeSoundChanges, year) && (
+        <Card.Body className='px-3 pt-1'>
+          Változatok:
+          <ListGroup as='ul' variant='flush' className='ps-3'>
+            {activeSoundChanges.map((soundChange, index) =>
+              soundChange.length <= 1 ? null : (
                 <Flasher key={index} {...{ preventFlashOnMount }}>
                   <Row as='li' className='fs-5 flash py-1 ps-0'>
                     <Col xs={2} className=''>
-                      <ChangingPronunciation
-                        main={element?.main}
-                        newPron={element?.new}
-                        oldPron={element?.old}
-                        {...{ year }}
-                      />
+                      •&nbsp;
+                      {soundChange.map((c, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            color: `rgba(0, 0, 0, ${calculateOpacity(c, year)}`,
+                          }}
+                        >
+                          {i !== 0 && ' > '}
+                          {c.sound}
+                        </span>
+                      ))}
                     </Col>
                     <Col className='pt-2' style={{ fontSize: '70%' }}>
-                      {element?.note ? (
-                        <ReactMarkdown>{element.note}</ReactMarkdown>
-                      ) : null}
+                      <ReactMarkdown>
+                        {soundChange
+                          .slice()
+                          .reverse()
+                          .find(s => s.note)?.note || ''}
+                      </ReactMarkdown>
                     </Col>
                   </Row>
                 </Flasher>
-              ))}
-            </ListGroup>
-          </Card.Body>
-        )}
-      </>
-    )
-  }
+              )
+            )}
+          </ListGroup>
+        </Card.Body>
+      )}
+    </>
+  )
 }
 
 export default PronunciationPane

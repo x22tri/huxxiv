@@ -21,15 +21,12 @@ import {
   ActivePane,
   Inflection,
   Keyword,
-  PhoneticInfo,
+  PronunciationChange,
   WordUse,
 } from '../types'
 import { calculateOpacity } from '../utils/appearance-utils'
 import { Flasher } from '../utils/useNoFlashOnMount'
-import {
-  getMainPronunciation,
-  getNumberOfVariants,
-} from '../utils/getPronunciation'
+import { getNumberOfVariants } from '../utils/getPronunciation'
 
 import './SearchResults.css'
 
@@ -79,18 +76,23 @@ const NavIcon = ({
 }
 
 const PronunciationOverview = ({
-  pronunciations,
+  activeSoundChanges,
+  mainPronunciation,
+  year,
 }: {
-  pronunciations: PhoneticInfo[] | undefined
+  activeSoundChanges: PronunciationChange[][] | undefined
+  mainPronunciation: string | undefined
+  year: number
 }) =>
-  !!pronunciations ? (
+  !!mainPronunciation ? (
     <div>
-      <span>{`[${getMainPronunciation(pronunciations)}]`}</span>
-      {!!getNumberOfVariants(pronunciations) && (
-        <span id='number-of-variants'>
-          {`(+${getNumberOfVariants(pronunciations)})`}
-        </span>
-      )}
+      <span>[{mainPronunciation}]</span>
+      {!!activeSoundChanges?.length &&
+        !!getNumberOfVariants(activeSoundChanges, year) && (
+          <span id='number-of-variants'>
+            {`(+${getNumberOfVariants(activeSoundChanges, year)})`}
+          </span>
+        )}
     </div>
   ) : (
     <span />
@@ -150,12 +152,14 @@ const TabNavigation = ({
   inflection,
   setActivePane,
   useList,
+  year,
 }: {
   activePane: ActivePane
   mainKeyword: Keyword
   inflection: Inflection
   setActivePane: Dispatch<SetStateAction<ActivePane>>
   useList: WordUse[]
+  year: number
 }) => (
   <Nav
     defaultActiveKey={activePane}
@@ -179,7 +183,10 @@ const TabNavigation = ({
       activeTitle='KIEJTÉS'
       notActiveTitle={
         <PronunciationOverview
-          pronunciations={mainKeyword.concurrentPronunciations}
+          activeSoundChanges={mainKeyword.activeSoundChanges}
+          mainPronunciation={mainKeyword.mainPronunciation}
+          {...{ year }}
+          // pronunciations={mainKeyword.concurrentPronunciations}
         />
       }
       {...{ activePane }}
