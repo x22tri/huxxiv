@@ -1,5 +1,5 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react'
-import { DataOptions, PronunciationChange } from '../types'
+import { Word } from '../types'
 import { getPronunciation } from './getPronunciation'
 
 const useChangeYearOnScroll = () => {
@@ -22,29 +22,26 @@ const useChangeYearOnScroll = () => {
 }
 
 const useUpdateCharBasedOnYear = (
-  initialState: DataOptions[],
-  setWordState: Dispatch<SetStateAction<DataOptions[]>>
+  initialState: Word,
+  wordState: Word,
+  setWordState: Dispatch<SetStateAction<Word>>
 ): number => {
   let year = useChangeYearOnScroll()
+  const [activeSoundChanges, mainPronunciation] = getPronunciation(
+    initialState,
+    year
+  )
 
   useEffect(() => {
-    setWordState(
-      initialState.map(element => {
-        if ('word' in element) {
-          const [activeSoundChanges, mainPronunciation] = getPronunciation(
-            element,
-            year
-          ) as [PronunciationChange[][], string]
-
-          // console.log(activeSoundChanges)
-          return {
-            ...element,
-            ...{ activeSoundChanges, mainPronunciation },
-          }
-        } else return element
-      })
-    )
-  }, [year, initialState, setWordState])
+    setWordState({ ...wordState, activeSoundChanges, mainPronunciation })
+  }, [
+    year,
+    initialState,
+    setWordState,
+    activeSoundChanges,
+    mainPronunciation,
+    wordState,
+  ])
 
   return year
 }

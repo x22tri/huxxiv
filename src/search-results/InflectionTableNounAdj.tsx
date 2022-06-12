@@ -1,5 +1,11 @@
 import getInflection, { Declension } from '../utils/getInflection'
-import { CaseName, GrammaticalCaseForm, Inflection, Keyword } from '../types'
+import {
+  CaseName,
+  GrammaticalCaseForm,
+  InflectionType,
+  PartOfSpeech,
+  VowelHarmony,
+} from '../types'
 import { CASE_NAMES, MISC_NAMES } from '../database/CASE_NAMES'
 import { calculateOpacity } from '../utils/appearance-utils'
 import './InflectionTableNounAdj.css'
@@ -78,15 +84,27 @@ const CaseDisplay = ({
 }
 
 const InflectionTableNounAdj = ({
-  inflection,
-  mainKeyword,
+  // inflection,
+  partOfSpeech,
+  vowelHarmony,
+  classes,
+  word,
   year,
 }: {
-  inflection: Inflection
-  mainKeyword: Keyword
+  // inflection: Inflection
+  partOfSpeech: PartOfSpeech
+  vowelHarmony: VowelHarmony
+  classes: InflectionType[] | undefined
+  word: string
   year: number
 }) => {
-  const cases = getInflection(mainKeyword.word, inflection, year) as Declension
+  const cases = getInflection(
+    word,
+    partOfSpeech,
+    vowelHarmony,
+    classes,
+    year
+  ) as Declension
   return (
     <>
       <thead>

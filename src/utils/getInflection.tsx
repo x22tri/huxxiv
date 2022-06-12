@@ -1,5 +1,11 @@
 import INFLECTION_CHANGES from '../database/INFLECTION_CHANGES'
-import { CaseNameWithNumber, Declension, Inflection } from '../types'
+import {
+  CaseNameWithNumber,
+  Declension,
+  PartOfSpeech,
+  VowelHarmony,
+  InflectionType,
+} from '../types'
 import { handleAppear, notOutOfBounds } from './appearance-utils'
 import { convertWordToLetters } from './getPronunciation'
 
@@ -13,9 +19,11 @@ const linkingVowelDictionary = {
 // A function used to get the base inflection (in 2000) which the changes will build on.
 const getBaseInflection = (
   mainKeyword: string,
-  inflection: Inflection
+  partOfSpeech: PartOfSpeech,
+  vowelHarmony: VowelHarmony,
+  classes: InflectionType[] | undefined
 ): [Declension, string, string] => {
-  const { vowelHarmony, partOfSpeech, classes } = inflection
+  // const { vowelHarmony, partOfSpeech, classes } = inflection
   const lowStem = classes?.includes('nyitótő') || partOfSpeech === 'melléknév'
 
   const [a, aa, o, oo, u] = linkingVowelDictionary[vowelHarmony]
@@ -96,12 +104,16 @@ const getBaseInflection = (
 
 const getInflection = (
   mainKeyword: string,
-  inflection: Inflection,
+  partOfSpeech: PartOfSpeech,
+  vowelHarmony: VowelHarmony,
+  classes: InflectionType[] | undefined,
   year: number
 ): Declension => {
   let [cases, plStem, lowVowelSpeStem] = getBaseInflection(
     mainKeyword,
-    inflection
+    partOfSpeech,
+    vowelHarmony,
+    classes
   )
 
   // Makes disappearing elements in the base inflection disappear.
@@ -130,7 +142,12 @@ const getInflection = (
         // Don't run if the change has a class and it doesn't match the word's classes.
         if (
           change.classes &&
-          !change.classes?.some(c => inflection.classes?.includes(c))
+          !change.classes?.some(
+            c =>
+              classes?.includes(c as InflectionType) ||
+              c === vowelHarmony ||
+              c === partOfSpeech
+          )
         ) {
           break
         } else {

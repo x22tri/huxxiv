@@ -22,11 +22,11 @@ interface GrammaticalCaseForm extends Changeable {
   form: string
 }
 
-interface Inflection extends Changeable {
-  classes?: (PartOfSpeech | VowelHarmony | InflectionType)[]
-  partOfSpeech: PartOfSpeech
-  vowelHarmony: VowelHarmony
-}
+// interface Inflection extends Changeable {
+//   classes?: (PartOfSpeech | VowelHarmony | InflectionType)[]
+//   partOfSpeech: PartOfSpeech
+//   vowelHarmony: VowelHarmony
+// }
 
 interface InflectionChange extends Changeable {
   id: number
@@ -65,7 +65,14 @@ interface SoundChangeRule extends Changeable {
 
 interface Word {
   id: number
-  data: DataOptions[]
+  word: string
+  phonemic?: string[]
+  activeSoundChanges?: PronunciationChange[][]
+  mainPronunciation?: string
+  partOfSpeech: PartOfSpeech
+  vowelHarmony: VowelHarmony
+  classes?: InflectionType[]
+  meanings: WordUse[]
 }
 
 interface WordUse extends Changeable {
@@ -78,7 +85,7 @@ interface WordUse extends Changeable {
 type ActivePane = 'meaning' | 'pronunciation' | 'inflection'
 type CaseName = keyof typeof CASE_NAMES
 type CaseNameWithNumber = `${CaseName}_sg` | `${CaseName}_pl`
-type DataOptions = Keyword | Inflection | WordUse | PhoneticInfo[]
+// type DataOptions = Keyword | Inflection | WordUse | PhoneticInfo[]
 type Declension = {
   [K in CaseNameWithNumber]: GrammaticalCaseForm[]
 }
@@ -98,11 +105,11 @@ export type {
   CaseNameWithNumber,
   Changeable,
   ConcurrentPronunciation,
-  DataOptions,
+  // DataOptions,
   Declension,
   ErrorMessage,
   GrammaticalCaseForm,
-  Inflection,
+  // Inflection,
   InflectionChange,
   InflectionType,
   Keyword,

@@ -6,7 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import { Search } from 'react-bootstrap-icons'
 
 import { WORDS } from './database/WORDS'
-import { ActivePane, DataOptions, ErrorMessage } from './types'
+import { ActivePane, ErrorMessage, Word } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
 import logo from './assets/hun2500logo.png'
@@ -21,16 +21,14 @@ const WordSearcher = ({
 }: {
   searchTerm: string
   setSearchTerm: Dispatch<SetStateAction<string>>
-  setSearchResult: Dispatch<
-    SetStateAction<DataOptions[] | ErrorMessage | undefined>
-  >
-  setInitialState: Dispatch<SetStateAction<DataOptions[] | undefined>>
+  setSearchResult: Dispatch<SetStateAction<Word | ErrorMessage | undefined>>
+  setInitialState: Dispatch<SetStateAction<Word | undefined>>
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
-    let w = WORDS.find(el => el.data.find(d => 'word' in d && d.word === word))
-    setSearchResult(w?.data ?? 'A szó nem található az adatbázisban.')
-    setInitialState(w?.data ?? undefined)
+    let w = WORDS.find(el => el.word === word)
+    setSearchResult(w ?? 'A szó nem található az adatbázisban.')
+    setInitialState(w ?? undefined)
   }
 
   return (
@@ -68,14 +66,14 @@ const WordSearcher = ({
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResult, setSearchResult] = useState<
-    DataOptions[] | ErrorMessage | undefined
+    Word | ErrorMessage | undefined
   >()
 
   // The active pane state needed to be lifted up here so it stays constant between rerenders.
   const [activePane, setActivePane] = useState<ActivePane>('meaning')
 
   // This state provides an immutable starting point for all phonetic etc. processes.
-  const [initialState, setInitialState] = useState<DataOptions[] | undefined>()
+  const [initialState, setInitialState] = useState<Word | undefined>()
 
   return (
     <div className='App'>
@@ -118,10 +116,8 @@ const App = () => {
             <SearchResults // Show search result card.
               key={JSON.stringify(searchResult)}
               wordState={searchResult}
-              setWordState={
-                setSearchResult as Dispatch<SetStateAction<DataOptions[]>>
-              }
-              initialState={initialState as DataOptions[]}
+              setWordState={setSearchResult as Dispatch<SetStateAction<Word>>}
+              initialState={initialState as Word}
               {...{ activePane, setActivePane }}
             />
           )}

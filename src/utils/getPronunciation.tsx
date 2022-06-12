@@ -1,4 +1,4 @@
-import { Keyword, PronunciationChange } from '../types'
+import { PronunciationChange, Word } from '../types'
 import { SOUND_CHANGES, CATEGORIES } from '../database/SOUND_CHANGES'
 import PHONEMES from '../database/PHONEMES'
 import { handleAppear, notOutOfBounds } from './appearance-utils'
@@ -16,7 +16,10 @@ const isMatch = (phonemeElement: string, symbol: string) =>
     ? !!CATEGORIES[symbol as keyof typeof CATEGORIES].includes(phonemeElement)
     : !!(symbol === phonemeElement)
 
-const getPronunciation = (wordObject: Keyword, year: number) => {
+const getPronunciation = (
+  wordObject: Word,
+  year: number
+): [PronunciationChange[][], string] => {
   const phonemic = wordObject.phonemic || convertWordToPhonemes(wordObject.word)
   let word = phonemic.join('').split('') // Needed to break up affricates in IPA (with tie bars) that count as multiple characters.
   let rules: PronunciationChange[][] = []

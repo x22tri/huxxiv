@@ -3,9 +3,10 @@ import { Word } from '../types'
 const WORDS: Word[] = [
   {
     id: 1,
-    data: [
-      { word: 'kapcsos' },
-      { partOfSpeech: 'melléknév', vowelHarmony: 'o' },
+    word: 'kapcsos',
+    partOfSpeech: 'melléknév',
+    vowelHarmony: 'o',
+    meanings: [
       {
         meaning: 'Olyan <tárgy, eszköz>, amelyen kapocs van.',
         examples: ['kapcsos ruha', 'kapcsos pénztárca'],
@@ -24,14 +25,11 @@ const WORDS: Word[] = [
   },
   {
     id: 2,
-    data: [
-      { word: 'szamár' },
-      {
-        partOfSpeech: 'főnév',
-        vowelHarmony: 'o',
-        classes: ['rövidülő', 'nyitótő'],
-      },
-    ],
+    word: 'szamár',
+    partOfSpeech: 'főnév',
+    vowelHarmony: 'o',
+    classes: ['rövidülő', 'nyitótő'],
+    meanings: [],
   },
 ]
 

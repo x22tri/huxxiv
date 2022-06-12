@@ -1,27 +1,27 @@
-import { useNoFlashOnMount, Flasher } from '../utils/useNoFlashOnMount'
 import Table from 'react-bootstrap/Table'
 import InflectionTableNounAdj from './InflectionTableNounAdj'
-import { Inflection, Keyword } from '../types'
+import { InflectionType, PartOfSpeech, VowelHarmony } from '../types'
 
 const InflectionPane = ({
-  inflection,
-  mainKeyword,
+  partOfSpeech,
+  vowelHarmony,
+  classes,
+  word,
   year,
 }: {
-  inflection: Inflection
-  mainKeyword: Keyword
+  partOfSpeech: PartOfSpeech
+  vowelHarmony: VowelHarmony
+  classes: InflectionType[] | undefined
+  word: string
   year: number
-}) => {
-  const preventFlashOnMount = useNoFlashOnMount()
-
-  return (
-    <Table bordered responsive className='mb-0'>
-      {(inflection.partOfSpeech === 'melléknév' ||
-        inflection.partOfSpeech === 'főnév') && (
-        <InflectionTableNounAdj {...{ inflection, mainKeyword, year }} />
-      )}
-    </Table>
-  )
-}
+}) => (
+  <Table bordered responsive className='mb-0'>
+    {(partOfSpeech === 'melléknév' || partOfSpeech === 'főnév') && (
+      <InflectionTableNounAdj
+        {...{ partOfSpeech, vowelHarmony, classes, word, year }}
+      />
+    )}
+  </Table>
+)
 
 export default InflectionPane

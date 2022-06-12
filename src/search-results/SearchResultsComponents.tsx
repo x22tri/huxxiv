@@ -19,12 +19,10 @@ import {
 } from 'react-bootstrap-icons'
 import {
   ActivePane,
-  Inflection,
-  Keyword,
+  PartOfSpeech,
   PronunciationChange,
   WordUse,
 } from '../types'
-import { calculateOpacity } from '../utils/appearance-utils'
 import { Flasher } from '../utils/useNoFlashOnMount'
 import { getNumberOfVariants } from '../utils/getPronunciation'
 
@@ -99,10 +97,10 @@ const PronunciationOverview = ({
   )
 
 const PartOfSpeechOverview = ({
-  inflection,
+  partOfSpeech,
 }: {
-  inflection: Inflection | undefined
-}) => (inflection ? <span>{inflection.partOfSpeech}</span> : <span />)
+  partOfSpeech: PartOfSpeech | undefined
+}) => <span>{partOfSpeech || ''}</span>
 
 const YearsBG = ({ cardHeight }: { cardHeight: number | undefined }) =>
   !!cardHeight ? (
@@ -120,11 +118,11 @@ const YearsBG = ({ cardHeight }: { cardHeight: number | undefined }) =>
   ) : null
 
 const KeywordRow = ({
-  mainKeyword,
+  word,
   preventFlashOnMount,
   year,
 }: {
-  mainKeyword: Keyword
+  word: string
   preventFlashOnMount: number
   year: number
 }) => (
@@ -133,30 +131,27 @@ const KeywordRow = ({
     id='keyword'
     className='pt-2 pb-2 mb-0 fw-bold d-flex justify-content-center'
   >
-    <Flasher key={mainKeyword.word} {...{ preventFlashOnMount }}>
-      <span
-        className='flash'
-        style={{
-          color: `rgba(255, 255, 255, ${calculateOpacity(mainKeyword, year)}`,
-        }}
-      >
-        {mainKeyword.word}
-      </span>
+    <Flasher key={word} {...{ preventFlashOnMount }}>
+      <span className='flash text-white'>{word}</span>
     </Flasher>
   </Card.Title>
 )
 
 const TabNavigation = ({
   activePane,
-  mainKeyword,
-  inflection,
+  activeSoundChanges,
+  mainPronunciation,
+  word,
+  partOfSpeech,
   setActivePane,
   useList,
   year,
 }: {
   activePane: ActivePane
-  mainKeyword: Keyword
-  inflection: Inflection
+  activeSoundChanges: PronunciationChange[][] | undefined
+  mainPronunciation: string | undefined
+  word: string
+  partOfSpeech: PartOfSpeech
   setActivePane: Dispatch<SetStateAction<ActivePane>>
   useList: WordUse[]
   year: number
@@ -183,10 +178,10 @@ const TabNavigation = ({
       activeTitle='KIEJTÉS'
       notActiveTitle={
         <PronunciationOverview
-          activeSoundChanges={mainKeyword.activeSoundChanges}
-          mainPronunciation={mainKeyword.mainPronunciation}
+          activeSoundChanges={activeSoundChanges}
+          mainPronunciation={mainPronunciation}
           {...{ year }}
-          // pronunciations={mainKeyword.concurrentPronunciations}
+          // pronunciations={word.concurrentPronunciations}
         />
       }
       {...{ activePane }}
@@ -196,7 +191,7 @@ const TabNavigation = ({
       passiveIcon={Pencil}
       activeIcon={PencilFill}
       activeTitle='RAGOZÁS'
-      notActiveTitle={<PartOfSpeechOverview {...{ inflection }} />}
+      notActiveTitle={<PartOfSpeechOverview {...{ partOfSpeech }} />}
       {...{ activePane }}
     />
   </Nav>
