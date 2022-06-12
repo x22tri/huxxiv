@@ -23,25 +23,18 @@ const useChangeYearOnScroll = () => {
 
 const useUpdateCharBasedOnYear = (
   initialState: Word,
-  wordState: Word,
   setWordState: Dispatch<SetStateAction<Word>>
 ): number => {
   let year = useChangeYearOnScroll()
-  const [activeSoundChanges, mainPronunciation] = getPronunciation(
-    initialState,
-    year
-  )
 
   useEffect(() => {
-    setWordState({ ...wordState, activeSoundChanges, mainPronunciation })
-  }, [
-    year,
-    initialState,
-    setWordState,
-    activeSoundChanges,
-    mainPronunciation,
-    wordState,
-  ])
+    const [activeSoundChanges, mainPronunciation] = getPronunciation(
+      initialState,
+      year
+    )
+
+    setWordState({ ...initialState, activeSoundChanges, mainPronunciation })
+  }, [initialState, setWordState, year])
 
   return year
 }

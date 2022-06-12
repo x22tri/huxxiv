@@ -1,3 +1,5 @@
+/// <reference types="react-scripts" />
+
 import { useState, Dispatch, SetStateAction } from 'react'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
@@ -26,8 +28,8 @@ const WordSearcher = ({
   navbarView?: boolean
 }) => {
   const findWord = (word: string): void => {
-    let w = WORDS.find(el => el.word === word)
-    setSearchResult(w ?? 'A szó nem található az adatbázisban.')
+    let w = WORDS.find(entry => entry.word === word)
+    setSearchResult(w ?? `A ${word} szó nem található az adatbázisban.`)
     setInitialState(w ?? undefined)
   }
 
@@ -128,4 +130,4 @@ const App = () => {
 }
 
 export type { ErrorMessage }
-export default App
+export { App, SearchResults }

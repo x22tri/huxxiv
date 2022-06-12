@@ -41,7 +41,7 @@ const NavIcon = ({
   activeIcon: ComponentClass | FunctionComponent<any>
   activePane: string
   activeTitle: string
-  notActiveTitle: string | JSX.Element | JSX.Element[]
+  notActiveTitle: string | JSX.Element
 }) => {
   const active = !!(activePane === eventKey)
   const [hovered, setHovered] = useState(false)
@@ -120,11 +120,9 @@ const YearsBG = ({ cardHeight }: { cardHeight: number | undefined }) =>
 const KeywordRow = ({
   word,
   preventFlashOnMount,
-  year,
 }: {
   word: string
   preventFlashOnMount: number
-  year: number
 }) => (
   <Card.Title
     as='h3'
@@ -141,7 +139,6 @@ const TabNavigation = ({
   activePane,
   activeSoundChanges,
   mainPronunciation,
-  word,
   partOfSpeech,
   setActivePane,
   useList,
@@ -150,7 +147,6 @@ const TabNavigation = ({
   activePane: ActivePane
   activeSoundChanges: PronunciationChange[][] | undefined
   mainPronunciation: string | undefined
-  word: string
   partOfSpeech: PartOfSpeech
   setActivePane: Dispatch<SetStateAction<ActivePane>>
   useList: WordUse[]
@@ -178,10 +174,7 @@ const TabNavigation = ({
       activeTitle='KIEJTÉS'
       notActiveTitle={
         <PronunciationOverview
-          activeSoundChanges={activeSoundChanges}
-          mainPronunciation={mainPronunciation}
-          {...{ year }}
-          // pronunciations={word.concurrentPronunciations}
+          {...{ activeSoundChanges, mainPronunciation, year }}
         />
       }
       {...{ activePane }}

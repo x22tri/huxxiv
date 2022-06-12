@@ -31,7 +31,7 @@ const SearchResults = ({
   const preventFlashOnMount = useNoFlashOnMount()
 
   // The core of HUXXIV's business logic, a hook that updates the card on scroll.
-  let year = useUpdateCharBasedOnYear(initialState, wordState, setWordState)
+  let year = useUpdateCharBasedOnYear(initialState, setWordState)
 
   // This is used to make sure the first year, '2000', is displayed at the middle of the card.
   const [cardHeight, setCardHeight] = useState<number>(0)
@@ -43,10 +43,10 @@ const SearchResults = ({
 
   const {
     activeSoundChanges,
+    classes,
     mainPronunciation,
     partOfSpeech,
     vowelHarmony,
-    classes,
     word,
   } = wordState
 
