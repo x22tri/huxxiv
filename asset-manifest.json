@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/huxxiv/static/css/main.cf5b9772.css",
-    "main.js": "/huxxiv/static/js/main.0fc948b8.js",
+    "main.js": "/huxxiv/static/js/main.fa52dbe2.js",
     "static/media/hun2500logo.png": "/huxxiv/static/media/hun2500logo.6c192deb1d69bbfb37b9.png",
     "index.html": "/huxxiv/index.html",
     "main.cf5b9772.css.map": "/huxxiv/static/css/main.cf5b9772.css.map",
-    "main.0fc948b8.js.map": "/huxxiv/static/js/main.0fc948b8.js.map"
+    "main.fa52dbe2.js.map": "/huxxiv/static/js/main.fa52dbe2.js.map"
   },
   "entrypoints": [
     "static/css/main.cf5b9772.css",
-    "static/js/main.0fc948b8.js"
+    "static/js/main.fa52dbe2.js"
   ]
 }
