@@ -1,9 +1,9 @@
 import Container from 'react-bootstrap/Container'
 import Col from 'react-bootstrap/Col'
 import Navbar from 'react-bootstrap/Navbar'
-
-import logo from '../assets/hun2500logo.png'
 import './AppNavbar.css'
+
+const logo = require('../assets/hun2500logo.png')
 
 const AppNavbar = ({ wordSearcher }: { wordSearcher: JSX.Element }) => {
   return (

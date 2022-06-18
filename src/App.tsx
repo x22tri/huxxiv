@@ -1,5 +1,3 @@
-/// <reference types="react-scripts" />
-
 import { useState, Dispatch, SetStateAction } from 'react'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
@@ -11,8 +9,9 @@ import { WORDS } from './database/WORDS'
 import { ActivePane, ErrorMessage, Word } from './types'
 import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
-import logo from './assets/hun2500logo.png'
 import './App.css'
+
+const logo = require('./assets/hun2500logo.png')
 
 const WordSearcher = ({
   searchTerm,
