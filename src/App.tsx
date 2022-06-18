@@ -130,4 +130,4 @@ const App = () => {
 }
 
 export type { ErrorMessage }
-export { App, SearchResults }
+export default App

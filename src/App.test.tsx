@@ -1,9 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import '@testing-library/jest-dom'
-import { App, SearchResults } from './App'
+import App from './App'
 import userEvent from '@testing-library/user-event'
-import { Word } from './types'
 
 it('renders App with search bar', () => {
   const app = render(<App />)
