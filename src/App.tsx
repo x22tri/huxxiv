@@ -11,7 +11,9 @@ import SearchResults from './search-results/SearchResults'
 import AppNavbar from './navbar/AppNavbar'
 import './App.css'
 
-const logo = require('./assets/hun2500logo.png')
+// const logo = require('./assets/hun2500logo.png')
+// @ts-ignore
+import logo from './assets/hun2500logo.png'
 
 const WordSearcher = ({
   searchTerm,
